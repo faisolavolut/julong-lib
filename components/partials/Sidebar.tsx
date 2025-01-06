@@ -1,18 +1,13 @@
 "use client";
 import React, { FC } from "react";
-import Link from "next/link";
-import { Dropdown, Sidebar, TextInput, Tooltip } from "flowbite-react";
+import { Dropdown, Sidebar, Tooltip } from "flowbite-react";
 import { useEffect, useState } from "react";
-import { useSidebarContext } from "@/context/SidebarContext";
 import classNames from "classnames";
-import { HiAdjustments, HiChartPie, HiCog } from "react-icons/hi";
-import isSmallScreen from "@/lib/helpers/is-small-screen";
+import { HiAdjustments, HiCog } from "react-icons/hi";
 import { css } from "@emotion/css";
 import { FaAngleUp, FaChevronDown, FaChevronUp } from "react-icons/fa";
-import { Minimize } from "lucide-react";
 import { SidebarLinkBetter } from "../ui/link-better";
 import { detectCase } from "@/lib/utils/detectCase";
-import { Skeleton } from "../ui/Skeleton";
 import { useLocal } from "@/lib/utils/use-local";
 interface TreeMenuItem {
   title: string;
