@@ -17,8 +17,6 @@ export const PinterestLayout: React.FC<{
     });
     return columns;
   };
-  const layout_grid = new Array(col);
-  const columns = createColumns(data, col); // Membagi data ke dalam kolom
   const local = useLocal({
     data: [] as any[],
     ids: {
@@ -33,8 +31,6 @@ export const PinterestLayout: React.FC<{
       const targetColumn = index % col; // Menentukan kolom target berdasarkan indeks
       columns[targetColumn].push(item); // Memasukkan elemen ke kolom yang sesuai
     });
-
-    console.log("Columns:", columns); // Debugging
     local.data = columns;
     local.render();
   }, [data, col]);

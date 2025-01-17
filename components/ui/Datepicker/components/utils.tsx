@@ -14,6 +14,8 @@ interface Button {
   roundedFull?: boolean;
   padding?: string;
   active?: boolean;
+  style?: string;
+  className?: string;
 }
 
 export const DateIcon: React.FC<IconProps> = ({ className = "w-6 h-6" }) => {
@@ -205,27 +207,28 @@ export const RoundedButton: React.FC<Button> = ({
   onClick,
   disabled,
   roundedFull = false,
-  padding = "py-[0.55rem]",
+  padding = "",
   active = false,
+  style,
+  className = "rounded-full",
 }) => {
   // Contexts
   const { primaryColor } = useContext(DatepickerContext);
 
   // Functions
   const getClassName = useCallback(() => {
-    const darkClass =
-      "";
-    const activeClass = active
-      ? "font-semibold bg-gray-50 "
-      : "";
+    const darkClass = "";
+    const activeClass = active ? "font-semibold bg-gray-50 " : "";
     const defaultClass = !roundedFull
-      ? `w-full tracking-wide ${darkClass} ${activeClass} transition-all duration-300 ${padding} uppercase hover:bg-gray-100 rounded-md focus:ring-1`
-      : `${darkClass} ${activeClass} transition-all duration-300 hover:bg-gray-100 rounded-full p-[0.45rem] focus:ring-1`;
+      ? `w-full tracking-wide ${darkClass} ${activeClass} transition-all duration-300 ${
+          style === "custom" ? "px-2" : "uppercase p-[0.45rem] py-[0.55rem]"
+        } hover:bg-gray-100 focus:ring-1`
+      : `${darkClass} ${activeClass} transition-all duration-300 hover:bg-gray-100  focus:ring-1`;
     const buttonFocusColor =
       BUTTON_COLOR.focus[primaryColor as keyof typeof BUTTON_COLOR.focus];
     const disabledClass = disabled ? "line-through" : "";
 
-    return `${defaultClass} ${buttonFocusColor} ${disabledClass}`;
+    return `${defaultClass} ${buttonFocusColor} ${disabledClass} ${className}`;
   }, [disabled, padding, primaryColor, roundedFull, active]);
 
   return (

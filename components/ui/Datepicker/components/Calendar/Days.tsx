@@ -1,6 +1,12 @@
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
-import React, { useCallback, useContext } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { BG_COLOR, TEXT_COLOR } from "../../constants";
 import DatepickerContext from "../../contexts/DatepickerContext";
@@ -11,6 +17,8 @@ import {
   classNames as cn,
 } from "../../helpers";
 import { Period } from "../../types";
+import get from "lodash.get";
+import { getNumber } from "@/lib/utils/getNumber";
 
 dayjs.extend(isBetween);
 
@@ -26,16 +34,24 @@ interface Props {
   onClickPreviousDays: (day: number) => void;
   onClickDay: (day: number) => void;
   onClickNextDays: (day: number) => void;
-  onIcon?: (day: number, date: Date) => any;
+  onIcon?: (day: number, date: Date, data?: any) => any;
+  style?: string;
 }
-
 const Days: React.FC<Props> = ({
   calendarData,
   onClickPreviousDays,
   onClickDay,
   onClickNextDays,
   onIcon,
+  style,
 }) => {
+  // Ref
+  const calendarRef = useRef(null);
+  const markRef = useRef(null);
+  const [height, setHeight] = useState(0);
+  const [heightItem, setHeightItem] = useState(0);
+  const [maxItem, setMaxItem] = useState(0);
+  const [width, setWidth] = useState(0);
   // Contexts
   const {
     primaryColor,
@@ -76,17 +92,13 @@ const Days: React.FC<Props> = ({
       ) {
         className = ` ${BG_COLOR["500"][primaryColor]} text-white font-medium rounded-full`;
       } else if (dayjs(fullDay).isSame(period.start)) {
-        className = ` ${
-          BG_COLOR["500"][primaryColor]
-        } text-white font-medium ${
+        className = ` ${BG_COLOR["500"][primaryColor]} text-white font-medium ${
           dayjs(fullDay).isSame(dayHover) && !period.end
             ? "rounded-full"
             : "rounded-l-full"
         }`;
       } else if (dayjs(fullDay).isSame(period.end)) {
-        className = ` ${
-          BG_COLOR["500"][primaryColor]
-        } text-white font-medium ${
+        className = ` ${BG_COLOR["500"][primaryColor]} text-white font-medium ${
           dayjs(fullDay).isSame(dayHover) && !period.start
             ? "rounded-full"
             : "rounded-r-full"
@@ -241,13 +253,16 @@ const Days: React.FC<Props> = ({
 
   const buttonClass = useCallback(
     (day: number, type: "current" | "next" | "previous") => {
-      const baseClass =
-        "flex items-center justify-center w-10 h-10 relative";
+      let baseClass = `calender-day flex items-center justify-center ${
+        style === "custom" ? " w-6 h-6 m-1" : "w-12 h-12 lg:w-10 lg:h-10"
+      } relative`;
       if (type === "current") {
         return cn(
           baseClass,
           !activeDateData(day).active
             ? hoverClassByDay(day)
+            : style === "custom"
+            ? ""
             : activeDateData(day).className,
           isDateDisabled(day, type) && "text-gray-400 cursor-not-allowed"
         );
@@ -400,65 +415,222 @@ const Days: React.FC<Props> = ({
       }`;
     }
     const res = new Date(fullDay);
-    return typeof onIcon === "function" ? onIcon(day, res) : null;
+    return typeof onIcon === "function"
+      ? onIcon(day, res, {
+          ref: calendarRef,
+          height,
+          maxItem,
+          width,
+          heightItem,
+        })
+      : null;
   };
+  useEffect(() => {
+    if (calendarRef?.current && markRef?.current) {
+      const card = getNumber(get(calendarRef, "current.clientWidth"));
+      const cardHeight = getNumber(get(markRef, "current.clientHeight"));
+      const heightItem = 20; // perkiraan
+      setWidth(card - 2);
+      setHeight(cardHeight);
+      setMaxItem(Math.floor(cardHeight / heightItem));
+      setHeightItem(20);
+      // setMaxItem
+      const day = 3;
+      const fullwidth = card * 7;
+      const percent = (7 / 3) * 100;
+    }
+  }, [calendarRef.current, markRef.current]);
   return (
-    <div className="grid grid-cols-7 gap-y-0.5 my-1">
+    <div
+      className={cx(
+        "calender-days grid grid-cols-7 ",
+        style === "custom" ? "" : "  my-1 gap-y-0.5",
+        css`
+          z-index: 0;
+          .calender-grid {
+            // aspect-ratio: 1 / 1;
+          }
+        `
+      )}
+    >
       {calendarData.days.previous.map((item, index) => (
-        <button
-          type="button"
-          key={index}
-          disabled={isDateDisabled(item, "previous")}
-          className={`${buttonClass(item, "previous")}`}
-          onClick={() => handleClickDay(item, "previous")}
-          onMouseOver={() => {
-            hoverDay(item, "previous");
+        <div
+          key={"prev_" + index}
+          className={cx(
+            "calender-grid flex flex-row",
+            style === "custom"
+              ? "border-gray-200 hover:bg-gray-100  cursor-pointer"
+              : ""
+          )}
+          onClick={() => {
+            if (style === "custom") handleClickDay(item, "previous");
           }}
         >
-        <span className="relative">
-          {item}
-          {load_marker(item, "previous")}
-        </span>
-        </button>
+          <div className="flex flex-col flex-grow calender-day-wrap">
+            {style === "custom" ? (
+              <>
+                <button
+                  type="button"
+                  key={index}
+                  disabled={isDateDisabled(item, "previous")}
+                  className={`${buttonClass(item, "previous")}`}
+                  onMouseOver={() => {
+                    hoverDay(item, "previous");
+                  }}
+                >
+                  <span className="relative">{item}</span>
+                </button>
+                <div className="flex flex-grow  relative">
+                  {load_marker(item, "previous")}
+                  {/*
+                  {index === 1 && (
+                    <div
+                      className={cx(
+                        "hover:bg-gray-200 font-bold text-sm text-black px-2 absolute top-[27px] left-0 w-[196px] rounded-md",
+                        css`
+                          z-index: 1;
+                        `
+                      )}
+                    >
+                      1 more
+                    </div>
+                  )} */}
+                </div>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  key={index}
+                  disabled={isDateDisabled(item, "previous")}
+                  className={`${buttonClass(item, "previous")}`}
+                  onClick={() => handleClickDay(item, "previous")}
+                  onMouseOver={() => {
+                    hoverDay(item, "previous");
+                  }}
+                >
+                  <span className="relative">
+                    {item}
+                    {load_marker(item, "previous")}
+                  </span>
+                </button>
+              </>
+            )}
+          </div>
+        </div>
       ))}
 
       {calendarData.days.current.map((item, index) => (
-        <button
-          type="button"
-          key={index}
-          disabled={isDateDisabled(item, "current")}
+        <div
+          key={"current_" + index}
+          ref={index === 0 ? calendarRef : null}
           className={cx(
-            `${buttonClass(item, "current")}`,
-            item === 1 && "highlight"
+            "calender-grid flex flex-row",
+            style === "custom"
+              ? activeDateData(item).active
+                ? "bg-blue-200/75 ring-1  cursor-pointer border-gray-200"
+                : "hover:bg-gray-50  cursor-pointer border-gray-200 bg-white"
+              : ""
           )}
-          onClick={() => handleClickDay(item, "current")}
-          onMouseOver={() => {
-            hoverDay(item, "current");
+          onClick={() => {
+            if (style === "custom") handleClickDay(item, "current");
           }}
         >
-          <span className="relative">
-            {item}
-            {load_marker(item, "current")}
-          </span>
-        </button>
+          <div className="flex flex-col flex-grow calender-day-wrap">
+            {style === "custom" ? (
+              <>
+                <button
+                  type="button"
+                  key={index}
+                  disabled={isDateDisabled(item, "current")}
+                  className={`${buttonClass(item, "current")}`}
+                  // onClick={() => handleClickDay(item, "current")}
+                  onMouseOver={() => {
+                    hoverDay(item, "current");
+                  }}
+                >
+                  <span className="relative">{item}</span>
+                </button>
+                <div
+                  className="flex flex-grow  relative "
+                  ref={index === 0 ? markRef : null}
+                >
+                  {load_marker(item, "current")}
+                </div>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  key={index}
+                  disabled={isDateDisabled(item, "current")}
+                  className={`${buttonClass(item, "current")}`}
+                  onClick={() => handleClickDay(item, "current")}
+                  onMouseOver={() => {
+                    hoverDay(item, "current");
+                  }}
+                >
+                  <span className="relative">
+                    {item}
+                    {load_marker(item, "current")}
+                  </span>
+                </button>
+              </>
+            )}
+          </div>
+        </div>
       ))}
 
       {calendarData.days.next.map((item, index) => (
-        <button
-          type="button"
-          key={index}
-          disabled={isDateDisabled(item, "next")}
-          className={`${buttonClass(item, "next")}`}
-          onClick={() => handleClickDay(item, "next")}
-          onMouseOver={() => {
-            hoverDay(item, "next");
+        <div
+          key={"next_" + index}
+          className={cx(
+            "calender-grid flex flex-row ",
+            style === "custom"
+              ? "hover:bg-gray-100  cursor-pointer border-gray-200"
+              : ""
+          )}
+          onClick={() => {
+            if (style === "custom") handleClickDay(item, "next");
           }}
         >
-        <span className="relative">
-          {item}
-          {load_marker(item, "next")}
-        </span>
-        </button>
+          <div className="flex flex-col flex-grow calender-day-wrap">
+            {style === "custom" ? (
+              <>
+                <button
+                  type="button"
+                  key={index}
+                  disabled={isDateDisabled(item, "next")}
+                  className={`${buttonClass(item, "next")}`}
+                  onMouseOver={() => {
+                    hoverDay(item, "next");
+                  }}
+                >
+                  <span className="relative">{item}</span>
+                </button>
+                <div>{load_marker(item, "next")}</div>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  key={index}
+                  disabled={isDateDisabled(item, "next")}
+                  className={`${buttonClass(item, "next")}`}
+                  onClick={() => handleClickDay(item, "next")}
+                  onMouseOver={() => {
+                    hoverDay(item, "next");
+                  }}
+                >
+                  <span className="relative">
+                    {item}
+                    {load_marker(item, "next")}
+                  </span>
+                </button>
+              </>
+            )}
+          </div>
+        </div>
       ))}
     </div>
   );

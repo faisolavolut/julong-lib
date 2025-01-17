@@ -16,7 +16,6 @@ import React, { FC, useCallback, useEffect, useState } from "react";
 import {
   Breadcrumb,
   Button,
-  Checkbox,
   Label,
   Modal,
   Table,
@@ -44,12 +43,15 @@ import { InputSearch } from "../ui/input-search";
 import { Input } from "../ui/input";
 import { FaChevronDown } from "react-icons/fa";
 import get from "lodash.get";
+import { Checkbox } from "../ui/checkbox";
+import { getNumber } from "@/lib/utils/getNumber";
+import { formatMoney } from "../form/field/TypeInput";
 
 export const TableList: React.FC<any> = ({
   name,
   column,
   onLoad,
-  take = 50,
+  take = 20,
   header,
   disabledPagination,
   disabledHeader,
@@ -57,6 +59,8 @@ export const TableList: React.FC<any> = ({
   hiddenNoRow,
   disabledHoverRow,
   onInit,
+  onCount,
+  feature,
 }) => {
   const [data, setData] = useState<any[]>([]);
   const sideLeft =
@@ -71,11 +75,16 @@ export const TableList: React.FC<any> = ({
     status: string;
     progress: number;
   };
+  const checkbox =
+    Array.isArray(feature) && feature?.length
+      ? feature.includes("checkbox")
+      : false;
   const local = useLocal({
     table: null as any,
     data: [] as any[],
     sort: {} as any,
     search: null as any,
+    count: 0 as any,
     addRow: (row: any) => {
       setData((prev) => [...prev, row]);
       local.data.push(row);
@@ -145,51 +154,45 @@ export const TableList: React.FC<any> = ({
     },
   });
   useEffect(() => {
-    if (typeof onInit === "function") {
-      onInit(local);
-    }
-    toast.info(
-      <>
-        <Loader2
-          className={cx(
-            "h-4 w-4 animate-spin-important",
-            css`
-              animation: spin 1s linear infinite !important;
-              @keyframes spin {
-                0% {
-                  transform: rotate(0deg);
+    const run = async () => {
+      toast.info(
+        <>
+          <Loader2
+            className={cx(
+              "h-4 w-4 animate-spin-important",
+              css`
+                animation: spin 1s linear infinite !important;
+                @keyframes spin {
+                  0% {
+                    transform: rotate(0deg);
+                  }
+                  100% {
+                    transform: rotate(360deg);
+                  }
                 }
-                100% {
-                  transform: rotate(360deg);
-                }
-              }
-            `
-          )}
-        />
-        {"Loading..."}
-      </>
-    );
-    if (Array.isArray(onLoad)) {
-      local.data = onLoad;
-      local.render();
-      setData(onLoad);
-    } else {
-      const res: any = onLoad({
-        search: local.search,
-        sort: local.sort,
-        take,
-        paging: 1,
-      });
-      if (res instanceof Promise) {
-        res.then((e) => {
-          local.data = e;
-          local.render();
-          setData(e);
-          setTimeout(() => {
-            toast.dismiss();
-          }, 2000);
-        });
+              `
+            )}
+          />
+          {"Loading..."}
+        </>
+      );
+      if (typeof onCount === "function") {
+        const res = await onCount();
+        local.count = res;
+        local.render();
+      }
+
+      if (Array.isArray(onLoad)) {
+        local.data = onLoad;
+        local.render();
+        setData(onLoad);
       } else {
+        const res: any = await onLoad({
+          search: local.search,
+          sort: local.sort,
+          take,
+          paging: 1,
+        });
         local.data = res;
         local.render();
         setData(res);
@@ -197,13 +200,53 @@ export const TableList: React.FC<any> = ({
           toast.dismiss();
         }, 2000);
       }
+    };
+    if (typeof onInit === "function") {
+      onInit(local);
     }
+    run();
   }, []);
+  useEffect(() => {
+    // console.log("PERUBAHAN");
+  }, [data]);
+  const objectNull = {};
   const defaultColumns: ColumnDef<Person>[] = init_column(column);
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columns] = React.useState<typeof defaultColumns>(() => [
-    ...defaultColumns,
-  ]);
+  const [columns] = React.useState<typeof defaultColumns>(() =>
+    checkbox
+      ? [
+          {
+            id: "select",
+            width: 10,
+            header: ({ table }) => (
+              <Checkbox
+                id="terms"
+                checked={table.getIsAllRowsSelected()}
+                onClick={(e) => {
+                  table.getToggleAllRowsSelectedHandler();
+                  const handler = table.getToggleAllRowsSelectedHandler();
+                  handler(e); // Pastikan ini memanggil fungsi handler yang benar
+                }}
+              />
+            ),
+            cell: ({ row }) => (
+              <div className="px-0.5 items-center justify-center flex flex-row">
+                <Checkbox
+                  id="terms"
+                  checked={row.getIsSelected()}
+                  onClick={(e) => {
+                    const handler = row.getToggleSelectedHandler();
+                    handler(e); // Pastikan ini memanggil fungsi handler yang benar
+                  }}
+                />
+              </div>
+            ),
+            sortable: false,
+          },
+          ...defaultColumns,
+        ]
+      : [...defaultColumns]
+  );
   const [columnResizeMode, setColumnResizeMode] =
     React.useState<ColumnResizeMode>("onChange");
 
@@ -218,25 +261,29 @@ export const TableList: React.FC<any> = ({
     : {
         getPaginationRowModel: getPaginationRowModel(),
       };
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 20,
+  });
   const table = useReactTable({
     data: data,
     columnResizeMode,
+    pageCount: Math.ceil(local.count / 20),
+    manualPagination: true,
     columnResizeDirection,
     columns,
+    enableRowSelection: true,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
     initialState: {
       pagination: {
-        pageIndex: 0, //custom initial page index
-        pageSize: 25, //custom default page size
+        pageIndex: 0,
+        pageSize: 20, //custom default page size
       },
     },
     state: {
-      pagination: {
-        pageIndex: 0,
-        pageSize: 50,
-      },
+      pagination,
       sorting,
     },
     ...paginationConfig,
@@ -263,19 +310,9 @@ export const TableList: React.FC<any> = ({
     <>
       <div className="tbl-wrapper flex flex-grow flex-col">
         {!disabledHeader ? (
-          <div className="head-tbl-list block items-start justify-between border-b border-gray-200 bg-white p-4 sm:flex">
+          <div className="head-tbl-list block items-start justify-between  bg-white px-0 py-4 sm:flex">
             <div className="flex flex-row items-end">
               <div className="sm:flex flex flex-col space-y-2">
-                {false ? (
-                  <div className="">
-                    <h2 className="text-xl font-semibold text-gray-900  sm:text-2xl">
-                      All <span className="">{name ? `${name}s` : ``}</span>
-                    </h2>
-                  </div>
-                ) : (
-                  <></>
-                )}
-
                 <div className="flex">
                   {sideLeft ? (
                     sideLeft(local)
@@ -333,9 +370,35 @@ export const TableList: React.FC<any> = ({
           <div className="overflow-auto relative flex-grow flex-row">
             <div className="tbl absolute top-0 left-0 inline-block flex-grow w-full h-full align-middle">
               <div className="relative">
-                <Table className="min-w-full divide-y divide-gray-200 ">
+                <Table
+                  className={cx(
+                    "min-w-full divide-y divide-gray-200 ",
+                    css`
+                      thead th:first-child {
+                        overflow: hidden;
+                        border-top-left-radius: 10px; /* Sudut kiri atas */
+                        border-bottom-left-radius: 10px;
+                      }
+                      thead th:last-child {
+                        overflow: hidden;
+                        border-top-right-radius: 10px; /* Sudut kiri atas */
+                        border-bottom-right-radius: 10px;
+                      }
+                      tbody td:first-child {
+                        overflow: hidden;
+                        border-top-left-radius: 10px; /* Sudut kiri atas */
+                        border-bottom-left-radius: 10px;
+                      }
+                      tbody td:last-child {
+                        overflow: hidden;
+                        border-top-right-radius: 10px; /* Sudut kiri atas */
+                        border-bottom-right-radius: 10px;
+                      }
+                    `
+                  )}
+                >
                   {!disabledHeadTable ? (
-                    <thead className="text-md bg-second group/head text-md uppercase text-gray-700 sticky top-0">
+                    <thead className="rounded-md overflow-hidden text-md bg-second group/head text-md uppercase text-gray-700 sticky top-0">
                       {table.getHeaderGroups().map((headerGroup) => (
                         <tr
                           key={`${headerGroup.id}`}
@@ -347,14 +410,26 @@ export const TableList: React.FC<any> = ({
                               (e: any) => e?.name === name
                             );
                             const isSort =
-                              typeof col?.sortable === "boolean"
+                              name === "select"
+                                ? false
+                                : typeof col?.sortable === "boolean"
                                 ? col.sortable
+                                : true;
+                            const resize =
+                              name === "select"
+                                ? false
+                                : typeof col?.resize === "boolean"
+                                ? col.resize
                                 : true;
                             return (
                               <th
                                 {...{
                                   style: {
-                                    width: col?.width
+                                    width: !resize
+                                      ? `${col.width}px`
+                                      : name === "select"
+                                      ? `${5}px`
+                                      : col?.width
                                       ? header.getSize() < col?.width
                                         ? `${col.width}px`
                                         : header.getSize()
@@ -363,7 +438,13 @@ export const TableList: React.FC<any> = ({
                                 }}
                                 key={header.id}
                                 colSpan={header.colSpan}
-                                className="relative px-2 py-2 text-sm py-1 "
+                                className={cx(
+                                  "relative px-2 py-2 text-sm py-1 uppercase",
+                                  name === "select" &&
+                                    css`
+                                      max-width: 5px;
+                                    `
+                                )}
                               >
                                 <div
                                   key={`${header.id}-label`}
@@ -398,7 +479,12 @@ export const TableList: React.FC<any> = ({
                                     isSort ? " cursor-pointer" : ""
                                   )}
                                 >
-                                  <div className="flex flex-row items-center flex-grow text-sm">
+                                  <div
+                                    className={cx(
+                                      "flex flex-row items-center flex-grow text-sm  capitalize",
+                                      name === "select" ? "justify-center" : ""
+                                    )}
+                                  >
                                     {header.isPlaceholder
                                       ? null
                                       : flexRender(
@@ -438,13 +524,19 @@ export const TableList: React.FC<any> = ({
                                         header.column.resetSize(),
                                       onMouseDown: header.getResizeHandler(),
                                       onTouchStart: header.getResizeHandler(),
-                                      className: `resizer w-0.5 bg-gray-300 ${
-                                        table.options.columnResizeDirection
-                                      } ${
-                                        header.column.getIsResizing()
-                                          ? "isResizing"
-                                          : ""
-                                      }`,
+                                      className: cx(
+                                        `resizer  bg-[#b3c9fe] cursor-e-resize	 ${
+                                          table.options.columnResizeDirection
+                                        } ${
+                                          header.column.getIsResizing()
+                                            ? "isResizing"
+                                            : ""
+                                        }`,
+                                        css`
+                                          width: 1px;
+                                          cursor: e-resize !important;
+                                        `
+                                      ),
                                       style: {
                                         transform:
                                           columnResizeMode === "onEnd" &&
@@ -474,15 +566,16 @@ export const TableList: React.FC<any> = ({
                     <></>
                   )}
 
-                  <Table.Body className="divide-y divide-gray-200 bg-white">
+                  <Table.Body className="divide-y border-none bg-white">
                     {table.getRowModel().rows.map((row, idx) => (
                       <Table.Row
                         key={row.id}
                         className={cx(
-                          disabledHoverRow ? "" : "hover:bg-[#DBDBE7]",
+                          disabledHoverRow ? "" : "hover:bg-gray-100",
                           css`
                             height: 44px;
-                          `
+                          `,
+                          "border-none"
                         )}
                       >
                         {row.getVisibleCells().map((cell) => {
@@ -542,11 +635,19 @@ export const TableList: React.FC<any> = ({
           </div>
         </div>
         <Pagination
+          list={local}
+          count={local.count}
           onNextPage={() => table.nextPage()}
           onPrevPage={() => table.previousPage()}
           disabledNextPage={!table.getCanNextPage()}
           disabledPrevPage={!table.getCanPreviousPage()}
           page={table.getState().pagination.pageIndex + 1}
+          setPage={(page: any) => {
+            setPagination({
+              pageIndex: page,
+              pageSize: 20,
+            });
+          }}
           countPage={table.getPageCount()}
           countData={local.data.length}
           take={take}
@@ -565,138 +666,139 @@ export const Pagination: React.FC<any> = ({
   disabledNextPage,
   disabledPrevPage,
   page,
-  countPage,
-  countData,
-  take,
+  count,
+  list,
+  setPage,
   onChangePage,
 }) => {
   const local = useLocal({
     page: 1 as any,
+    pagination: [] as any,
   });
   useEffect(() => {
     local.page = page;
+    local.pagination = getPagination(page, Math.ceil(count / 20));
     local.render();
-  }, [page]);
+  }, [page, count]);
   return (
-    <div className="tbl-pagination sticky text-sm bottom-0 right-0 w-full items-center justify-end text-sm border-t border-gray-200 bg-white p-4 sm:flex">
-      <div className="mb-4 flex items-center sm:mb-0">
-        <div
-          onClick={() => {
-            if (!disabledPrevPage) {
-              onPrevPage();
-            }
-          }}
-          className={classNames(
-            "inline-flex  justify-center rounded p-1 ",
-            disabledPrevPage
-              ? "text-gray-200"
-              : "cursor-pointer text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-          )}
-        >
-          <span className="sr-only">Previous page</span>
-          <HiChevronLeft className="text-2xl" />
-        </div>
-        <div
-          onClick={() => {
-            if (!disabledNextPage) {
-              onNextPage();
-            }
-          }}
-          className={classNames(
-            "inline-flex  justify-center rounded p-1 ",
-            disabledNextPage
-              ? "text-gray-200"
-              : "cursor-pointer text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-          )}
-        >
-          <span className="sr-only">Next page</span>
-          <HiChevronRight className="text-2xl" />
-        </div>
-        <span className="text-md font-normal text-gray-500">
-          Page&nbsp;
-          <span className="font-semibold text-gray-900">{page}</span>
-          &nbsp;of&nbsp;
-          <span className="font-semibold text-gray-900">{countPage}</span>
-        </span>
-
-        <span className="flex items-center pl-2 text-black gap-x-2">
-          | Go to page:
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              const page = Number(local.page);
-              if (!page) {
-                local.page = 0;
-              } else if (page > countPage) {
-                local.page = countPage;
-              }
-              local.render();
-              onChangePage(local.page - 1);
-            }}
-          >
-            <Input
-              type="number"
-              min="1"
-              max={countPage}
-              value={local.page}
-              onChange={(e) => {
-                local.page = e.target.value;
-                local.render();
-                debouncedHandler(() => {
-                  const page = Number(local.page);
-                  if (!page) {
-                    local.page = 0;
-                  } else if (page > countPage) {
-                    local.page = countPage;
-                  }
-                  local.render();
-                  onChangePage(local.page - 1);
-                }, 1500);
-              }}
-            />
-          </form>
-        </span>
+    <div className=" border-t border-gray-300 tbl-pagination sticky text-sm bottom-0 right-0 w-full grid grid-cols-3 gap-4 justify-end text-sm  bg-white pt-2">
+      <div className="flex flex-row items-center text-gray-600">
+        Showing {local.page * 20 - 19} to{" "}
+        {list.data?.length >= 20
+          ? local.page * 20
+          : local.page === 1 && Math.ceil(count / 20) === 1
+          ? list.data?.length
+          : local.page * 20 - 19 + list.data?.length}{" "}
+        of {formatMoney(getNumber(count))} results
       </div>
-      <div className="flex items-center space-x-3 hidden">
-        {!disabledPrevPage ? (
-          <>
-            <div
-              onClick={() => {
-                if (!disabledPrevPage) {
-                  onPrevPage();
-                }
-              }}
-              className={classNames(
-                "cursor-pointer inline-flex flex-1 items-center justify-center rounded-lg bg-primary px-3 py-2 text-center text-md font-medium text-white hover:bg-primary focus:ring-4 focus:ring-primary-300"
-              )}
-            >
-              <HiChevronLeft className="mr-1 text-base" />
-              Previous
-            </div>
-          </>
-        ) : (
-          <></>
-        )}
-        {!disabledNextPage ? (
-          <>
-            <div
-              onClick={() => {
-                if (!disabledNextPage) {
-                  onNextPage();
-                }
-              }}
-              className={classNames(
-                "cursor-pointer inline-flex flex-1 items-center justify-center rounded-lg bg-primary px-3 py-2 text-center text-md font-medium text-white hover:bg-primary focus:ring-4 focus:ring-primary-300"
-              )}
-            >
-              Next
-              <HiChevronRight className="ml-1 text-base" />
-            </div>
-          </>
-        ) : (
-          <></>
-        )}
+      <div className="flex flex-row justify-center">
+        <div>
+          <nav
+            className="isolate inline-flex -space-x-px flex flex-row items-center gap-x-2"
+            aria-label="Pagination"
+          >
+            {local.pagination.map((e: any, idx: number) => {
+              return (
+                <div
+                  key={"page_" + idx}
+                  onClick={() => {
+                    if (e?.label !== "...") {
+                      local.page = getNumber(e?.label);
+                      local.render();
+                      onChangePage(local.page - 1);
+                      setPage(local.page - 1);
+                      list.reload();
+                    }
+                  }}
+                  className={cx(
+                    "text-sm px-2 py-1",
+                    e.active
+                      ? "relative z-10 inline-flex items-center bg-primary font-semibold text-white rounded-md"
+                      : e?.label === "..."
+                      ? "relative z-10 inline-flex items-center  font-semibold text-gray-800 rounded-md"
+                      : "cursor-pointer relative z-10 inline-flex items-center hover:bg-gray-100 font-semibold text-gray-800 rounded-md"
+                  )}
+                >
+                  {e?.label}
+                </div>
+              );
+            })}
+          </nav>
+        </div>
+      </div>
+      <div className="flex flex-row items-center justify-end">
+        <div className="flex items-center  flex-row gap-x-2 sm:mb-0 text-sm">
+          <div
+            onClick={() => {
+              if (!disabledPrevPage) {
+                onPrevPage();
+              }
+            }}
+            className={cx(
+              "flex flex-row items-center gap-x-2  justify-center rounded p-1 ",
+              disabledPrevPage
+                ? "text-gray-200 border-gray-200 border px-2"
+                : "cursor-pointer text-gray-500 hover:bg-gray-100 hover:text-gray-900  border-gray-500 border px-2"
+            )}
+          >
+            <HiChevronLeft className="text-sm" />
+            <span>Previous</span>
+          </div>
+          <div
+            onClick={() => {
+              if (!disabledNextPage) {
+                onNextPage();
+              }
+            }}
+            className={cx(
+              "flex flex-row items-center gap-x-2  justify-center rounded p-1 ",
+              disabledNextPage
+                ? "text-gray-200 border-gray-200 border px-2"
+                : "cursor-pointer text-gray-500 hover:bg-gray-100 hover:text-gray-900  border-gray-500 border px-2"
+            )}
+          >
+            <span>Next</span>
+            <HiChevronRight className="text-sm" />
+          </div>
+        </div>
       </div>
     </div>
   );
+};
+
+const getPagination = (currentPage: number, totalPages: number) => {
+  const pagination: { label: string; active: boolean }[] = [];
+  const maxVisible = 5; // Jumlah maksimal elemen yang ditampilkan
+  const halfRange = Math.floor((maxVisible - 3) / 2);
+
+  if (totalPages <= maxVisible) {
+    // Jika total halaman lebih kecil dari batas, tampilkan semua halaman
+    for (let i = 1; i <= totalPages; i++) {
+      pagination.push({ label: i.toString(), active: i === currentPage });
+    }
+  } else {
+    pagination.push({ label: "1", active: currentPage === 1 }); // Halaman pertama selalu ada
+
+    if (currentPage > halfRange + 2) {
+      pagination.push({ label: "...", active: false }); // Awal titik-titik
+    }
+
+    const startPage = Math.max(2, currentPage - halfRange);
+    const endPage = Math.min(totalPages - 1, currentPage + halfRange);
+
+    for (let i = startPage; i <= endPage; i++) {
+      pagination.push({ label: i.toString(), active: i === currentPage });
+    }
+
+    if (currentPage < totalPages - halfRange - 1) {
+      pagination.push({ label: "...", active: false }); // Akhir titik-titik
+    }
+
+    pagination.push({
+      label: totalPages.toString(),
+      active: currentPage === totalPages,
+    }); // Halaman terakhir selalu ada
+  }
+
+  return pagination;
 };

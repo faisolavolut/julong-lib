@@ -122,6 +122,21 @@ export function getFirstElementsInArray(array: number[] = [], size = 0) {
   return array.slice(0, size);
 }
 
+export function getLastElementsDateInArray(array: any[] = [], size = 0) {
+  const result: any[] = [];
+  if (Array.isArray(array) && size > 0) {
+    if (size >= array.length) {
+      return array;
+    }
+
+    let y = array.length - 1;
+    for (let i = 0; i < size; i++) {
+      result.push(array[y]);
+      y--;
+    }
+  }
+  return result.reverse();
+}
 export function getLastElementsInArray(array: number[] = [], size = 0) {
   const result: number[] = [];
   if (Array.isArray(array) && size > 0) {
@@ -194,7 +209,9 @@ export function getNumberOfDay(
 export function getLastDaysInMonth(date: dayjs.Dayjs | string, size = 0) {
   return getLastElementsInArray(getDaysInMonth(date), size);
 }
-
+export function getLastDateInMonth(date: dayjs.Dayjs | string, size = 0) {
+  return getLastElementsInArray(getDaysInMonth(date), size);
+}
 export function getFirstDaysInMonth(date: string | dayjs.Dayjs, size = 0) {
   return getFirstElementsInArray(getDaysInMonth(date), size);
 }

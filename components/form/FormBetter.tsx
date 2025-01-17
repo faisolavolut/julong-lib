@@ -19,14 +19,16 @@ export const FormBetter: React.FC<any> = ({
   });
   useEffect(() => {}, [fm.data]);
   return (
-    <div className="flex flex-col flex-grow">
+    <div className="flex flex-col flex-grow gap-y-3">
       {typeof fm === "object" && typeof onTitle === "function" ? (
-        <div className="flex flex-row w-full">{onTitle(fm)}</div>
+        <div className="flex flex-row p-3 items-center bg-white border border-gray-300 rounded-lg">
+          {onTitle(fm)}
+        </div>
       ) : (
         <></>
       )}
-      <div className="w-full flex-grow flex flex-row rounded-lg overflow-hidden">
-        <div className="w-full flex flex-row flex-grow bg-white rounded-lg  relative overflow-y-scroll shadow">
+      <div className="w-full flex-grow flex flex-row  rounded-lg overflow-hidden">
+        <div className="w-full flex flex-row flex-grow bg-white rounded-lg border border-gray-300  relative overflow-y-scroll">
           <Form
             {...{
               children,

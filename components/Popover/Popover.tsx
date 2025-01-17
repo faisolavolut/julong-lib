@@ -46,7 +46,9 @@ export function usePopover({
   const arrowRef = React.useRef<HTMLDivElement | null>(null);
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(initialOpen);
   const [labelId, setLabelId] = React.useState<string | undefined>();
-  const [descriptionId, setDescriptionId] = React.useState<string | undefined>();
+  const [descriptionId, setDescriptionId] = React.useState<
+    string | undefined
+  >();
 
   // Determine whether the popover is open
   const open = controlledOpen ?? uncontrolledOpen;
@@ -112,7 +114,6 @@ export function usePopover({
     ]
   );
 }
-
 
 function mapPlacementSideToCSSProperty(placement: Placement) {
   const staticPosition = placement.split("-")[0];
@@ -186,6 +187,7 @@ export function Popover({
   className,
   classNameTrigger,
   arrow,
+  popoverClassName,
   ...restOptions
 }: {
   root?: HTMLElement;
@@ -193,6 +195,7 @@ export function Popover({
   classNameTrigger?: string;
   children: React.ReactNode;
   content?: React.ReactNode;
+  popoverClassName?: string;
   arrow?: boolean;
 } & PopoverOptions) {
   const popover = usePopover({ modal, ...restOptions });
@@ -216,14 +219,17 @@ export function Popover({
       </PopoverTrigger>
       <PopoverContent
         className={cx(
-          className,
-          css`
-            background: white;
-            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
-            user-select: none;
-          `,
+          popoverClassName
+            ? popoverClassName
+            : cx(
+                className,
+                css`
+                  background: white;
+                  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
+                  user-select: none;
+                `
+              )
         )}
-        
       >
         {_content}
         {(typeof arrow === "undefined" || arrow) && <PopoverArrow />}
@@ -268,7 +274,6 @@ export const PopoverTrigger = React.forwardRef<
     </div>
   );
 });
-
 
 export const PopoverContent = React.forwardRef<
   HTMLDivElement,

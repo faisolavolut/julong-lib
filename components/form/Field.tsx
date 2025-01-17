@@ -1,9 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { FieldCheckbox } from "./field/TypeCheckbox";
 import { TypeDropdown } from "./field/TypeDropdown";
 import { TypeInput } from "./field/TypeInput";
 import { TypeUpload } from "./field/TypeUpload";
 import { FieldUploadMulti } from "./field/TypeUploadMulti";
+import { TypeRichText } from "./field/TypeRichText";
+import { TypeTag } from "./field/TypeTag";
+import get from "lodash.get";
+import { getNumber } from "@/lib/utils/getNumber";
 
 export const Field: React.FC<any> = ({
   fm,
@@ -18,8 +22,13 @@ export const Field: React.FC<any> = ({
   onChange,
   className,
   style,
+  prefix,
+  suffix,
 }) => {
   let result = null;
+
+  const suffixRef = useRef<HTMLDivElement | null>(null);
+  const prefixRef = useRef<HTMLDivElement | null>(null);
   const is_disable = fm.mode === "view" ? true : disabled;
   const error = fm.error?.[name];
   useEffect(() => {
@@ -42,6 +51,8 @@ export const Field: React.FC<any> = ({
       fm.render();
     }
   }, []);
+  const before = typeof prefix === "function" ? prefix() : prefix;
+  const after = typeof suffix === "function" ? suffix() : suffix;
   return (
     <>
       <div
@@ -65,11 +76,28 @@ export const Field: React.FC<any> = ({
         <div
           className={cx(
             error
-              ? "flex flex-row rounded-md flex-grow border-red-500 border"
-              : "flex flex-row rounded-md flex-grow",
-            is_disable ? "bg-gray-100" : ""
+              ? "flex flex-row rounded-md flex-grow border-red-500 border items-center"
+              : "flex flex-row rounded-md flex-grow  items-center",
+            is_disable ? "bg-gray-100" : "",
+            "relative"
           )}
         >
+          {before && (
+            <div
+              ref={prefixRef}
+              className={cx(
+                "absolute left-[1px] px-1 py-1 bg-gray-200/50  border  border-gray-100 items-center flex flex-row flex-grow rounded-l-md",
+                css`
+                  height: 2.13rem;
+                  top: 50%;
+                  transform: translateY(-50%);
+                `,
+                is_disable ? "bg-gray-100" : "bg-gray-200/50"
+              )}
+            >
+              {before}
+            </div>
+          )}
           {["upload"].includes(type) ? (
             <>
               <TypeUpload
@@ -139,6 +167,24 @@ export const Field: React.FC<any> = ({
                 mode="single"
               />
             </>
+          ) : ["richtext"].includes(type) ? (
+            <>
+              <TypeRichText
+                fm={fm}
+                name={name}
+                disabled={is_disable}
+                className={className}
+              />
+            </>
+          ) : ["tag"].includes(type) ? (
+            <>
+              <TypeTag
+                fm={fm}
+                name={name}
+                disabled={is_disable}
+                className={className}
+              />
+            </>
           ) : (
             <>
               <TypeInput
@@ -149,8 +195,40 @@ export const Field: React.FC<any> = ({
                 type={type}
                 disabled={is_disable}
                 onChange={onChange}
+                className={cx(
+                  before &&
+                    css`
+                      padding-left: ${getNumber(
+                        get(prefixRef, "current.clientWidth")
+                      ) + 10}px;
+                    `,
+                  after &&
+                    css`
+                      padding-right: ${getNumber(
+                        get(suffixRef, "current.clientWidth")
+                      ) + 10}px;
+                    `
+                )}
               />
             </>
+          )}
+          {after && (
+            <div
+              ref={suffixRef}
+              className={cx(
+                "absolute right-[1px] px-1 py-1    items-center flex flex-row flex-grow rounded-r-md",
+                css`
+                  height: 2.13rem;
+                  top: 50%;
+                  transform: translateY(-50%);
+                `,
+                is_disable
+                  ? "bg-gray-200/50 border-l border-gray-300"
+                  : "bg-gray-200/50 border  border-gray-100"
+              )}
+            >
+              {after}
+            </div>
           )}
         </div>
         {error ? (

@@ -34,6 +34,7 @@ import Week from "./Week";
 import Years from "./Years";
 
 import { DateType } from "../../types";
+import { Popover } from "@/lib/components/Popover/Popover";
 
 interface Props {
   date: dayjs.Dayjs;
@@ -44,7 +45,9 @@ interface Props {
   changeMonth: (month: number) => void;
   changeYear: (year: number) => void;
   mode?: "monthly" | "daily";
-  onMark?: (day: number, date: Date) => any;
+  onMark?: (day: number, date: Date, data?: any) => any;
+  style?: "custom" | "prasi";
+  onLoad?: (e?: any) => void | Promise<void>;
 }
 
 const Calendar: React.FC<Props> = ({
@@ -57,6 +60,8 @@ const Calendar: React.FC<Props> = ({
   changeYear,
   onMark,
   mode = "daily",
+  style = "prasi",
+  onLoad,
 }) => {
   // Contexts
   const {
@@ -77,6 +82,8 @@ const Calendar: React.FC<Props> = ({
   const [showMonths, setShowMonths] = useState(false);
   const [showYears, setShowYears] = useState(false);
   const [year, setYear] = useState(date.year());
+  const [openPopover, setOpenPopover] = useState(false);
+  const [openPopoverYear, setOpenPopoverYear] = useState(false);
   useEffect(() => {
     if (mode === "monthly") {
       setShowMonths(true);
@@ -90,7 +97,12 @@ const Calendar: React.FC<Props> = ({
       getNumberOfDay(getFirstDayInMonth(date).ddd, startWeekOn)
     );
   }, [date, startWeekOn]);
-
+  const previousDate = useCallback(() => {
+    const day = getLastDaysInMonth(
+      previousMonth(date),
+      getNumberOfDay(getFirstDayInMonth(date).ddd, startWeekOn)
+    );
+  }, [date, startWeekOn]);
   const current = useCallback(() => {
     return getDaysInMonth(formatDate(date));
   }, [date]);
@@ -245,17 +257,79 @@ const Calendar: React.FC<Props> = ({
     setYear(date.year());
   }, [date]);
 
+  const getMonth = (month?: string) => {
+    const value: any = date;
+    const currentDate: any = new Date(value);
+    const previousMonthDate = new Date(currentDate);
+    previousMonthDate.setDate(1);
+    switch (month) {
+      case "before":
+        previousMonthDate.setMonth(currentDate.getMonth() - 1);
+        break;
+      case "after":
+        previousMonthDate.setMonth(currentDate.getMonth() + 1);
+        break;
+      default:
+        break;
+    }
+    return previousMonthDate;
+  };
   // Variables
   const calendarData = useMemo(() => {
-    return {
+    const data = {
+      previous: previous(),
+      current: current(),
+      next: next(),
+    };
+    const result = {
       date: date,
-      days: {
-        previous: previous(),
-        current: current(),
-        next: next(),
+      days: data,
+      time: {
+        previous: data?.previous?.length
+          ? data.previous.map((e) => {
+              return new Date(
+                getMonth("before").getFullYear(),
+                getMonth("before").getMonth(),
+                e
+              );
+            })
+          : [],
+        current: data?.current?.length
+          ? data.current.map((e) => {
+              return new Date(
+                getMonth().getFullYear(),
+                getMonth().getMonth(),
+                e
+              );
+            })
+          : [],
+        next: data?.next?.length
+          ? data.next.map((e) => {
+              return new Date(
+                getMonth("after").getFullYear(),
+                getMonth("after").getMonth(),
+                e
+              );
+            })
+          : [],
       },
     };
+    return result;
   }, [current, date, next, previous]);
+  useEffect(() => {
+    if (typeof onLoad === "function") {
+      const run = async () => {
+        if (typeof onLoad === "function") {
+          const param = dayjs(formatDate(date)).toDate();
+          await onLoad({
+            date: param,
+            calender: calendarData,
+          });
+        }
+      };
+      run();
+    }
+  }, [calendarData, date]);
   const minYear = React.useMemo(
     () => (minDate && dayjs(minDate).isValid() ? dayjs(minDate).year() : null),
     [minDate]
@@ -264,88 +338,131 @@ const Calendar: React.FC<Props> = ({
     () => (maxDate && dayjs(maxDate).isValid() ? dayjs(maxDate).year() : null),
     [maxDate]
   );
+  const isCustom = style === "custom";
 
   return (
-    <div className="w-full md:w-[296px] md:min-w-[296px]">
+    <div
+      className={cx(
+        "w-full md:w-[296px] md:min-w-[296px] calender",
+        isCustom && "flex-grow"
+      )}
+    >
       <div
         className={cx(
-          "flex items-stretch space-x-1.5 px-2 py-1.5",
+          "flex items-stretch ",
+          isCustom ? "" : "space-x-1.5 px-2 py-1.5 flex-col",
           css`
             border-bottom: 1px solid #d1d5db;
           `
         )}
       >
-        {!showMonths && !showYears && (
-          <div className="flex-none  flex flex-row items-center">
-            <RoundedButton roundedFull={true} onClick={onClickPrevious}>
-              <ChevronLeftIcon className="h-5 w-5" />
-            </RoundedButton>
+        {style === "custom" ? (
+          <div className="flex flex-row items-center px-2 py-2 justify-between w-full">
+            <div className="flex flex-row gap-x-2 items-center">
+              <div className="flex flex-row gap-x-2">
+                <button
+                  type="button"
+                  onClick={onClickPrevious}
+                  className="flex items-center justify-center rounded-l-md py-2 pl-3 pr-4 text-gray-400 hover:text-gray-500 focus:relative md:w-9 md:px-2 md:hover:bg-gray-50"
+                >
+                  <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  onClick={onClickNext}
+                  className="flex items-center justify-center rounded-r-md py-2 pl-4 pr-3 text-gray-400 hover:text-gray-500 focus:relative md:w-9 md:px-2 md:hover:bg-gray-50"
+                >
+                  <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
+                </button>
+              </div>
+              <div className="text-base font-semibold text-gray-900 capitalize flex flex-row">
+                {calendarData.date.locale(i18n).format("MMMM")}{" "}
+                {calendarData.date.year()}
+              </div>
+            </div>
+            <div></div>
           </div>
-        )}
+        ) : (
+          <div>
+            {!showMonths && !showYears && (
+              <div className="flex-none">
+                <RoundedButton roundedFull={true} onClick={onClickPrevious}>
+                  <ChevronLeftIcon className="h-5 w-5" />
+                </RoundedButton>
+              </div>
+            )}
 
-        {showYears && (
-          <div className="flex-none  flex flex-row items-center">
-            <RoundedButton
-              roundedFull={true}
-              onClick={() => {
-                setYear(year - 12);
-              }}
-            >
-              <DoubleChevronLeftIcon className="h-5 w-5" />
-            </RoundedButton>
-          </div>
-        )}
+            {showYears && (
+              <div className="flex-none">
+                <RoundedButton
+                  roundedFull={true}
+                  onClick={() => {
+                    setYear(year - 12);
+                  }}
+                >
+                  <DoubleChevronLeftIcon className="h-5 w-5" />
+                </RoundedButton>
+              </div>
+            )}
 
-        <div className=" flex flex-1 items-stretch space-x-1.5">
-          <div className="w-1/2 flex items-stretch">
-            <RoundedButton
-              onClick={() => {
-                setShowMonths(!showMonths);
-                hideYears();
-              }}
-            >
-              <>{calendarData.date.locale(i18n).format("MMM")}</>
-            </RoundedButton>
-          </div>
+            <div className=" flex flex-1 items-stretch space-x-1.5">
+              <div className="w-1/2 flex items-stretch">
+                <RoundedButton
+                  onClick={() => {
+                    setShowMonths(!showMonths);
+                    hideYears();
+                  }}
+                >
+                  <>{calendarData.date.locale(i18n).format("MMM")}</>
+                </RoundedButton>
+              </div>
 
-          <div className="w-1/2 flex items-stretch">
-            <RoundedButton
-              onClick={() => {
-                setShowYears(!showYears);
-                hideMonths();
-              }}
-            >
-              <div className="">{calendarData.date.year()}</div>
-            </RoundedButton>
-          </div>
-        </div>
+              <div className="w-1/2 flex items-stretch">
+                <RoundedButton
+                  onClick={() => {
+                    setShowYears(!showYears);
+                    hideMonths();
+                  }}
+                >
+                  <div className="py-2">{calendarData.date.year()}</div>
+                </RoundedButton>
+              </div>
+            </div>
 
-        {showYears && (
-          <div className="flex-none flex flex-row items-center">
-            <RoundedButton
-              roundedFull={true}
-              onClick={() => {
-                setYear(year + 12);
-              }}
-            >
-              <DoubleChevronRightIcon className="h-5 w-5" />
-            </RoundedButton>
-          </div>
-        )}
+            {showYears && (
+              <div className="flex-none">
+                <RoundedButton
+                  roundedFull={true}
+                  onClick={() => {
+                    setYear(year + 12);
+                  }}
+                >
+                  <DoubleChevronRightIcon className="h-5 w-5" />
+                </RoundedButton>
+              </div>
+            )}
 
-        {!showMonths && !showYears && (
-          <div className="flex-none flex flex-row items-center" >
-            <RoundedButton roundedFull={true} onClick={onClickNext}>
-              <ChevronRightIcon className="h-5 w-5" />
-            </RoundedButton>
+            {!showMonths && !showYears && (
+              <div className="flex-none">
+                <RoundedButton roundedFull={true} onClick={onClickNext}>
+                  <ChevronRightIcon className="h-5 w-5" />
+                </RoundedButton>
+              </div>
+            )}
           </div>
         )}
       </div>
-      <div className={cx("mt-0.5 min-h-[285px]")}>
+      <div
+        className={cx(
+          isCustom ? "flex-grow" : "min-h-[285px]",
+          "mt-0.5  calender-body"
+        )}
+      >
         {showMonths && (
           <Months
             currentMonth={calendarData.date.month() + 1}
             clickMonth={clickMonth}
+            style={style}
           />
         )}
 
@@ -361,27 +478,19 @@ const Calendar: React.FC<Props> = ({
 
         {!showMonths && !showYears && (
           <>
-            <Week />
+            <Week style={style} />
 
             <Days
               calendarData={calendarData}
               onClickPreviousDays={clickPreviousDays}
               onClickDay={clickDay}
               onClickNextDays={clickNextDays}
-              onIcon={(day, date) => {
-                if(typeof onMark === "function"){
-                  return onMark(day, date)
+              style={style}
+              onIcon={(day, date, data) => {
+                if (typeof onMark === "function") {
+                  return onMark(day, date, data);
                 }
-                return <></>
-                if (new Date().getDate() === day)
-                  return (
-                    <div className="absolute inset-y-0 left-0 -translate-y-1/2 -translate-x-1/2">
-                      <div className="w-full h-full flex flex-row items-center justif-center px-0.5">
-                       !
-                      </div>
-                    </div>
-                  );
-                return <></>
+                return <></>;
               }}
             />
           </>

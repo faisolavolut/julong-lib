@@ -4,8 +4,10 @@ import React, { useContext, useMemo } from "react";
 import { DAYS } from "../../constants";
 import DatepickerContext from "../../contexts/DatepickerContext";
 import { loadLanguageModule, shortString, ucFirst } from "../../helpers";
-
-const Week: React.FC = () => {
+interface Props {
+  style?: string;
+}
+const Week: React.FC<Props> = ({ style }) => {
   const { i18n, startWeekOn } = useContext(DatepickerContext);
   loadLanguageModule(i18n);
   const startDateModifier = useMemo(() => {
@@ -33,11 +35,25 @@ const Week: React.FC = () => {
   }, [startWeekOn]);
 
   return (
-    <div className=" grid grid-cols-7 border-b border-gray-300 dark:border-gray-700 py-2">
+    <div
+      className={cx(
+        " grid grid-cols-7 border-b  dark:border-gray-700",
+        style === "custom"
+          ? "sticky top-0 bg-white z-99 border-gray-200"
+          : "border-gray-300  py-2",
+        style === "custom" &&
+          css`
+            z-index: 99;
+          `
+      )}
+    >
       {DAYS.map((item) => (
         <div
           key={item}
-          className="tracking-wide text-gray-500 text-center"
+          className={cx(
+            "tracking-wide text-gray-500 text-center",
+            style === "custom" && " border-r border-gray-200 py-2"
+          )}
         >
           {ucFirst(
             shortString(

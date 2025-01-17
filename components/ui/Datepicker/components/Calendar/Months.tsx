@@ -9,13 +9,19 @@ import { RoundedButton } from "../utils";
 interface Props {
   currentMonth: number;
   clickMonth: (month: number) => void;
+  style?: string;
 }
 
-const Months: React.FC<Props> = ({ currentMonth, clickMonth }) => {
+const Months: React.FC<Props> = ({ currentMonth, clickMonth, style }) => {
   const { i18n } = useContext(DatepickerContext);
   loadLanguageModule(i18n);
   return (
-    <div className={"w-full grid grid-cols-2 gap-2 mt-2"}>
+    <div
+      className={cx(
+        "w-full grid gap-2 mt-2",
+        style === "custom" ? "uppercase grid-cols-2 p-4" : "grid-cols-2"
+      )}
+    >
       {MONTHS.map((item) => (
         <RoundedButton
           key={item}
@@ -24,8 +30,15 @@ const Months: React.FC<Props> = ({ currentMonth, clickMonth }) => {
             clickMonth(item);
           }}
           active={currentMonth === item}
+          style={style}
         >
-          <>{dayjs(`2022-${item}-01`).locale(i18n).format("MMM")}</>
+          {style === "custom" ? (
+            <div className="px-2 py-1">
+              {dayjs(`2022-${item}-01`).locale(i18n).format("MMMM")}
+            </div>
+          ) : (
+            <>{dayjs(`2022-${item}-01`).locale(i18n).format("MMM")}</>
+          )}
         </RoundedButton>
       ))}
     </div>

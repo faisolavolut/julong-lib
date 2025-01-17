@@ -446,6 +446,10 @@ export const Typeahead: FC<{
             }
             local.open = open;
             local.render();
+            
+            if (!open) {
+              resetSearch();
+            }
           }}
           showEmpty={!allow_new}
           className={popupClassName}

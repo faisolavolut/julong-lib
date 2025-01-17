@@ -11,6 +11,7 @@ interface Props {
   minYear: number | null;
   maxYear: number | null;
   clickYear: (data: number) => void;
+  style?: string;
 }
 
 const Years: React.FC<Props> = ({
@@ -19,6 +20,7 @@ const Years: React.FC<Props> = ({
   minYear,
   maxYear,
   clickYear,
+  style,
 }) => {
   const { dateLooking } = useContext(DatepickerContext);
 

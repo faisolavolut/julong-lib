@@ -3,6 +3,8 @@ import Datepicker from "../../ui/Datepicker";
 import { Input } from "../../ui/input";
 import { Textarea } from "../../ui/text-area";
 import { useEffect } from "react";
+import tinycolor from "tinycolor2";
+import { FieldColorPicker } from "../../ui/FieldColorPopover";
 
 export const TypeInput: React.FC<any> = ({
   name,
@@ -13,12 +15,28 @@ export const TypeInput: React.FC<any> = ({
   type,
   field,
   onChange,
+  className,
 }) => {
   let value: any = fm.data?.[name] || "";
   const input = useLocal({
     value: 0 as any,
     ref: null as any,
+    open: false,
   });
+  const meta = useLocal({
+    originalValue: "",
+    inputValue: value,
+    rgbValue: "",
+    selectedEd: "" as string,
+  });
+  useEffect(() => {
+    if (type === "color") {
+      meta.inputValue = value || "";
+      const convertColor = tinycolor(meta.inputValue);
+      meta.rgbValue = convertColor.toRgbString();
+      meta.render();
+    }
+  }, [value]);
   useEffect(() => {
     if (type === "money") {
       input.value =
@@ -67,6 +85,51 @@ export const TypeInput: React.FC<any> = ({
       );
       break;
 
+    case "color":
+      return (
+        <div className="flex flex-row items-center">
+          <div className="border border-gray-300 p-0.5 rounded-sm">
+            <FieldColorPicker
+              value={fm.data?.[name]}
+              update={(val) => {
+                fm.data[name] = val;
+                fm.render();
+              }}
+              onOpen={() => {
+                input.open = true;
+                input.render();
+              }}
+              onClose={() => {
+                input.open = false;
+                input.render();
+              }}
+              open={input.open}
+              showHistory={false}
+            >
+              <div
+                className={cx(
+                  css`
+                    background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill-opacity=".05"><path d="M8 0h8v8H8zM0 8h8v8H0z"/></svg>');
+                  `,
+                  "cursor-pointer  rounded-md"
+                )}
+              >
+                <div
+                  className={cx(
+                    "rounded-sm h-8 w-8",
+                    css`
+                      background: ${fm?.data?.[name]};
+                    `,
+                    "color-box"
+                  )}
+                ></div>
+              </div>
+            </FieldColorPicker>
+          </div>
+        </div>
+      );
+      break;
+
     case "date":
       return (
         <>
@@ -111,7 +174,8 @@ export const TypeInput: React.FC<any> = ({
                     ? "rgb(243 244 246)"
                     : "transparant"}
                   ? "";
-              `
+              `,
+              className
             )}
             required={required}
             placeholder={placeholder || ""}
@@ -165,7 +229,8 @@ export const TypeInput: React.FC<any> = ({
           css`
             background-color: ${disabled ? "rgb(243 244 246)" : "transparant"} ?
               "";
-          `
+          `,
+          className
         )}
         disabled={disabled}
         required={required}
