@@ -50,6 +50,7 @@ import { formatMoney } from "../form/field/TypeInput";
 export const TableList: React.FC<any> = ({
   name,
   column,
+  align = "center",
   onLoad,
   take = 20,
   header,
@@ -574,6 +575,9 @@ export const TableList: React.FC<any> = ({
                           disabledHoverRow ? "" : "hover:bg-gray-100",
                           css`
                             height: 44px;
+                            > td {
+                              vertical-align: ${align};
+                            }
                           `,
                           "border-none"
                         )}
@@ -602,7 +606,7 @@ export const TableList: React.FC<any> = ({
                           return (
                             <Table.Cell
                               className={cx(
-                                "text-md px-2  py-1  whitespace-nowrap text-gray-900 "
+                                "text-md px-2  py-1  whitespace-nowrap text-gray-900 items-start"
                               )}
                               key={cell.id}
                             >

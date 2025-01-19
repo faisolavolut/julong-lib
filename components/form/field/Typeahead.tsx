@@ -398,6 +398,8 @@ export const Typeahead: FC<{
               css`
                 margin-top: 5px;
                 margin-bottom: -3px;
+                display: flex;
+                flex-wrap: wrap;
               `
             )}
           >
@@ -446,7 +448,7 @@ export const Typeahead: FC<{
             }
             local.open = open;
             local.render();
-            
+
             if (!open) {
               resetSearch();
             }

@@ -427,11 +427,16 @@ const Days: React.FC<Props> = ({
   };
   useEffect(() => {
     if (calendarRef?.current && markRef?.current) {
-      const card = getNumber(get(calendarRef, "current.clientWidth"));
+      // const card = getNumber(get(calendarRef, "current.clientWidth"));
+      const cardDay = calendarRef.current as any;
+      const rect = cardDay.getBoundingClientRect();
+      const card = getNumber(rect?.width);
       const cardHeight = getNumber(get(markRef, "current.clientHeight"));
       const heightItem = 20; // perkiraan
-      setWidth(card - 2);
+      console.log(card);
+      setWidth(card);
       setHeight(cardHeight);
+      console.log(Math.floor(cardHeight / heightItem));
       setMaxItem(Math.floor(cardHeight / heightItem));
       setHeightItem(20);
       // setMaxItem
@@ -608,7 +613,9 @@ const Days: React.FC<Props> = ({
                 >
                   <span className="relative">{item}</span>
                 </button>
-                <div>{load_marker(item, "next")}</div>
+                <div className="flex flex-grow  relative ">
+                  {load_marker(item, "next")}
+                </div>
               </>
             ) : (
               <>

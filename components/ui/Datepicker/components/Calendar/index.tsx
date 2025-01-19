@@ -383,9 +383,9 @@ const Calendar: React.FC<Props> = ({
             <div></div>
           </div>
         ) : (
-          <div>
+          <div className="flex flex-row items-center">
             {!showMonths && !showYears && (
-              <div className="flex-none">
+              <div className="flex-none flex-row flex items-center">
                 <RoundedButton roundedFull={true} onClick={onClickPrevious}>
                   <ChevronLeftIcon className="h-5 w-5" />
                 </RoundedButton>
@@ -393,7 +393,7 @@ const Calendar: React.FC<Props> = ({
             )}
 
             {showYears && (
-              <div className="flex-none">
+              <div className="flex-none  flex-row flex items-center">
                 <RoundedButton
                   roundedFull={true}
                   onClick={() => {
@@ -424,13 +424,13 @@ const Calendar: React.FC<Props> = ({
                     hideMonths();
                   }}
                 >
-                  <div className="py-2">{calendarData.date.year()}</div>
+                  <div className="">{calendarData.date.year()}</div>
                 </RoundedButton>
               </div>
             </div>
 
             {showYears && (
-              <div className="flex-none">
+              <div className="flex-none  flex-row flex items-center">
                 <RoundedButton
                   roundedFull={true}
                   onClick={() => {
@@ -443,7 +443,7 @@ const Calendar: React.FC<Props> = ({
             )}
 
             {!showMonths && !showYears && (
-              <div className="flex-none">
+              <div className="flex-none  flex-row flex items-center">
                 <RoundedButton roundedFull={true} onClick={onClickNext}>
                   <ChevronRightIcon className="h-5 w-5" />
                 </RoundedButton>

@@ -1,6 +1,6 @@
 "use client";
 import React, { FC } from "react";
-import { Dropdown, Sidebar, Tooltip } from "flowbite-react";
+import { Avatar, Dropdown, Sidebar, Tooltip } from "flowbite-react";
 import { useEffect, useState } from "react";
 import classNames from "classnames";
 import { HiAdjustments, HiCog } from "react-icons/hi";
@@ -9,6 +9,8 @@ import { FaAngleUp, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { SidebarLinkBetter } from "../ui/link-better";
 import { detectCase } from "@/lib/utils/detectCase";
 import { useLocal } from "@/lib/utils/use-local";
+import { get_user } from "@/lib/utils/get_user";
+import { siteurl } from "@/lib/utils/siteurl";
 interface TreeMenuItem {
   title: string;
   href?: string;
@@ -71,8 +73,8 @@ const SidebarTree: React.FC<TreeMenuProps> = ({ data, minimaze, mini }) => {
       return (
         <React.Fragment key={item.href || item.title || index}>
           {hasChildren ? (
-            <li className="relative">
-              {mini && isParentActive && (
+            <li className="relative ">
+              {false && (
                 <div
                   className={cx("absolute top-[-15px] right-[-1px] text-layer")}
                 >
@@ -100,10 +102,10 @@ const SidebarTree: React.FC<TreeMenuProps> = ({ data, minimaze, mini }) => {
 
                   mini
                     ? isParentActive && !depth
-                      ? " text-base font-normal text-primary rounded-full  rounded-r-none group bg-layer   transition-all duration-200  dark:bg-gray-700"
+                      ? " text-base font-normal text-primary rounded-full  rounded-r-none group bg-layer    dark:bg-gray-700 vertical-rounded-tab"
                       : " text-white"
                     : isActive && !depth
-                    ? " text-base font-normal text-primary rounded-full  rounded-r-none group bg-layer   transition-all duration-200  dark:bg-gray-700"
+                    ? " text-base font-normal text-primary rounded-full  rounded-r-none group bg-layer    dark:bg-gray-700"
                     : " text-white",
                   mini ? "pr-4 m-0 flex-grow w-full" : "py-2.5 px-4 ",
                   mini
@@ -162,7 +164,7 @@ const SidebarTree: React.FC<TreeMenuProps> = ({ data, minimaze, mini }) => {
 
                   {!mini ? (
                     <>
-                      <div className="pl-2 flex-grow   text-xs">
+                      <div className="pl-2 flex-grow   text-xs line-clamp-2">
                         {item.title}
                       </div>
                       <div className="text-md px-1">
@@ -174,7 +176,7 @@ const SidebarTree: React.FC<TreeMenuProps> = ({ data, minimaze, mini }) => {
                   )}
                 </div>
 
-                {mini && isParentActive && (
+                {false && (
                   <div className=" absolute bottom-[-15px] right-[-1px] text-layer">
                     <svg
                       width="147"
@@ -206,7 +208,7 @@ const SidebarTree: React.FC<TreeMenuProps> = ({ data, minimaze, mini }) => {
             </li>
           ) : (
             <li className="relative">
-              {isActive && (
+              {false && (
                 <div
                   className={cx(
                     " absolute top-[-15px] right-[-1px] text-layer"
@@ -242,8 +244,8 @@ const SidebarTree: React.FC<TreeMenuProps> = ({ data, minimaze, mini }) => {
                   mini ? "transition-all duration-200" : "",
                   isActive
                     ? !depth
-                      ? " bg-layer  font-normal"
-                      : " bg-layer  text-primary font-bold"
+                      ? " bg-layer  font-normal  vertical-rounded-tab"
+                      : " bg-layer  text-primary font-bold  vertical-rounded-tab"
                     : "text-white",
                   css`
                     & > span {
@@ -271,13 +273,15 @@ const SidebarTree: React.FC<TreeMenuProps> = ({ data, minimaze, mini }) => {
                   )}
                   {!mini ? (
                     <>
-                      <div className="pl-2 text-xs">{item.title}</div>
+                      <div className="pl-2 text-xs  line-clamp-1">
+                        {item.title}
+                      </div>
                     </>
                   ) : (
                     <></>
                   )}
                 </div>
-                {isActive && (
+                {false && (
                   <div
                     className={cx(
                       "absolute bottom-[-15px] right-[-1px] text-layer"
@@ -309,36 +313,113 @@ const SidebarTree: React.FC<TreeMenuProps> = ({ data, minimaze, mini }) => {
   };
 
   return (
-    <div className={classNames("flex h-full lg:!block ", {})}>
-      <Sidebar
-        aria-label="Sidebar with multi-level dropdown example"
-        className={classNames(
-          "relative bg-primary pt-0 sidebar",
-          mini ? "w-20" : "",
-          css`
-            > div {
-              background: transparent;
-              padding-top: 0;
-              padding-right: 0;
-            }
-          `
-        )}
-      >
-        <div className="w-full h-full relative ">
-          <div className="flex h-full flex-col justify-between w-full absolute top-0 left-0">
-            <Sidebar.Items>
-              <Sidebar.ItemGroup
-                className={cx(
-                  "border-none mt-0 pt-4",
-                  mini ? "flex flex-col gap-y-2" : ""
-                )}
-              >
-                {renderTree(data)}
-              </Sidebar.ItemGroup>
-            </Sidebar.Items>
+    <div className="flex flex-col gap-y-4 flex-grow bg-primary ">
+      <div className={classNames("flex flex-grow lg:!block ", {})}>
+        <Sidebar
+          aria-label="Sidebar with multi-level dropdown example"
+          className={classNames(
+            "relative pt-0 sidebar rounded-none",
+            mini ? "w-20" : "",
+            css`
+              > div {
+                border-radius: 0px;
+                background: transparent;
+                padding-top: 0;
+                padding-right: 0;
+              }
+            `
+          )}
+        >
+          <div className="w-full h-full relative ">
+            <div className="flex h-full flex-col justify-between w-full absolute top-0 left-0">
+              <Sidebar.Items>
+                <Sidebar.ItemGroup
+                  className={cx(
+                    "border-none mt-0 pt-4",
+                    mini ? "flex flex-col gap-y-2" : ""
+                  )}
+                >
+                  {renderTree(data)}
+                </Sidebar.ItemGroup>
+              </Sidebar.Items>
+            </div>
+          </div>
+        </Sidebar>
+      </div>
+      <div className="flex flex-col">
+        <div
+          className={cx(
+            "flex flex-col flex-grow gap-y-2",
+            mini ? "justify-center" : "px-4"
+          )}
+        >
+          <div
+            className={cx(
+              "flex flex-row w-full p-2 items-center gap-x-2 items-center text-white text-sm",
+              mini ? "justify-center" : ""
+            )}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width={20}
+              height={20}
+              viewBox="0 0 24 24"
+            >
+              <g fill="none" stroke="currentColor" strokeWidth={2}>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 19v-9a6 6 0 0 1 6-6v0a6 6 0 0 1 6 6v9M6 19h12M6 19H4m14 0h2m-9 3h2"
+                ></path>
+                <circle cx={12} cy={3} r={1}></circle>
+              </g>
+            </svg>
+            {!mini && "Notifications"}
+          </div>
+
+          <div
+            className={cx(
+              "flex flex-row w-full p-2 items-center gap-x-2 items-center text-white text-sm",
+              mini ? "justify-center" : ""
+            )}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width={20}
+              height={20}
+              viewBox="0 0 24 24"
+            >
+              <g fill="currentColor">
+                <path d="M6.5 3.75c-.526 0-1.25.63-1.25 1.821V18.43c0 1.192.724 1.821 1.25 1.821h6.996a.75.75 0 1 1 0 1.5H6.5c-1.683 0-2.75-1.673-2.75-3.321V5.57c0-1.648 1.067-3.321 2.75-3.321h7a.75.75 0 0 1 0 1.5z"></path>
+                <path d="M16.53 7.97a.75.75 0 0 0-1.06 0v3.276H9.5a.75.75 0 0 0 0 1.5h5.97v3.284a.75.75 0 0 0 1.06 0l3.5-3.5a.75.75 0 0 0 .22-.532v-.002a.75.75 0 0 0-.269-.575z"></path>
+              </g>
+            </svg>
+            {!mini && "Sign Out"}
           </div>
         </div>
-      </Sidebar>
+
+        <div className="flex flex-row w-full">
+          <div
+            className={cx(
+              "flex flex-row justify-center flex-grow  rounded-lg",
+              mini ? "py-4" : "p-4  bg-[#31314D] "
+            )}
+          >
+            <Avatar alt="" img={siteurl("/dog.jpg")} rounded size="sm" />
+            {!mini && (
+              <div className="flex flex-row items-center flex-grow font-bold text-white">
+                <div className=" px-2 h-full flex items-end justify-center flex-col text-xs">
+                  <div>
+                    {get_user("employee.name")
+                      ? get_user("employee.name")
+                      : "-"}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
