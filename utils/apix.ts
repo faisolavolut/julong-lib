@@ -39,10 +39,14 @@ export const apix = async ({
 
   try {
     // Convert data to FormData if type is "form"
+    const execption = ["certificate"];
     const requestData =
       type === "form" && data
         ? Object.entries(data as any).reduce((formData, [key, value]) => {
-            formData.append(key.replace(/\[\d+\]/, ""), value as any);
+            formData.append(
+              key.includes("certificate") ? key : key.replace(/\[\d+\]/, ""),
+              value as any
+            );
             return formData;
           }, new FormData())
         : data;

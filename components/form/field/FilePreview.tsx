@@ -117,8 +117,12 @@ export const ThumbPreview = ({
   );
 };
 
-export const FilePreview = ({ url }: { url: string }) => {
-  const file = getFileName(url);
+export const FilePreview = ({ url }: { url: any }) => {
+  let ural = url;
+  if (url instanceof File) {
+    ural = `${URL.createObjectURL(url)}.${url.name.split(".").pop()}`;
+  }
+  const file = getFileName(ural);
   if (typeof file === "string")
     return (
       <div
@@ -164,13 +168,14 @@ export const FilePreview = ({ url }: { url: string }) => {
     parts.pop(); // Hapus bagian terakhir (ekstensi)
     return parts.join("."); // Gabungkan kembali
   };
-  const ura = url.startsWith("blob:") ? getFileNameWithoutExtension(url) : url;
-  if ([".png", ".jpeg", ".jpg", ".webp"].find((e) => url.endsWith(e))) {
+  const ura =
+    ural && ural.startsWith("blob:") ? getFileNameWithoutExtension(ural) : ural;
+  if ([".png", ".jpeg", ".jpg", ".webp"].find((e) => ural.endsWith(e))) {
     content = (
       <div className="rounded-lg flex-grow overflow-hidden">
         <img
           onClick={() => {
-            let _url = siteurl(url || "");
+            let _url = siteurl(ural || "");
             window.open(_url, "_blank");
           }}
           className={cx(
@@ -195,7 +200,7 @@ export const FilePreview = ({ url }: { url: string }) => {
               background-position: 0 0, 12.5px 0, 12.5px -12.5px, 0px 12.5px; /* Must be half of one side of the square */
             `
           )}
-          src={url.startsWith("blob:") ? ura : url}
+          src={ural && ural.startsWith("blob:") ? ura : ural}
         />
       </div>
     );
@@ -216,7 +221,8 @@ export const FilePreview = ({ url }: { url: string }) => {
             `
           )}
           onClick={() => {
-            let _url: any = url.startsWith("blob:") ? ura : siteurl(ura || "");
+            let _url: any =
+              url && url.startsWith("blob:") ? ura : siteurl(ura || "");
             console.log(_url);
             window.open(_url, "_blank");
           }}
@@ -269,7 +275,7 @@ function generateRandomColor(str: string): string {
   return color;
 }
 const getFileName = (url: string) => {
-  if (url && url.startsWith("[")) {
+  if (url && typeof url === "string" && url.startsWith("[")) {
     try {
       const list = JSON.parse(url);
       if (list.length === 0) return "Empty";

@@ -1,6 +1,6 @@
 import get from "lodash.get";
 import { Loader2, Paperclip, Trash2, Upload } from "lucide-react";
-import { ChangeEvent, FC } from "react";
+import { ChangeEvent, FC, useEffect } from "react";
 import * as XLSX from "xlsx";
 import { useLocal } from "@/lib/utils/use-local";
 import { siteurl } from "@/lib/utils/siteurl";
@@ -26,6 +26,15 @@ export const FieldUploadSingle: FC<{
     preview: null as any,
     isLocal: false,
   });
+  useEffect(() => {
+    if (value instanceof File) {
+      input.preview = `${URL.createObjectURL(value)}.${value.name
+        .split(".")
+        .pop()}`;
+      input.isLocal = true;
+      input.render();
+    }
+  }, []);
 
   const on_upload = async (event: ChangeEvent<HTMLInputElement>) => {
     let file = null;
