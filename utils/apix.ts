@@ -42,7 +42,7 @@ export const apix = async ({
     const requestData =
       type === "form" && data
         ? Object.entries(data as any).reduce((formData, [key, value]) => {
-            formData.append(key, value as any);
+            formData.append(key.replace(/\[\d+\]/, ""), value as any);
             return formData;
           }, new FormData())
         : data;
@@ -105,3 +105,13 @@ export const apix = async ({
     throw error;
   }
 };
+function removeIndexFromKey(obj: any) {
+  let result = {} as any;
+
+  for (const [key, value] of Object.entries(obj)) {
+    const newKey = key.replace(/\[\d+\]/, ""); // Hapus indeks [n] dari key
+    result[newKey] = value;
+  }
+
+  return result;
+}

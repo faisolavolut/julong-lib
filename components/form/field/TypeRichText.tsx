@@ -770,7 +770,7 @@ export const TypeRichText: React.FC<any> = ({
   return (
     <div
       className={cx(
-        "flex flex-col relative bg-white border border-gray-300 rounded-md w-full",
+        "flex flex-col relative bg-white border border-gray-300 rounded-md w-full richtext-field",
         css`
           .tiptap h1 {
             font-size: 1.4rem !important;

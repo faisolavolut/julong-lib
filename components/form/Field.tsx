@@ -79,7 +79,8 @@ export const Field: React.FC<any> = ({
               ? "flex flex-row rounded-md flex-grow border-red-500 border items-center"
               : "flex flex-row rounded-md flex-grow  items-center",
             is_disable ? "bg-gray-100" : "",
-            "relative"
+            "relative",
+            ""
           )}
         >
           {before && (

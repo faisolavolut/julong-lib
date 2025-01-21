@@ -2,9 +2,12 @@ import { useLocal } from "@/lib/utils/use-local";
 import Datepicker from "../../ui/Datepicker";
 import { Input } from "../../ui/input";
 import { Textarea } from "../../ui/text-area";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import tinycolor from "tinycolor2";
 import { FieldColorPicker } from "../../ui/FieldColorPopover";
+import { FaRegStar, FaStar } from "react-icons/fa6";
+import { Rating } from "../../ui/ratings";
+import { getNumber } from "@/lib/utils/getNumber";
 
 export const TypeInput: React.FC<any> = ({
   name,
@@ -17,7 +20,15 @@ export const TypeInput: React.FC<any> = ({
   onChange,
   className,
 }) => {
+  const [hover, setHover] = useState(0); // State untuk menyimpan nilai hover
+
   let value: any = fm.data?.[name] || "";
+  const [rating, setRating] = useState(value); // State untuk menyimpan nilai rating
+  const handleClick = (index: number) => {
+    setRating(index); // Update nilai rating
+    fm.data[name] = rating + 1;
+    fm.render();
+  };
   const input = useLocal({
     value: 0 as any,
     ref: null as any,
@@ -35,6 +46,8 @@ export const TypeInput: React.FC<any> = ({
       const convertColor = tinycolor(meta.inputValue);
       meta.rgbValue = convertColor.toRgbString();
       meta.render();
+    } else {
+      setRating(value ? value - 1 : value);
     }
   }, [value]);
   useEffect(() => {
@@ -85,6 +98,59 @@ export const TypeInput: React.FC<any> = ({
       );
       break;
 
+    case "rating":
+      return (
+        <div className="flex">
+          <Rating
+            rating={getNumber(fm.data?.[name])}
+            totalStars={5}
+            size={24}
+            variant="yellow"
+            disabled={disabled}
+            className="h-1"
+            showText={false}
+            onRatingChange={(e) => {
+              fm.data[name] = getNumber(e);
+              fm.render();
+            }}
+          />
+        </div>
+      );
+      return (
+        <>
+          <div className="flex">
+            {Array.from({ length: 5 }, (_, index) => index + 1).map(
+              (number) => (
+                <button
+                  key={number}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleClick(number);
+                  }}
+                  onMouseEnter={() => setHover(number)} // Set nilai hover saat mouse masuk
+                  onMouseLeave={() => setHover(number)} // Reset nilai hover saat mouse keluar
+                  className={cx(
+                    "focus:outline-none px-0.5",
+                    disabled ? "" : "transition-transform duration-200"
+                  )}
+                  style={{
+                    transform:
+                      hover === number && !disabled ? "scale(1.2)" : "scale(1)",
+                  }}
+                >
+                  {hover >= number || rating >= number ? (
+                    <FaStar className="text-yellow-400" /> // Star yang diisi (fill)
+                  ) : (
+                    <FaRegStar className="text-gray-400" /> // Star yang kosong (outline)
+                  )}
+                </button>
+              )
+            )}
+          </div>
+        </>
+      );
+      break;
     case "color":
       return (
         <div className="flex flex-row items-center">

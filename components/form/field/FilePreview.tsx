@@ -269,7 +269,7 @@ function generateRandomColor(str: string): string {
   return color;
 }
 const getFileName = (url: string) => {
-  if (url.startsWith("[")) {
+  if (url && url.startsWith("[")) {
     try {
       const list = JSON.parse(url);
       if (list.length === 0) return "Empty";
