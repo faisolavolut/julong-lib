@@ -1,5 +1,4 @@
 "use client";
-import { makeData } from "@/lib/makeData";
 import {
   ColumnDef,
   ColumnResizeDirection,
