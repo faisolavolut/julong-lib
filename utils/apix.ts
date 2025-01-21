@@ -8,11 +8,13 @@ type apixType = {
   data?: any;
   value?: any;
   validate?: "object" | "array" | "dropdown";
+  type?: "usual" | "form";
   keys?: {
     value?: string;
     label: string | ((item: any) => string);
   };
 };
+
 export const apix = async ({
   port = "portal",
   method = "get",
@@ -20,6 +22,7 @@ export const apix = async ({
   value,
   path,
   validate = "object",
+  type = "usual",
   keys,
 }: apixType) => {
   const root_url = `${
@@ -31,8 +34,19 @@ export const apix = async ({
       ? process.env.NEXT_PUBLIC_API_MPP
       : ""
   }${path}`;
+
   let result = null as any;
+
   try {
+    // Convert data to FormData if type is "form"
+    const requestData =
+      type === "form" && data
+        ? Object.entries(data as any).reduce((formData, [key, value]) => {
+            formData.append(key, value as any);
+            return formData;
+          }, new FormData())
+        : data;
+
     try {
       switch (method) {
         case "get":
@@ -40,15 +54,21 @@ export const apix = async ({
           break;
 
         case "post":
-          result = await api.post(root_url, data);
+          result = await api.post(root_url, requestData, {
+            headers:
+              type === "form" ? { "Content-Type": "multipart/form-data" } : {},
+          });
           break;
 
         case "put":
-          result = await api.put(root_url, data);
+          result = await api.put(root_url, requestData, {
+            headers:
+              type === "form" ? { "Content-Type": "multipart/form-data" } : {},
+          });
           break;
 
         case "delete":
-          result = await api.delete(root_url, data);
+          result = await api.delete(root_url, { data: requestData });
           break;
 
         default:
@@ -60,6 +80,7 @@ export const apix = async ({
         get(ex, "response.data.meta.message") || ex.message
       );
     }
+
     const val = get(result, value);
     return validate === "object"
       ? get(result, value)
@@ -67,6 +88,7 @@ export const apix = async ({
       ? val.map((e: any) => {
           return {
             value: keys?.value ? get(e, keys?.value) : get(e, "id"),
+            data: e,
             label:
               typeof keys?.label === "function"
                 ? keys.label(e)

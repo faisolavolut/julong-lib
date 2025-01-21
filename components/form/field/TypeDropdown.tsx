@@ -15,7 +15,13 @@ export const TypeDropdown: React.FC<any> = ({
   return (
     <>
       <Typeahead
-        value={Array.isArray(fm.data?.[name]) ? fm.data?.[name] : fm.data?.[name] ? [fm.data?.[name]]: []}
+        value={
+          Array.isArray(fm.data?.[name])
+            ? fm.data?.[name]
+            : fm.data?.[name]
+            ? [fm.data?.[name]]
+            : []
+        }
         disabledSearch={false}
         //   popupClassName={}
         required={required}
@@ -48,8 +54,8 @@ export const TypeDropdown: React.FC<any> = ({
         onInit={(e) => {
           fm.fields[name] = {
             ...fm.fields[name],
-            ...e
-          }
+            ...e,
+          };
         }}
       />
     </>

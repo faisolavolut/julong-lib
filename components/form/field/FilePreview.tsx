@@ -10,9 +10,7 @@ export const ThumbPreview = ({
   url: string;
   options: ReactElement;
 }) => {
-  const local = useLocal({ size: "", is_doc: true }, async () => {
-
-  });
+  const local = useLocal({ size: "", is_doc: true }, async () => {});
 
   const file = getFileName(url);
   if (typeof file === "string") return;
@@ -61,42 +59,44 @@ export const ThumbPreview = ({
   );
 
   let is_image = false;
-  
+
   if ([".png", ".jpeg", ".jpg", ".webp"].find((e) => url.endsWith(e))) {
     is_image = true;
     local.is_doc = false;
     content = (
-      <img
-        onClick={() => {
-          let _url = siteurl(url || "");
-          window.open(_url, "_blank");
-        }}
-        className={cx(
-          "rounded-md",
-          css`
-            &:hover {
-              outline: 2px solid #1c4ed8;
-            }
-          `,
-          css`
-            width: 60px;
-            height: 60px;
-            background-image: linear-gradient(
-                45deg,
-                #ccc 25%,
-                transparent 25%
-              ),
-              linear-gradient(135deg, #ccc 25%, transparent 25%),
-              linear-gradient(45deg, transparent 75%, #ccc 75%),
-              linear-gradient(135deg, transparent 75%, #ccc 75%);
-            background-size: 25px 25px; /* Must be a square */
-            background-position: 0 0, 12.5px 0, 12.5px -12.5px, 0px 12.5px; /* Must be half of one side of the square */
-          `
-        )}
-        src={siteurl(
-          `/_img/${url.substring("_file/".length)}?${"w=60&h=60&fit=cover"}`
-        )}
-      />
+      <div className="rounded-lg w-96 overflow-hidden shadow-lg">
+        <img
+          onClick={() => {
+            let _url = siteurl(url || "");
+            window.open(_url, "_blank");
+          }}
+          className={cx(
+            "rounded-md w-96 h-full object-cover",
+            css`
+              &:hover {
+                outline: 2px solid #1c4ed8;
+              }
+            `,
+            css`
+              width: 60px;
+              height: 60px;
+              background-image: linear-gradient(
+                  45deg,
+                  #ccc 25%,
+                  transparent 25%
+                ),
+                linear-gradient(135deg, #ccc 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #ccc 75%),
+                linear-gradient(135deg, transparent 75%, #ccc 75%);
+              background-size: 25px 25px; /* Must be a square */
+              background-position: 0 0, 12.5px 0, 12.5px -12.5px, 0px 12.5px; /* Must be half of one side of the square */
+            `
+          )}
+          src={siteurl(
+            `/_img/${url.substring("_file/".length)}?${"w=60&h=60&fit=cover"}`
+          )}
+        />
+      </div>
     );
   }
 
@@ -159,14 +159,30 @@ export const FilePreview = ({ url }: { url: string }) => {
       {file.extension}
     </div>
   );
-
-  if (url.startsWith("_file/")) {
-    if ([".png", ".jpeg", ".jpg", ".webp"].find((e) => url.endsWith(e))) {
-      content = (
+  const getFileNameWithoutExtension = (filename: string) => {
+    const parts = filename.split(".");
+    parts.pop(); // Hapus bagian terakhir (ekstensi)
+    return parts.join("."); // Gabungkan kembali
+  };
+  const ura = url.startsWith("blob:") ? getFileNameWithoutExtension(url) : url;
+  if ([".png", ".jpeg", ".jpg", ".webp"].find((e) => url.endsWith(e))) {
+    content = (
+      <div className="rounded-lg flex-grow overflow-hidden">
         <img
+          onClick={() => {
+            let _url = siteurl(url || "");
+            window.open(_url, "_blank");
+          }}
           className={cx(
-            "my-1 rounded-md",
+            "rounded-md h-full object-cover",
             css`
+              &:hover {
+                outline: 2px solid #1c4ed8;
+              }
+            `,
+            css`
+              width: 30px;
+              height: 30px;
               background-image: linear-gradient(
                   45deg,
                   #ccc 25%,
@@ -179,12 +195,10 @@ export const FilePreview = ({ url }: { url: string }) => {
               background-position: 0 0, 12.5px 0, 12.5px -12.5px, 0px 12.5px; /* Must be half of one side of the square */
             `
           )}
-          src={siteurl(
-            `/_img/${url.substring("_file/".length)}?${"w=100&h=20"}`
-          )}
+          src={url.startsWith("blob:") ? ura : url}
         />
-      );
-    }
+      </div>
+    );
   }
 
   return (
@@ -192,7 +206,7 @@ export const FilePreview = ({ url }: { url: string }) => {
       {file.extension && (
         <div
           className={cx(
-            "flex border rounded items-center px-1  bg-white cursor-pointer",
+            "flex border rounded items-center px-1  bg-white cursor-pointer flex-grow",
             "pr-2",
             css`
               &:hover {
@@ -202,7 +216,8 @@ export const FilePreview = ({ url }: { url: string }) => {
             `
           )}
           onClick={() => {
-            let _url = siteurl(url || "");
+            let _url: any = url.startsWith("blob:") ? ura : siteurl(ura || "");
+            console.log(_url);
             window.open(_url, "_blank");
           }}
         >

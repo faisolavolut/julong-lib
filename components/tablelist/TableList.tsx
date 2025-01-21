@@ -46,6 +46,7 @@ import get from "lodash.get";
 import { Checkbox } from "../ui/checkbox";
 import { getNumber } from "@/lib/utils/getNumber";
 import { formatMoney } from "../form/field/TypeInput";
+import { cloneFM } from "@/lib/utils/cloneFm";
 
 export const TableList: React.FC<any> = ({
   name,
@@ -61,7 +62,10 @@ export const TableList: React.FC<any> = ({
   disabledHoverRow,
   onInit,
   onCount,
+  fm,
+  mode,
   feature,
+  onChange,
 }) => {
   const [data, setData] = useState<any[]>([]);
   const sideLeft =
@@ -80,9 +84,12 @@ export const TableList: React.FC<any> = ({
     Array.isArray(feature) && feature?.length
       ? feature.includes("checkbox")
       : false;
+
   const local = useLocal({
     table: null as any,
     data: [] as any[],
+    dataForm: [] as any[],
+    listData: [] as any[],
     sort: {} as any,
     search: null as any,
     count: 0 as any,
@@ -137,6 +144,7 @@ export const TableList: React.FC<any> = ({
         if (res instanceof Promise) {
           res.then((e) => {
             local.data = e;
+            cloneListFM(e);
             local.render();
             setData(e);
             setTimeout(() => {
@@ -145,6 +153,7 @@ export const TableList: React.FC<any> = ({
           });
         } else {
           local.data = res;
+          cloneListFM(res);
           local.render();
           setData(res);
           setTimeout(() => {
@@ -154,6 +163,12 @@ export const TableList: React.FC<any> = ({
       }
     },
   });
+  const cloneListFM = (data: any[]) => {
+    if (mode === "form") {
+      local.dataForm = data.map((e: any) => cloneFM(fm, e));
+      local.render();
+    }
+  };
   useEffect(() => {
     const run = async () => {
       toast.info(
@@ -180,11 +195,13 @@ export const TableList: React.FC<any> = ({
       if (typeof onCount === "function") {
         const res = await onCount();
         local.count = res;
+
         local.render();
       }
 
       if (Array.isArray(onLoad)) {
         local.data = onLoad;
+        cloneListFM(onLoad);
         local.render();
         setData(onLoad);
       } else {
@@ -195,6 +212,7 @@ export const TableList: React.FC<any> = ({
           paging: 1,
         });
         local.data = res;
+        cloneListFM(res);
         local.render();
         setData(res);
         setTimeout(() => {
@@ -207,10 +225,6 @@ export const TableList: React.FC<any> = ({
     }
     run();
   }, []);
-  useEffect(() => {
-    // console.log("PERUBAHAN");
-  }, [data]);
-  const objectNull = {};
   const defaultColumns: ColumnDef<Person>[] = init_column(column);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columns] = React.useState<typeof defaultColumns>(() =>
@@ -395,7 +409,18 @@ export const TableList: React.FC<any> = ({
                         border-top-right-radius: 10px; /* Sudut kiri atas */
                         border-bottom-right-radius: 10px;
                       }
-                    `
+                    `,
+                    checkbox &&
+                      css`
+                        .table-header-tbl > th:first-child {
+                          width: 20px !important; /* Atur lebar sesuai kebutuhan */
+                          text-align: center;
+                        }
+                        .table-row-element > td:first-child {
+                          width: 20px !important; /* Atur lebar sesuai kebutuhan */
+                          text-align: center;
+                        }
+                      `
                   )}
                 >
                   {!disabledHeadTable ? (
@@ -403,7 +428,7 @@ export const TableList: React.FC<any> = ({
                       {table.getHeaderGroups().map((headerGroup) => (
                         <tr
                           key={`${headerGroup.id}`}
-                          className={headerGroup.id}
+                          className={"table-header-tbl"}
                         >
                           {headerGroup.headers.map((header, index) => {
                             const name = header.column.id;
@@ -427,7 +452,7 @@ export const TableList: React.FC<any> = ({
                                 {...{
                                   style: {
                                     width: !resize
-                                      ? `${col.width}px`
+                                      ? `${col?.width}px`
                                       : name === "select"
                                       ? `${5}px`
                                       : col?.width
@@ -568,54 +593,67 @@ export const TableList: React.FC<any> = ({
                   )}
 
                   <Table.Body className="divide-y border-none bg-white">
-                    {table.getRowModel().rows.map((row, idx) => (
-                      <Table.Row
-                        key={row.id}
-                        className={cx(
-                          disabledHoverRow ? "" : "hover:bg-gray-100",
-                          css`
-                            height: 44px;
-                            > td {
-                              vertical-align: ${align};
-                            }
-                          `,
-                          "border-none"
-                        )}
-                      >
-                        {row.getVisibleCells().map((cell) => {
-                          const ctx = cell.getContext();
-                          const param = {
-                            row: row.original,
-                            name: get(ctx, "column.columnDef.accessorKey"),
-                            cell,
-                            idx,
-                            tbl: local,
-                          };
-                          const head = column.find(
-                            (e: any) =>
-                              e?.name ===
-                              get(ctx, "column.columnDef.accessorKey")
-                          );
-                          const renderData =
-                            typeof head?.renderCell === "function"
-                              ? head.renderCell(param)
-                              : flexRender(
-                                  cell.column.columnDef.cell,
-                                  cell.getContext()
-                                );
-                          return (
-                            <Table.Cell
-                              className={cx(
-                                "text-md px-2  py-1  whitespace-nowrap text-gray-900 items-start"
-                              )}
-                              key={cell.id}
-                            >
-                              {renderData}
-                            </Table.Cell>
-                          );
-                        })}
-                      </Table.Row>
-                    ))}
+                    {table.getRowModel().rows.map((row, idx) => {
+                      const fm_row =
+                        mode === "form" ? local.dataForm?.[idx] : null;
+                      return (
+                        <Table.Row
+                          key={row.id}
+                          className={cx(
+                            disabledHoverRow ? "" : "hover:bg-gray-100",
+                            css`
+                              height: 44px;
+                              > td {
+                                vertical-align: ${align};
+                              }
+                            `,
+                            "border-none"
+                          )}
+                        >
+                          {row.getVisibleCells().map((cell: any) => {
+                            const ctx = cell.getContext();
+                            const param = {
+                              row: row.original,
+                              name: get(ctx, "column.columnDef.accessorKey"),
+                              cell,
+                              idx,
+                              tbl: local,
+                              fm_row: fm_row,
+                              onChange,
+                            };
+                            const head = column.find(
+                              (e: any) =>
+                                e?.name ===
+                                get(ctx, "column.columnDef.accessorKey")
+                            );
+                            console.log(head);
+                            const renderData =
+                              typeof head?.renderCell === "function"
+                                ? head.renderCell(param)
+                                : flexRender(
+                                    cell.column.columnDef.cell,
+                                    cell.getContext()
+                                  );
+                            console.log(name);
+                            return (
+                              <Table.Cell
+                                className={cx(
+                                  "text-md px-2  py-1  whitespace-nowrap text-gray-900 items-start",
+                                  name === "select"
+                                    ? css`
+                                        width: 5px;
+                                      `
+                                    : ``
+                                )}
+                                key={cell.id}
+                              >
+                                {renderData}
+                              </Table.Cell>
+                            );
+                          })}
+                        </Table.Row>
+                      );
+                    })}
                   </Table.Body>
                 </Table>
               </div>

@@ -137,8 +137,12 @@ export const Form: React.FC<any> = ({
     fields: {} as any,
     render: () => {},
     error: {} as any,
+    onChange: () => {},
     mode,
   });
+  useEffect(() => {
+    local.onChange();
+  }, [local.data]);
   useEffect(() => {
     if (typeof onInit === "function") {
       onInit(local);

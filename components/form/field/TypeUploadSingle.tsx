@@ -23,6 +23,8 @@ export const FieldUploadSingle: FC<{
     drop: false as boolean,
     fase: value ? "preview" : ("start" as "start" | "upload" | "preview"),
     style: "inline" as "inline" | "full",
+    preview: null as any,
+    isLocal: false,
   });
 
   const on_upload = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -65,6 +67,16 @@ export const FieldUploadSingle: FC<{
         }
       }
     } else if (file) {
+      fm.data[field.name] = file;
+      fm.render();
+      input.fase = "preview";
+      input.preview = `${URL.createObjectURL(file)}.${file.name
+        .split(".")
+        .pop()}`;
+      input.isLocal = true;
+      input.render();
+      console.log(input.preview);
+      return;
       const formData = new FormData();
       formData.append("file", file);
 
@@ -126,19 +138,20 @@ export const FieldUploadSingle: FC<{
         <>
           <div
             className={cx(
-              "bg-gray-50 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500",
+              "hover:bg-gray-50 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-1.5 ",
               css`
                 input[type="file"],
                 input[type="file"]::-webkit-file-upload-button {
                   cursor: pointer;
                 }
-              `
+              `,
+              disabled && "bg-gray-50"
             )}
           >
             {!disabled && (
               <input
                 ref={(ref) => {
-                  if(ref) input.ref = ref
+                  if (ref) input.ref = ref;
                 }}
                 type="file"
                 multiple={false}
@@ -176,8 +189,8 @@ export const FieldUploadSingle: FC<{
           <div className="">Uploading</div>
         </div>
       ) : input.fase === "preview" ? (
-        <div className="flex justify-between flex-1 p-1">
-          <FilePreview url={value || ""} />
+        <div className="flex flex-row gap-x-1 justify-between flex-1 p-1">
+          <FilePreview url={input.isLocal ? input.preview : value || ""} />
           {!disabled ? (
             <>
               <div
