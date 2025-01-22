@@ -1,4 +1,11 @@
-import { FC, KeyboardEvent, useCallback, useEffect, useRef } from "react";
+import {
+  FC,
+  KeyboardEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { useLocal } from "@/lib/utils/use-local";
 import { TypeaheadOptions } from "./typeahead-opt";
@@ -11,6 +18,7 @@ import uniqBy from "lodash.uniqby";
 type OptItem = { value: string; label: string; tag?: string };
 
 export const Typeahead: FC<{
+  fitur?: "search-add";
   value?: string[] | null;
   placeholder?: string;
   required?: boolean;
@@ -34,6 +42,7 @@ export const Typeahead: FC<{
   onInit?: (e: any) => void;
 }> = ({
   value,
+  fitur,
   note,
   options: options_fn,
   onSelect,
@@ -51,6 +60,8 @@ export const Typeahead: FC<{
   disabledSearch,
   onInit,
 }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedTerm, setDebouncedTerm] = useState("");
   const local = useLocal({
     value: [] as string[],
     open: false,
@@ -133,7 +144,7 @@ export const Typeahead: FC<{
           return false;
         }
       }
-
+      console.log(local.unique);
       if (local.unique) {
         let found = local.value.find((e) => {
           return e === arg.item?.value || arg.search === e;
@@ -194,7 +205,6 @@ export const Typeahead: FC<{
       if (e.key === "Enter") {
         e.preventDefault();
         e.stopPropagation();
-
         const selected = select({
           search: local.search.input,
           item: local.select,
@@ -217,6 +227,7 @@ export const Typeahead: FC<{
         return;
       }
       if (options.length > 0) {
+        console.log("HALOOO");
         local.open = true;
         if (e.key === "ArrowDown") {
           e.preventDefault();
@@ -268,9 +279,11 @@ export const Typeahead: FC<{
         search: local.search.input,
         existing: options,
       });
+      console.log({ res });
 
       if (res) {
         const applyOptions = (result: (string | OptItem)[]) => {
+          console.log({ result });
           local.options = result.map((item) => {
             if (typeof item === "string") return { value: item, label: item };
             return item;
@@ -328,7 +341,47 @@ export const Typeahead: FC<{
       });
     }
   }, []);
+  // Debounce effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedTerm(searchTerm); // Update debounced term after 1 second
+    }, 100);
 
+    return () => clearTimeout(timer); // Clear timeout if user types again
+  }, [searchTerm]);
+
+  // Function to handle search
+  useEffect(() => {
+    if (debouncedTerm) {
+      performSearch(debouncedTerm);
+    }
+  }, [debouncedTerm]);
+
+  const performSearch = (value: any) => {
+    console.log("Searching for:", value);
+    if (typeof onSelect === "function") {
+      const result = onSelect({
+        search: value,
+        item: {
+          label: value,
+          value: value,
+        },
+      });
+
+      if (result) {
+        local.value.push(result);
+        local.render();
+
+        if (typeof onChange === "function") {
+          onChange(local.value);
+        }
+        return result;
+      } else {
+        return false;
+      }
+    }
+    // Lakukan pencarian, panggil API, atau filter data di sini
+  };
   const resetSearch = () => {
     local.search.searching = false;
     local.search.input = "";
@@ -372,6 +425,7 @@ export const Typeahead: FC<{
   );
   let inputval = local.search.input;
 
+  // console.log("search-add ->  ", value?.[0], local.open, local.value?.length);
   if (!local.open && local.mode === "single" && local.value?.length > 0) {
     const found = options.find((e) => e.value === local.value[0]);
     if (found) {
@@ -380,11 +434,23 @@ export const Typeahead: FC<{
       inputval = local.value[0];
     }
   }
+  useEffect(() => {
+    if (allow_new && local.open) {
+      console.log(local);
+      local.search.input = local.value[0];
+      local.render();
+    }
+  }, [local.open]);
+
   return (
     <div className="flex flex-row flex-grow w-full relative">
       <div
         className={cx(
-          local.mode === "single" ? "cursor-pointer" : "cursor-text",
+          allow_new
+            ? "cursor-text"
+            : local.mode === "single"
+            ? "cursor-pointer"
+            : "cursor-text",
           "text-black flex relative flex-wrap py-0 items-center w-full h-full flex-1 ",
           className
         )}
@@ -441,8 +507,10 @@ export const Typeahead: FC<{
           <></>
         )}
         <TypeaheadOptions
+          fitur={fitur}
           popup={true}
           onOpenChange={(open) => {
+            console.log("OPEN");
             if (!open) {
               local.select = null;
             }
@@ -491,7 +559,10 @@ export const Typeahead: FC<{
           }}
         >
           <div
-            className="single flex-1 flex-grow flex flex-row cursor-pointer"
+            className={cx(
+              allow_new ? "cursor-text" : "cursor-pointer",
+              "single flex-1 flex-grow flex flex-row"
+            )}
             onClick={(e) => {
               e.stopPropagation();
               if (!disabled) {
@@ -500,9 +571,12 @@ export const Typeahead: FC<{
                     loadOptions();
                     local.open = true;
                     local.render();
+                    // if (allow_new) {
+                    //   local.search.input = inputval;
+                    //   local.render();
+                    // }
                   }
                 }
-
                 if (local.mode === "single") {
                   if (input && input.current) input.current.select();
                 }
@@ -531,7 +605,9 @@ export const Typeahead: FC<{
 
                 local.search.searching = true;
                 local.render();
-
+                if (allow_new) {
+                  setSearchTerm(val);
+                }
                 if (local.search.searching) {
                   if (local.local_search) {
                     if (!local.loaded) {
@@ -612,7 +688,7 @@ export const Typeahead: FC<{
         </TypeaheadOptions>
       </div>
 
-      {local.mode === "single" && (
+      {local.mode === "single" && fitur !== "search-add" && (
         <>
           <div
             className={cx(

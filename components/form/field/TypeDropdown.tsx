@@ -22,8 +22,11 @@ export const TypeDropdown: React.FC<any> = ({
             ? [fm.data?.[name]]
             : []
         }
+        allowNew={true}
+        unique={false}
         disabledSearch={false}
         //   popupClassName={}
+        fitur="search-add"
         required={required}
         onSelect={({ search, item }) => {
           if (item) {
@@ -42,10 +45,11 @@ export const TypeDropdown: React.FC<any> = ({
           if (typeof onChange === "function" && item) {
             onChange(item);
           }
+          console.log(fm.data[name]);
           return item?.value || search;
         }}
         disabled={disabled}
-        allowNew={false}
+        // allowNew={false}
         autoPopupWidth={true}
         focusOpen={true}
         mode={mode ? mode : "single"}

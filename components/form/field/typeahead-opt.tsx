@@ -1,6 +1,7 @@
 import { FC } from "react";
 import { useLocal } from "@/lib/utils/use-local";
 import { Popover } from "../../Popover/Popover";
+import { ButtonBetter } from "../../ui/button";
 
 export type OptionItem = { value: string; label: string };
 export const TypeaheadOptions: FC<{
@@ -20,7 +21,8 @@ export const TypeaheadOptions: FC<{
   searching?: boolean;
   searchText?: string;
   width?: number;
-  isMulti?: boolean
+  isMulti?: boolean;
+  fitur?: "search-add";
 }> = ({
   popup,
   children,
@@ -33,7 +35,9 @@ export const TypeaheadOptions: FC<{
   searching,
   searchText,
   showEmpty,
-  width,isMulti
+  width,
+  isMulti,
+  fitur,
 }) => {
   if (!popup) return children;
   const local = useLocal({
@@ -53,61 +57,97 @@ export const TypeaheadOptions: FC<{
             `,
         css`
           max-height: 400px;
-          overflow: auto
+          overflow: auto;
         `
       )}
     >
-       {options.map((item, idx) => {
-          const is_selected = selected?.({ item, options, idx });
+      {options.map((item, idx) => {
+        const is_selected = selected?.({ item, options, idx });
 
-          if (is_selected) {
-            local.selectedIdx = idx;
-          }
+        if (is_selected) {
+          local.selectedIdx = idx;
+        }
 
-          return (
-            <div
-              tabIndex={0}
-              key={item.value + "_" + idx}
-              className={cx(
-                "opt-item px-3 py-1 cursor-pointer option-item text-sm",
-                is_selected ? "bg-blue-600 text-white" : "hover:bg-blue-50",
-                idx > 0 && "border-t"
-              )}
-              onClick={() => {
-                onSelect?.(item.value);
-              }}
-            >
-              {item.label || <>&nbsp;</>}
-            </div>
-          );
-        })}
+        return (
+          <div
+            tabIndex={0}
+            key={item.value + "_" + idx}
+            className={cx(
+              "opt-item px-3 py-1 cursor-pointer option-item text-sm",
+              is_selected ? "bg-blue-600 text-white" : "hover:bg-blue-50",
+              idx > 0 && "border-t"
+            )}
+            onClick={() => {
+              onSelect?.(item.value);
+            }}
+          >
+            {item.label || <>&nbsp;</>}
+          </div>
+        );
+      })}
 
-        {searching ? (
-          <div className="px-4 w-full text-slate-400">Loading...</div>
-        ) : (
-          <>
-            {options.length === 0 && (
-              <div className="p-4 w-full text-center text-md text-slate-400">
-                {!searchText ? (
-                  <>&mdash; Empty &mdash;</>
-                ) : (
-                  <>
-                    Search
+      {searching ? (
+        <div className="px-4 w-full text-slate-400">Loading...</div>
+      ) : (
+        <>
+          {options.length === 0 && (
+            <div className="p-4 w-full text-center text-md text-slate-400">
+              {fitur === "search-add" ? (
+                <ButtonBetter
+                  variant={"outline"}
+                  className="flex flex-row gap-x-2"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={20}
+                    height={20}
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      fill="none"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeMiterlimit={10}
+                      strokeWidth={1.5}
+                      d="M6 12h12m-6 6V6"
+                    ></path>
+                  </svg>{" "}
+                  <span>
+                    Add{" "}
                     <span
                       className={css`
                         font-style: italic;
-                        padding: 0px 5px;
                       `}
                     >
                       "{searchText}"
                     </span>
-                    not found
-                  </>
-                )}
-              </div>
-            )}
-          </>
-        )}
+                  </span>
+                </ButtonBetter>
+              ) : (
+                <>
+                  {!searchText ? (
+                    <>&mdash; Empty &mdash;</>
+                  ) : (
+                    <>
+                      Search
+                      <span
+                        className={css`
+                          font-style: italic;
+                          padding: 0px 5px;
+                        `}
+                      >
+                        "{searchText}"
+                      </span>
+                      not found
+                    </>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 
