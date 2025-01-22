@@ -139,6 +139,7 @@ export const Field: React.FC<any> = ({
                 name={name}
                 on_change={onChange}
                 mode={"upload"}
+                disabled={is_disable}
               />
             </>
           ) : ["multi-upload"].includes(type) ? (
@@ -149,6 +150,7 @@ export const Field: React.FC<any> = ({
                 on_change={onChange}
                 mode={"upload"}
                 type="multi"
+                disabled={is_disable}
               />
             </>
           ) : ["dropdown"].includes(type) ? (
