@@ -770,11 +770,6 @@ export const TypeRichText: React.FC<any> = ({
       },
     }),
   ];
-  const AfterEditor = () => {
-    const { editor } = useCurrentEditor();
-    if (!editor) return <></>;
-    return <InitEditor editor={editor} local={local} />;
-  };
   return (
     <div
       ref={(e) => {
@@ -829,7 +824,6 @@ export const TypeRichText: React.FC<any> = ({
         }}
         content={input.value}
         editable={!disabled}
-        slotAfter={<AfterEditor />}
       ></EditorProvider>
     </div>
   );
