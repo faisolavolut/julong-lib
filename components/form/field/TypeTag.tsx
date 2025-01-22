@@ -38,8 +38,13 @@ export const TypeTag: React.FC<any> = ({
     }
   }, []);
   useEffect(() => {
+    console.log("NEW");
     fm.data[name] = tags;
     fm.render();
+
+    if (typeof onChange === "function") {
+      onChange(tags);
+    }
   }, [inputValue]);
   const handleSaveEdit = (index: number) => {
     if (!disabled) return;
@@ -53,23 +58,22 @@ export const TypeTag: React.FC<any> = ({
     }
   };
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!disabled) return;
+    if (e.key === "Enter") {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (disabled) return;
     if (e.key === "Enter" && inputValue) {
       e.preventDefault();
+      e.stopPropagation();
       setTags([...tags, inputValue]);
       setInputValue("");
-      if (typeof onChange === "function") {
-        onChange(tags);
-      }
     } else if (e.key === "Backspace" && !inputValue && tags.length > 0) {
       setTags(tags.slice(0, -1));
-      if (typeof onChange === "function") {
-        onChange(tags);
-      }
     }
   };
   const handleFocusTag = (index: number) => {
-    if (!disabled) return;
+    if (disabled) return;
     setEditingIndex(index); // Masuk ke mode edit
     setTempValue(tags[index]); // Isi nilai sementara dengan nilai tag
     setTimeout(() => {
@@ -77,15 +81,17 @@ export const TypeTag: React.FC<any> = ({
     }, 0);
   };
   const removeTag = (index: number) => {
-    if (!disabled) return;
+    if (disabled) return;
     setTags(tags.filter((_, i) => i !== index));
-    if (typeof onChange === "function") {
-      onChange(tags);
-    }
   };
 
   return (
-    <div className="flex flex-wrap items-center  rounded-md flex-grow ">
+    <div
+      className={cx(
+        "flex flex-wrap items-center  rounded-md flex-grow ",
+        disabled && !tags?.length ? "h-9" : ""
+      )}
+    >
       {tags.map((tag, index) => (
         <div
           key={index}
@@ -106,6 +112,7 @@ export const TypeTag: React.FC<any> = ({
                 if (!disabled) return;
                 if (e.key === "Enter") {
                   e.preventDefault();
+                  e.stopPropagation();
                   handleSaveEdit(index);
                 }
                 if (e.key === "Escape") {
@@ -138,7 +145,7 @@ export const TypeTag: React.FC<any> = ({
         <input
           type="text"
           value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
+          onChange={(e: any) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
           className="rounded-md flex-grow border-none outline-none text-sm focus:shadow-none focus:ring-0	 focus:border-none focus:outline-none"
           placeholder="Add a option..."
