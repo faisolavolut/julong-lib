@@ -48,6 +48,9 @@ export const TypeTag: React.FC<any> = ({
     setTags(updatedTags);
     setEditingIndex(null); // Keluar dari mode edit
     setTempValue(""); // Reset nilai sementara
+    if (typeof onChange === "function") {
+      onChange(tags);
+    }
   };
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!disabled) return;
@@ -55,8 +58,14 @@ export const TypeTag: React.FC<any> = ({
       e.preventDefault();
       setTags([...tags, inputValue]);
       setInputValue("");
+      if (typeof onChange === "function") {
+        onChange(tags);
+      }
     } else if (e.key === "Backspace" && !inputValue && tags.length > 0) {
       setTags(tags.slice(0, -1));
+      if (typeof onChange === "function") {
+        onChange(tags);
+      }
     }
   };
   const handleFocusTag = (index: number) => {
@@ -70,10 +79,13 @@ export const TypeTag: React.FC<any> = ({
   const removeTag = (index: number) => {
     if (!disabled) return;
     setTags(tags.filter((_, i) => i !== index));
+    if (typeof onChange === "function") {
+      onChange(tags);
+    }
   };
 
   return (
-    <div className="flex flex-wrap items-center border border-gray-300 rounded-md flex-grow ">
+    <div className="flex flex-wrap items-center  rounded-md flex-grow ">
       {tags.map((tag, index) => (
         <div
           key={index}

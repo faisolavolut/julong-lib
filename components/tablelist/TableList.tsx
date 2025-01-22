@@ -807,6 +807,100 @@ export const Pagination: React.FC<any> = ({
     </div>
   );
 };
+export const PaginationPage: React.FC<any> = ({
+  onNextPage,
+  onPrevPage,
+  disabledNextPage,
+  disabledPrevPage,
+  page,
+  count,
+  list,
+  take,
+  setPage,
+  onChangePage,
+}) => {
+  const local = useLocal({
+    page: 1 as any,
+    pagination: [] as any,
+  });
+  useEffect(() => {
+    local.page = page;
+    local.pagination = getPagination(page, Math.ceil(count / take));
+    local.render();
+  }, [page, count]);
+  return (
+    <div className=" tbl-pagination  text-sm bottom-0 right-0 w-full grid grid-cols-1 gap-4 justify-center text-sm  bg-white pt-2">
+      <div className="flex flex-row items-center justify-center">
+        <div className="flex items-center  flex-row gap-x-2 sm:mb-0 text-sm">
+          <div
+            onClick={() => {
+              if (!disabledPrevPage) {
+                onPrevPage();
+              }
+            }}
+            className={cx(
+              "flex flex-row items-center gap-x-2  justify-center rounded-full p-2 text-md",
+              disabledPrevPage
+                ? "text-gray-200 border-gray-200 border "
+                : "cursor-pointer text-gray-500 hover:bg-gray-100 hover:text-gray-900  border-gray-500 border "
+            )}
+          >
+            <HiChevronLeft />
+          </div>
+          <div className="flex flex-row justify-center">
+            <div>
+              <nav
+                className="isolate inline-flex -space-x-px flex flex-row items-center gap-x-2"
+                aria-label="Pagination"
+              >
+                {local.pagination.map((e: any, idx: number) => {
+                  return (
+                    <div
+                      key={"page_" + idx}
+                      onClick={() => {
+                        if (e?.label !== "...") {
+                          local.page = getNumber(e?.label);
+                          local.render();
+                          onChangePage(local.page - 1);
+                          setPage(local.page - 1);
+                        }
+                      }}
+                      className={cx(
+                        "text-md px-2.5 py-1",
+                        e.active
+                          ? "relative z-10 inline-flex items-center bg-primary font-semibold text-white rounded-full"
+                          : e?.label === "..."
+                          ? "relative z-10 inline-flex items-center  font-semibold text-gray-800 rounded-full"
+                          : "cursor-pointer relative z-10 inline-flex items-center hover:bg-gray-100 font-semibold text-gray-800 rounded-full"
+                      )}
+                    >
+                      {e?.label}
+                    </div>
+                  );
+                })}
+              </nav>
+            </div>
+          </div>
+          <div
+            onClick={() => {
+              if (!disabledNextPage) {
+                onNextPage();
+              }
+            }}
+            className={cx(
+              "flex flex-row items-center gap-x-2   justify-center rounded-full p-2 ",
+              disabledNextPage
+                ? "text-gray-200 border-gray-200 border"
+                : "cursor-pointer text-gray-500 hover:bg-gray-100 hover:text-gray-900  border-gray-500 border "
+            )}
+          >
+            <HiChevronRight className="text-md" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const getPagination = (currentPage: number, totalPages: number) => {
   const pagination: { label: string; active: boolean }[] = [];

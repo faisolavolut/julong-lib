@@ -10,6 +10,7 @@ export const TypeColor: React.FC<any> = ({
   value,
   onChangePicker,
   onClose,
+  onChange,
 }) => {
   const meta = useLocal({
     originalValue: "",

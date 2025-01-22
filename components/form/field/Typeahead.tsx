@@ -385,7 +385,7 @@ export const Typeahead: FC<{
       <div
         className={cx(
           local.mode === "single" ? "cursor-pointer" : "cursor-text",
-          "text-black flex relative flex-wrap py-0 items-center w-full h-full flex-1 rounded-md border border-gray-300 overflow-hidden ",
+          "text-black flex relative flex-wrap py-0 items-center w-full h-full flex-1 ",
           className
         )}
         onClick={() => {

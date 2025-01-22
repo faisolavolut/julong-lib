@@ -1,12 +1,7 @@
 import { useLocal } from "@/lib/utils/use-local";
 import { Input } from "../../ui/input";
-import { useEffect, useState } from "react";
-import {
-  useEditor,
-  EditorContent,
-  useCurrentEditor,
-  EditorProvider,
-} from "@tiptap/react";
+import { useEffect, useRef, useState } from "react";
+import { useCurrentEditor, EditorProvider } from "@tiptap/react";
 import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
 import StarterKit from "@tiptap/starter-kit";
@@ -23,6 +18,7 @@ import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import TableRow from "@tiptap/extension-table-row";
 import { ButtonRichText } from "../../ui/button-rich-text";
+import { InitEditor } from "./AfterEditor";
 
 export const TypeRichText: React.FC<any> = ({
   name,
@@ -35,10 +31,14 @@ export const TypeRichText: React.FC<any> = ({
   onChange,
 }) => {
   let value: any = fm.data?.[name] || "";
+  const editorRef = useRef(null);
+  const [content, setContent] = useState(``);
+
   const input = useLocal({
-    value: 0 as any,
+    value: `` as any,
     ref: null as any,
     open: false,
+    editor: null as any,
   });
   const [url, setUrl] = useState(null as any);
   const local = useLocal({
@@ -47,9 +47,13 @@ export const TypeRichText: React.FC<any> = ({
     tab: 0,
     active: "General",
   });
-  useEffect(() => {}, [fm.data?.[name]]);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    try {
+      fm.fields[name] = { ...fm.fields?.[name], ...input };
+      fm.render();
+    } catch (e) {}
+  }, []);
   const MenuBar = () => {
     const { editor } = useCurrentEditor();
     if (disabled) return <></>;
@@ -766,11 +770,18 @@ export const TypeRichText: React.FC<any> = ({
       },
     }),
   ];
-
+  const AfterEditor = () => {
+    const { editor } = useCurrentEditor();
+    if (!editor) return <></>;
+    return <InitEditor editor={editor} local={local} />;
+  };
   return (
     <div
+      ref={(e) => {
+        if (e) input.ref = e;
+      }}
       className={cx(
-        "flex flex-col relative bg-white border border-gray-300 rounded-md w-full richtext-field",
+        "flex flex-col relative bg-white  rounded-md w-full richtext-field",
         css`
           .tiptap h1 {
             font-size: 1.4rem !important;
@@ -812,9 +823,13 @@ export const TypeRichText: React.FC<any> = ({
         onUpdate={({ editor }) => {
           fm.data[name] = editor.getHTML();
           fm.render();
+          if (typeof onChange === "function") {
+            onChange(fm.data[name]);
+          }
         }}
-        content={fm.data[name]}
+        content={input.value}
         editable={!disabled}
+        slotAfter={<AfterEditor />}
       ></EditorProvider>
     </div>
   );

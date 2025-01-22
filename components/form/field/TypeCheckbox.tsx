@@ -57,12 +57,16 @@ export const FieldCheckbox: FC<any> = ({
     const val = selected.map((e) => e.value);
     if (mode === "single") {
       selected = val?.[0];
-      
+
       fm.data[name] = selected;
     } else {
       fm.data[name] = val;
     }
     fm.render();
+
+    if (typeof onChange === "function") {
+      onChange(fm.data[name]);
+    }
   };
   return (
     <>

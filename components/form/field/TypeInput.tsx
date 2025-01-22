@@ -70,12 +70,7 @@ export const TypeInput: React.FC<any> = ({
             disabled={disabled}
             required={required}
             className={cx(
-              "text-sm",
-              error
-                ? css`
-                    border-color: red !important;
-                  `
-                : ``,
+              "text-sm border-none",
               css`
                 background-color: ${disabled
                     ? "rgb(243 244 246)"
@@ -112,6 +107,9 @@ export const TypeInput: React.FC<any> = ({
             onRatingChange={(e) => {
               fm.data[name] = getNumber(e);
               fm.render();
+              if (typeof onChange === "function") {
+                onChange(fm.data[name]);
+              }
             }}
           />
         </div>
@@ -160,6 +158,9 @@ export const TypeInput: React.FC<any> = ({
               update={(val) => {
                 fm.data[name] = val;
                 fm.render();
+                if (typeof onChange === "function") {
+                  onChange(fm.data[name]);
+                }
               }}
               onOpen={() => {
                 input.open = true;

@@ -8,6 +8,7 @@ import { TypeRichText } from "./field/TypeRichText";
 import { TypeTag } from "./field/TypeTag";
 import get from "lodash.get";
 import { getNumber } from "@/lib/utils/getNumber";
+import { useLocal } from "@/lib/utils/use-local";
 
 export const Field: React.FC<any> = ({
   fm,
@@ -26,7 +27,9 @@ export const Field: React.FC<any> = ({
   suffix,
 }) => {
   let result = null;
-
+  const field = useLocal({
+    focus: false,
+  });
   const suffixRef = useRef<HTMLDivElement | null>(null);
   const prefixRef = useRef<HTMLDivElement | null>(null);
   const is_disable = fm.mode === "view" ? true : disabled;
@@ -58,7 +61,25 @@ export const Field: React.FC<any> = ({
       <div
         className={cx(
           "flex",
-          style === "inline" ? "flex-row gap-x-1" : "flex-col"
+          style === "inline" ? "flex-row gap-x-1" : "flex-col",
+          css`
+            .field input:focus {
+              outline: 0px !important;
+              border: 0px !important;
+              outline-offset: 0px !important;
+              --tw-ring-color: transparent !important;
+            }
+            .field textarea:focus {
+              outline: 0px !important;
+              border: 0px !important;
+              outline-offset: 0px !important;
+              --tw-ring-color: transparent !important;
+            }
+            .field input {
+              border: 0px !important;
+              box-shadow: none;
+            }
+          `
         )}
       >
         {!hidden_label ? (
@@ -78,22 +99,34 @@ export const Field: React.FC<any> = ({
             error
               ? "flex flex-row rounded-md flex-grow border-red-500 border items-center"
               : "flex flex-row rounded-md flex-grow  items-center",
-            is_disable ? "bg-gray-100" : "",
-            "relative",
-            ""
+            is_disable
+              ? "border border-gray-100 bg-gray-100"
+              : "border border-gray-300 ",
+            "relative field",
+            !is_disable
+              ? style === "underline"
+                ? "focus-within:border-b focus-within:border-b-gray-500"
+                : "focus-within:border focus-within:border-gray-500"
+              : "",
+
+            style === "underline"
+              ? "rounded-none border-transparent border-b-gray-300"
+              : "",
+            ["rating", "color", "single-checkbox", "checkbox"].includes(type) &&
+              css`
+                border: 0px !important;
+              `
           )}
         >
           {before && (
             <div
-              ref={prefixRef}
+              // ref={prefixRef}
               className={cx(
-                "absolute left-[1px] px-1 py-1 bg-gray-200/50  border  border-gray-100 items-center flex flex-row flex-grow rounded-l-md",
+                "px-1 py-1  items-center flex flex-row flex-grow rounded-l-md h-full",
                 css`
                   height: 2.13rem;
-                  top: 50%;
-                  transform: translateY(-50%);
                 `,
-                is_disable ? "bg-gray-100" : "bg-gray-200/50"
+                is_disable ? "" : ""
               )}
             >
               {before}
@@ -151,7 +184,7 @@ export const Field: React.FC<any> = ({
                 onLoad={onLoad}
                 placeholder={placeholder}
                 disabled={is_disable}
-                on_change={onChange}
+                onChange={onChange}
                 className={className}
               />
             </>
@@ -163,8 +196,8 @@ export const Field: React.FC<any> = ({
                 onLoad={onLoad}
                 placeholder={placeholder}
                 disabled={is_disable}
-                on_change={onChange}
                 className={className}
+                onChange={onChange}
                 mode="single"
               />
             </>
@@ -175,6 +208,7 @@ export const Field: React.FC<any> = ({
                 name={name}
                 disabled={is_disable}
                 className={className}
+                onChange={onChange}
               />
             </>
           ) : ["tag"].includes(type) ? (
@@ -184,6 +218,7 @@ export const Field: React.FC<any> = ({
                 name={name}
                 disabled={is_disable}
                 className={className}
+                onChange={onChange}
               />
             </>
           ) : (
@@ -196,6 +231,10 @@ export const Field: React.FC<any> = ({
                 type={type}
                 disabled={is_disable}
                 onChange={onChange}
+                onFocus={() => {
+                  field.focus = true;
+                  field.render();
+                }}
                 className={cx(
                   before &&
                     css`
@@ -215,7 +254,7 @@ export const Field: React.FC<any> = ({
           )}
           {after && (
             <div
-              ref={suffixRef}
+              // ref={suffixRef}
               className={cx(
                 "absolute right-[1px] px-1 py-1    items-center flex flex-row flex-grow rounded-r-md",
                 css`

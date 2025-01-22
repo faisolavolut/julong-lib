@@ -69,7 +69,7 @@ const SidebarTree: React.FC<TreeMenuProps> = ({ data, minimaze, mini }) => {
       }, [isParentActive]);
       const itemStyle = {
         paddingLeft:
-          !hasChildren && !depth ? "16px" : !mini ? `${depth * 16}px` : "0px",
+          !hasChildren && !depth ? "13px" : !mini ? `${depth * 16}px` : "0px",
       };
       return (
         <React.Fragment key={item.href || item.title || index}>
@@ -248,7 +248,7 @@ const SidebarTree: React.FC<TreeMenuProps> = ({ data, minimaze, mini }) => {
                       ? " bg-layer  font-normal  vertical-rounded-tab"
                       : " bg-layer  text-primary font-bold  vertical-rounded-tab"
                     : "text-white",
-                  !depth && !hasChildren ? "px-3" : "",
+                  !depth && !hasChildren ? "px-2" : "",
                   css`
                     & > span {
                       white-space: wrap !important;
