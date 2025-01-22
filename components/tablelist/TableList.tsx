@@ -1,5 +1,4 @@
 "use client";
-import { makeData } from "@/lib/utils/makeData";
 import {
   ColumnDef,
   ColumnResizeDirection,
@@ -8,39 +7,20 @@ import {
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  PaginationState,
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import React, { FC, useCallback, useEffect, useState } from "react";
-import {
-  Breadcrumb,
-  Button,
-  Label,
-  Modal,
-  Table,
-  TextInput,
-} from "flowbite-react";
-import {
-  HiChevronLeft,
-  HiChevronRight,
-  HiHome,
-  HiOutlinePencilAlt,
-  HiPlus,
-  HiSearch,
-  HiTrash,
-} from "react-icons/hi";
-import classNames from "classnames";
+import React, { useCallback, useEffect, useState } from "react";
+import { Button, Label, Table } from "flowbite-react";
+import { HiChevronLeft, HiChevronRight, HiPlus } from "react-icons/hi";
 import { useLocal } from "@/lib/utils/use-local";
 import { debouncedHandler } from "@/lib/utils/debounceHandler";
-import { FaArrowDownLong, FaArrowUp, FaChevronUp } from "react-icons/fa6";
-
+import { FaChevronUp } from "react-icons/fa6";
 import Link from "next/link";
 import { init_column } from "./lib/column";
 import { toast } from "sonner";
-import { Check, Loader2, Sticker } from "lucide-react";
+import { Loader2, Sticker } from "lucide-react";
 import { InputSearch } from "../ui/input-search";
-import { Input } from "../ui/input";
 import { FaChevronDown } from "react-icons/fa";
 import get from "lodash.get";
 import { Checkbox } from "../ui/checkbox";
@@ -97,6 +77,10 @@ export const TableList: React.FC<any> = ({
       setData((prev) => [...prev, row]);
       local.data.push(row);
       local.render();
+    },
+    selection: {
+      all: false,
+      partial: [] as any[],
     },
     renderRow: (row: any) => {
       setData((prev) => [...prev, row]);
@@ -241,21 +225,49 @@ export const TableList: React.FC<any> = ({
                   table.getToggleAllRowsSelectedHandler();
                   const handler = table.getToggleAllRowsSelectedHandler();
                   handler(e); // Pastikan ini memanggil fungsi handler yang benar
+                  local.selection.all = !local.selection.all;
+                  local.render();
                 }}
               />
             ),
-            cell: ({ row }) => (
-              <div className="px-0.5 items-center justify-center flex flex-row">
-                <Checkbox
-                  id="terms"
-                  checked={row.getIsSelected()}
-                  onClick={(e) => {
-                    const handler = row.getToggleSelectedHandler();
-                    handler(e); // Pastikan ini memanggil fungsi handler yang benar
-                  }}
-                />
-              </div>
-            ),
+            cell: ({ row }) => {
+              const findCheck = (row: any) => {
+                if (row.getIsSelected()) return true;
+                const data: any = row.original;
+                const res = local.selection.partial.find((e) => e === data?.id);
+                return res ? true : false;
+              };
+              return (
+                <div className="px-0.5 items-center justify-center flex flex-row">
+                  <Checkbox
+                    id="terms"
+                    checked={findCheck(row)}
+                    onClick={(e) => {
+                      const handler = row.getToggleSelectedHandler();
+                      handler(e); // Pastikan ini memanggil fungsi handler yang benar
+                      const data: any = row.original;
+                      const checked = local.selection.all
+                        ? true
+                        : local.selection.partial.find((e) => e === data?.id);
+                      if (!checked) {
+                        local.selection.partial.push(data?.id);
+                      } else {
+                        if (
+                          local.selection.partial.find((e) => e === data?.id)
+                        ) {
+                          local.selection.partial =
+                            local.selection.partial.filter(
+                              (e: any) => e !== data?.id
+                            );
+                        }
+                        local.selection.all = false;
+                      }
+                      local.render();
+                    }}
+                  />
+                </div>
+              );
+            },
             sortable: false,
           },
           ...defaultColumns,
@@ -626,7 +638,6 @@ export const TableList: React.FC<any> = ({
                                 e?.name ===
                                 get(ctx, "column.columnDef.accessorKey")
                             );
-                            console.log(head);
                             const renderData =
                               typeof head?.renderCell === "function"
                                 ? head.renderCell(param)
@@ -634,7 +645,6 @@ export const TableList: React.FC<any> = ({
                                     cell.column.columnDef.cell,
                                     cell.getContext()
                                   );
-                            console.log(name);
                             return (
                               <Table.Cell
                                 className={cx(
