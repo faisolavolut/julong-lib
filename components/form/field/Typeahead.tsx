@@ -144,7 +144,6 @@ export const Typeahead: FC<{
           return false;
         }
       }
-      console.log(local.unique);
       if (local.unique) {
         let found = local.value.find((e) => {
           return e === arg.item?.value || arg.search === e;
@@ -227,7 +226,6 @@ export const Typeahead: FC<{
         return;
       }
       if (options.length > 0) {
-        console.log("HALOOO");
         local.open = true;
         if (e.key === "ArrowDown") {
           e.preventDefault();
@@ -279,11 +277,9 @@ export const Typeahead: FC<{
         search: local.search.input,
         existing: options,
       });
-      console.log({ res });
 
       if (res) {
         const applyOptions = (result: (string | OptItem)[]) => {
-          console.log({ result });
           local.options = result.map((item) => {
             if (typeof item === "string") return { value: item, label: item };
             return item;
@@ -358,7 +354,6 @@ export const Typeahead: FC<{
   }, [debouncedTerm]);
 
   const performSearch = (value: any) => {
-    console.log("Searching for:", value);
     if (typeof onSelect === "function") {
       const result = onSelect({
         search: value,
@@ -425,7 +420,6 @@ export const Typeahead: FC<{
   );
   let inputval = local.search.input;
 
-  // console.log("search-add ->  ", value?.[0], local.open, local.value?.length);
   if (!local.open && local.mode === "single" && local.value?.length > 0) {
     const found = options.find((e) => e.value === local.value[0]);
     if (found) {
@@ -436,7 +430,6 @@ export const Typeahead: FC<{
   }
   useEffect(() => {
     if (allow_new && local.open) {
-      console.log(local);
       local.search.input = local.value[0];
       local.render();
     }
@@ -510,7 +503,6 @@ export const Typeahead: FC<{
           fitur={fitur}
           popup={true}
           onOpenChange={(open) => {
-            console.log("OPEN");
             if (!open) {
               local.select = null;
             }

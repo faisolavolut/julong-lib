@@ -8,6 +8,8 @@ import { FieldColorPicker } from "../../ui/FieldColorPopover";
 import { FaRegStar, FaStar } from "react-icons/fa6";
 import { Rating } from "../../ui/ratings";
 import { getNumber } from "@/lib/utils/getNumber";
+import Cleave from "cleave.js/react";
+import MaskedInput from "../../ui/MaskedInput";
 
 export const TypeInput: React.FC<any> = ({
   name,
@@ -84,6 +86,24 @@ export const TypeInput: React.FC<any> = ({
               fm.data[name] = ev.currentTarget.value;
               fm.render();
 
+              if (typeof onChange === "function") {
+                onChange(fm.data[name]);
+              }
+            }}
+          />
+        </>
+      );
+      break;
+
+    case "time":
+      return (
+        <>
+          <MaskedInput
+            value={value}
+            onChange={(value) => {
+              console.log(value);
+              fm.data[name] = value;
+              fm.render();
               if (typeof onChange === "function") {
                 onChange(fm.data[name]);
               }

@@ -330,7 +330,7 @@ export const TableList: React.FC<any> = ({
   const handleSearch = useCallback(
     debouncedHandler(() => {
       local.reload();
-    }, 1000), // 1 detik jeda
+    }, 1000),
     []
   );
   return (
@@ -427,10 +427,14 @@ export const TableList: React.FC<any> = ({
                         .table-header-tbl > th:first-child {
                           width: 20px !important; /* Atur lebar sesuai kebutuhan */
                           text-align: center;
+                          min-width: 40px;
+                          max-width: 40px;
                         }
                         .table-row-element > td:first-child {
                           width: 20px !important; /* Atur lebar sesuai kebutuhan */
                           text-align: center;
+                          min-width: 40px;
+                          max-width: 40px;
                         }
                       `
                   )}
@@ -794,7 +798,7 @@ export const Pagination: React.FC<any> = ({
             )}
           >
             <HiChevronLeft className="text-sm" />
-            <span>Previous</span>
+            {/* <span>Previous</span> */}
           </div>
           <div
             onClick={() => {
@@ -809,7 +813,7 @@ export const Pagination: React.FC<any> = ({
                 : "cursor-pointer text-gray-500 hover:bg-gray-100 hover:text-gray-900  border-gray-500 border px-2"
             )}
           >
-            <span>Next</span>
+            {/* <span>Next</span> */}
             <HiChevronRight className="text-sm" />
           </div>
         </div>

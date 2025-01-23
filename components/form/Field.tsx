@@ -25,6 +25,7 @@ export const Field: React.FC<any> = ({
   style,
   prefix,
   suffix,
+  allowNew,
 }) => {
   let result = null;
   const field = useLocal({
@@ -163,6 +164,7 @@ export const Field: React.FC<any> = ({
                 placeholder={placeholder}
                 disabled={is_disable}
                 onChange={onChange}
+                allowNew={allowNew}
               />
             </>
           ) : ["multi-dropdown"].includes(type) ? (

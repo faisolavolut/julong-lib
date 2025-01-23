@@ -11,6 +11,7 @@ export const TypeDropdown: React.FC<any> = ({
   placeholder,
   disabled,
   mode,
+  allowNew = false,
 }) => {
   return (
     <>
@@ -22,11 +23,10 @@ export const TypeDropdown: React.FC<any> = ({
             ? [fm.data?.[name]]
             : []
         }
-        allowNew={true}
+        allowNew={allowNew}
         unique={false}
         disabledSearch={false}
         //   popupClassName={}
-        fitur="search-add"
         required={required}
         onSelect={({ search, item }) => {
           if (item) {
