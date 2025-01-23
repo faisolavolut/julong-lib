@@ -100,8 +100,17 @@ export const TypeInput: React.FC<any> = ({
         <>
           <MaskedInput
             value={value}
+            disabled={disabled}
+            className={cx(
+              css`
+                background-color: ${disabled
+                  ? "rgb(243 244 246)"
+                  : "transparant"};
+              `,
+              className
+            )}
             onChange={(value) => {
-              console.log(value);
+              if (disabled) return;
               fm.data[name] = value;
               fm.render();
               if (typeof onChange === "function") {

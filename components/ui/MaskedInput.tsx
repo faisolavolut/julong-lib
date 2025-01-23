@@ -3,13 +3,21 @@ import React, { useRef, useState } from "react";
 interface MaskedInputProps {
   value: string;
   onChange: (value: any) => void;
+  disabled?: boolean;
+  className?: string;
 }
 
-const MaskedInput: React.FC<MaskedInputProps> = ({ value, onChange }) => {
+const MaskedInput: React.FC<MaskedInputProps> = ({
+  value,
+  onChange,
+  disabled = false,
+  className,
+}) => {
   const inputRef = useRef<HTMLInputElement>(null); // Referensi ke elemen input
   const [localValue, setLocalValue] = useState<string>(value); // State lokal untuk kontrol input
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (disabled) return;
     let input = e.target.value;
 
     // Hapus semua karakter non-digit
@@ -61,9 +69,13 @@ const MaskedInput: React.FC<MaskedInputProps> = ({ value, onChange }) => {
       id="time"
       type="text"
       value={localValue}
+      disabled={disabled}
       onChange={handleInputChange}
-      placeholder="__:__"
-      className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-300 focus:border-blue-500"
+      placeholder={disabled ? "" : "__:__"}
+      className={cx(
+        "w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-300 focus:border-blue-500",
+        className
+      )}
     />
   );
 };
