@@ -143,7 +143,6 @@ export const TableEditBetter: React.FC<any> = ({
         if (res instanceof Promise) {
           res.then((e) => {
             local.data = e;
-            cloneListFM(e);
             local.render();
             setData(e);
             setTimeout(() => {
@@ -152,7 +151,6 @@ export const TableEditBetter: React.FC<any> = ({
           });
         } else {
           local.data = res;
-          cloneListFM(res);
           local.render();
           setData(res);
           setTimeout(() => {
