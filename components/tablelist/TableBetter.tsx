@@ -84,12 +84,7 @@ export const TableEditBetter: React.FC<any> = ({
       local.render();
     },
     removeRow: (row: any) => {
-      // setData((prev) => prev.filter((item) => item !== row)); // Update state lokal
-      // local.data = local.data.filter((item: any) => item !== row); // Hapus row dari local.data
-      // local.render(); // Panggil render untuk memperbarui UI
-      console.log("HALOO");
       const data = fm.data?.[name] || [];
-      // data.push(row);
       if (delete_name) {
         const ids: any[] = Array.isArray(fm.data?.[delete_name])
           ? fm.data?.deleted_line_ids
@@ -103,9 +98,6 @@ export const TableEditBetter: React.FC<any> = ({
       fm.render();
       local.data = fm.data[name];
       local.render();
-      console.log({ fm });
-      // local.data = fm.data[name];
-      // local.render();
     },
     reload: async () => {
       toast.info(

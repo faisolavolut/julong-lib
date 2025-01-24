@@ -577,7 +577,9 @@ export const Typeahead: FC<{
           >
             <input
               placeholder={
-                local.mode === "multi" ? placeholder : valueLabel[0]?.label
+                local.mode === "multi"
+                  ? placeholder
+                  : valueLabel[0]?.label || placeholder
               }
               type="text"
               ref={input}

@@ -179,13 +179,13 @@ export const FieldUploadSingle: FC<{
                   input.ref.click();
                 }
               }}
-              className="items-center flex text-base px-1 outline-none rounded cursor-pointer "
+              className="items-center flex text-base px-1 outline-none rounded cursor-pointer flex-row justify-center"
             >
               <div className="flex flex-row items-center px-2">
                 <Upload className="h-4 w-4" />
               </div>
-              <div className="flex flex-row items-center  text-md">
-                Upload File
+              <div className="flex flex-row items-center  text-sm">
+                Add File
               </div>
             </div>
           </div>

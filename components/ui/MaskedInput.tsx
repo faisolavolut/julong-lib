@@ -39,7 +39,17 @@ const MaskedInput: React.FC<MaskedInputProps> = ({
     if (input.length > 5) {
       input = input.substring(0, 5);
     }
+    // Validasi batas maksimal jam
+    if (input.length === 5 && !input.includes("_")) {
+      const [hours, minutes] = input.split(":").map(Number);
 
+      // Koreksi jika jam atau menit melebihi batas
+      const correctedHours = Math.min(hours, 23);
+      const correctedMinutes = Math.min(minutes, 59);
+      input = `${String(correctedHours).padStart(2, "0")}:${String(
+        correctedMinutes
+      ).padStart(2, "0")}`;
+    }
     // Update state lokal
     setLocalValue(input);
 

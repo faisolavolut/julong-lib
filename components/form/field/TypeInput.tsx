@@ -2,7 +2,7 @@ import { useLocal } from "@/lib/utils/use-local";
 import Datepicker from "../../ui/Datepicker";
 import { Input } from "../../ui/input";
 import { Textarea } from "../../ui/text-area";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import tinycolor from "tinycolor2";
 import { FieldColorPicker } from "../../ui/FieldColorPopover";
 import { FaRegStar, FaStar } from "react-icons/fa6";
@@ -22,6 +22,7 @@ export const TypeInput: React.FC<any> = ({
   className,
 }) => {
   const [hover, setHover] = useState(0); // State untuk menyimpan nilai hover
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   let value: any = fm.data?.[name] || "";
   const [rating, setRating] = useState(value); // State untuk menyimpan nilai rating
@@ -41,6 +42,13 @@ export const TypeInput: React.FC<any> = ({
     rgbValue: "",
     selectedEd: "" as string,
   });
+  const handleInput = () => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = "auto"; // Reset height to calculate new height
+      textarea.style.height = `${textarea.scrollHeight}px`; // Adjust height based on content
+    }
+  };
   useEffect(() => {
     if (type === "color") {
       meta.inputValue = value || "";
@@ -66,7 +74,9 @@ export const TypeInput: React.FC<any> = ({
       return (
         <>
           <Textarea
+            ref={textareaRef}
             id={name}
+            onInput={handleInput}
             name={name}
             disabled={disabled}
             required={required}

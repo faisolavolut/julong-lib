@@ -9,6 +9,7 @@ import { TypeTag } from "./field/TypeTag";
 import get from "lodash.get";
 import { getNumber } from "@/lib/utils/getNumber";
 import { useLocal } from "@/lib/utils/use-local";
+import { FieldRadio } from "./field/TypeRadio";
 
 export const Field: React.FC<any> = ({
   fm,
@@ -80,7 +81,18 @@ export const Field: React.FC<any> = ({
               border: 0px !important;
               box-shadow: none;
             }
-          `
+          `,
+          style === "gform" &&
+            css`
+              .field input {
+                padding-left: 0px !important;
+                padding-right: 0px !important;
+              }
+              .field textarea {
+                padding-left: 0px !important;
+                padding-right: 0px !important;
+              }
+            `
         )}
       >
         {!hidden_label ? (
@@ -105,17 +117,26 @@ export const Field: React.FC<any> = ({
               : "border border-gray-300 ",
             "relative field",
             !is_disable
-              ? style === "underline"
-                ? "focus-within:border-b focus-within:border-b-gray-500"
-                : "focus-within:border focus-within:border-gray-500"
+              ? style === "underline" || style === "gform"
+                ? "focus-within:border-b focus-within:border-b-primary"
+                : "focus-within:border focus-within:border-primary"
               : "",
-
-            style === "underline"
+            style === "underline" || style === "gform"
               ? "rounded-none border-transparent border-b-gray-300"
               : "",
-            ["rating", "color", "single-checkbox", "checkbox"].includes(type) &&
+            [
+              "rating",
+              "color",
+              "single-checkbox",
+              "radio",
+              "checkbox",
+            ].includes(type) &&
               css`
                 border: 0px !important;
+              `,
+            ["upload"].includes(type) &&
+              css`
+                padding: 0px !important;
               `
           )}
         >
@@ -183,6 +204,18 @@ export const Field: React.FC<any> = ({
           ) : ["checkbox"].includes(type) ? (
             <>
               <FieldCheckbox
+                fm={fm}
+                name={name}
+                onLoad={onLoad}
+                placeholder={placeholder}
+                disabled={is_disable}
+                onChange={onChange}
+                className={className}
+              />
+            </>
+          ) : ["radio"].includes(type) ? (
+            <>
+              <FieldRadio
                 fm={fm}
                 name={name}
                 onLoad={onLoad}
