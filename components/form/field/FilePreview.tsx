@@ -211,12 +211,16 @@ export const FilePreview = ({ url }: { url: any }) => {
       {file.extension && (
         <div
           className={cx(
-            "flex border rounded items-center px-1  bg-white cursor-pointer flex-grow",
+            "flex  rounded items-center px-1  bg-white cursor-pointer flex-grow hover:bg-gray-100 gap-x-1",
             "pr-2",
             css`
               &:hover {
-                border: 1px solid #1c4ed8;
-                outline: 1px solid #1c4ed8;
+                // border: 1px solid #1c4ed8;
+                // outline: 1px solid #1c4ed8;
+              }
+              &:hover {
+                // border-bottom: 1px solid #1c4ed8;
+                // outline: 1px solid #1c4ed8;
               }
             `
           )}
@@ -227,7 +231,9 @@ export const FilePreview = ({ url }: { url: any }) => {
             window.open(_url, "_blank");
           }}
         >
-          {content}
+          <div className="h-[30px] flex flex-row items-center">{content}</div>
+          <div className="text-xs filename">{file?.name}</div>
+
           <div className="ml-2">
             <ExternalLink size="12px" />
           </div>
@@ -287,6 +293,7 @@ const getFileName = (url: string) => {
   }
 
   const fileName = url.substring(url.lastIndexOf("/") + 1);
+  console.log({ fileName });
   const dotIndex = fileName.lastIndexOf(".");
   const fullname = fileName;
   if (dotIndex === -1) {
