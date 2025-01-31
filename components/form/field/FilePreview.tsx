@@ -117,7 +117,13 @@ export const ThumbPreview = ({
   );
 };
 
-export const FilePreview = ({ url }: { url: any }) => {
+export const FilePreview = ({
+  url,
+  disabled,
+}: {
+  url: any;
+  disabled?: boolean;
+}) => {
   let ural = url;
   if (url instanceof File) {
     ural = `${URL.createObjectURL(url)}.${url.name.split(".").pop()}`;
@@ -211,7 +217,7 @@ export const FilePreview = ({ url }: { url: any }) => {
       {file.extension && (
         <div
           className={cx(
-            "flex  rounded items-center px-1  bg-white cursor-pointer flex-grow hover:bg-gray-100 gap-x-1",
+            "flex  rounded items-center px-1   cursor-pointer flex-grow hover:bg-gray-100 gap-x-1 justify-between",
             "pr-2",
             css`
               &:hover {
@@ -222,7 +228,8 @@ export const FilePreview = ({ url }: { url: any }) => {
                 // border-bottom: 1px solid #1c4ed8;
                 // outline: 1px solid #1c4ed8;
               }
-            `
+            `,
+            disabled ? "bg-transparent" : "bg-white"
           )}
           onClick={() => {
             let _url: any =
@@ -231,8 +238,10 @@ export const FilePreview = ({ url }: { url: any }) => {
             window.open(_url, "_blank");
           }}
         >
-          <div className="h-[30px] flex flex-row items-center">{content}</div>
-          <div className="text-xs filename">{file?.name}</div>
+          <div className="flex flex-row gap-x-1 items-center">
+            <div className="h-[30px] flex flex-row items-center">{content}</div>
+            <div className="text-xs filename">{file?.name}</div>
+          </div>
 
           <div className="ml-2">
             <ExternalLink size="12px" />

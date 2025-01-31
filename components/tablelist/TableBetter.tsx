@@ -1,33 +1,13 @@
 "use client";
-import {
-  ColumnDef,
-  ColumnResizeDirection,
-  ColumnResizeMode,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  SortingState,
-  useReactTable,
-} from "@tanstack/react-table";
-import React, { useCallback, useEffect, useState } from "react";
-import { Button, Label, Table } from "flowbite-react";
-import { HiChevronLeft, HiChevronRight, HiPlus } from "react-icons/hi";
+import React, { useEffect, useState } from "react";
+import { Table } from "flowbite-react";
+import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
 import { useLocal } from "@/lib/utils/use-local";
-import { debouncedHandler } from "@/lib/utils/debounceHandler";
-import { FaChevronUp } from "react-icons/fa6";
-import Link from "next/link";
 import { init_column } from "./lib/column";
 import { toast } from "sonner";
 import { Loader2, Sticker } from "lucide-react";
-import { InputSearch } from "../ui/input-search";
-import { FaChevronDown } from "react-icons/fa";
-import get from "lodash.get";
-import { Checkbox } from "../ui/checkbox";
 import { getNumber } from "@/lib/utils/getNumber";
 import { formatMoney } from "../form/field/TypeInput";
-import { cloneFM } from "@/lib/utils/cloneFm";
-import { ResizableBox } from "react-resizable";
 export const TableEditBetter: React.FC<any> = ({
   name,
   column,
@@ -250,7 +230,14 @@ export const TableEditBetter: React.FC<any> = ({
                   )}
                 >
                   {!disabledHeadTable ? (
-                    <thead className="rounded-md overflow-hidden text-md bg-second group/head text-md uppercase text-gray-700 sticky top-0">
+                    <thead
+                      className={cx(
+                        "rounded-md overflow-hidden text-md bg-primary group/head text-md uppercase text-white sticky top-0",
+                        css`
+                          z-index: 1;
+                        `
+                      )}
+                    >
                       <tr className={"table-header-tbl"}>
                         {columns.map((col, idx) => {
                           return (
@@ -265,7 +252,7 @@ export const TableEditBetter: React.FC<any> = ({
                               }}
                             >
                               <div className="flex items-center h-full flex-grow  p-2">
-                                <span>{col?.name}</span>
+                                <span>{col?.header()}</span>
                               </div>
                             </th>
                           );
@@ -277,9 +264,25 @@ export const TableEditBetter: React.FC<any> = ({
                   )}
                   <tbody>
                     {local.data.map((row: any, index: any) => {
-                      const fm_row = cloneFM(fm, row);
+                      const fm_row = {
+                        ...fm,
+
+                        data: row,
+                        render: () => {
+                          local.render();
+                          fm.data[name] = local.data;
+                          fm.render();
+                        },
+                      };
                       return (
-                        <tr key={`row_${name}_${index}`}>
+                        <tr
+                          key={`row_${name}_${index}`}
+                          className={cx(css`
+                            td {
+                              vertical-align: ${align};
+                            }
+                          `)}
+                        >
                           {columns.map((col, idx) => {
                             const param = {
                               row: row,
@@ -300,7 +303,7 @@ export const TableEditBetter: React.FC<any> = ({
                                 key={`row_${name}_${index}_${col?.accessorKey}_${idx}`}
                                 className={"table-header-tbl capitalize"}
                               >
-                                {renderData}
+                                <div className="p-1">{renderData}</div>
                               </td>
                             );
                           })}

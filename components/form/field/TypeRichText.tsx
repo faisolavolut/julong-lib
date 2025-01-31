@@ -18,7 +18,6 @@ import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import TableRow from "@tiptap/extension-table-row";
 import { ButtonRichText } from "../../ui/button-rich-text";
-import { InitEditor } from "./AfterEditor";
 
 export const TypeRichText: React.FC<any> = ({
   name,
@@ -822,7 +821,7 @@ export const TypeRichText: React.FC<any> = ({
             onChange(fm.data[name]);
           }
         }}
-        content={input.value}
+        content={fm.data?.[name]}
         editable={!disabled}
       ></EditorProvider>
     </div>

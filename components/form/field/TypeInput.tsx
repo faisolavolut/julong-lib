@@ -5,7 +5,7 @@ import { Textarea } from "../../ui/text-area";
 import { useEffect, useRef, useState } from "react";
 import tinycolor from "tinycolor2";
 import { FieldColorPicker } from "../../ui/FieldColorPopover";
-import { FaRegStar, FaStar } from "react-icons/fa6";
+import { FaRegEye, FaRegEyeSlash, FaRegStar, FaStar } from "react-icons/fa6";
 import { Rating } from "../../ui/ratings";
 import { getNumber } from "@/lib/utils/getNumber";
 import MaskedInput from "../../ui/MaskedInput";
@@ -34,6 +34,7 @@ export const TypeInput: React.FC<any> = ({
   const input = useLocal({
     value: 0 as any,
     ref: null as any,
+    show_pass: false as boolean,
     open: false,
   });
   const meta = useLocal({
@@ -319,6 +320,10 @@ export const TypeInput: React.FC<any> = ({
       );
       break;
   }
+  let type_field = type;
+  if (input.show_pass) {
+    type_field = "text";
+  }
   return (
     <>
       <Input
@@ -341,7 +346,7 @@ export const TypeInput: React.FC<any> = ({
         required={required}
         placeholder={placeholder || ""}
         value={value}
-        type={!type ? "text" : type}
+        type={!type ? "text" : type_field}
         onChange={(ev) => {
           fm.data[name] = ev.currentTarget.value;
           fm.render();
@@ -350,6 +355,24 @@ export const TypeInput: React.FC<any> = ({
           }
         }}
       />
+
+      {type === "password" && (
+        <div
+          className=" right-0 h-full flex items-center cursor-pointer px-2"
+          onClick={() => {
+            input.show_pass = !input.show_pass;
+            input.render();
+          }}
+        >
+          <div className="">
+            {input.show_pass ? (
+              <FaRegEyeSlash className="h-4" />
+            ) : (
+              <FaRegEye className="h-4" />
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 };

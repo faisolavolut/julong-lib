@@ -199,7 +199,10 @@ export const FieldUploadSingle: FC<{
         </div>
       ) : input.fase === "preview" ? (
         <div className="flex flex-row gap-x-1 justify-between flex-1 p-1">
-          <FilePreview url={input.isLocal ? input.preview : value || ""} />
+          <FilePreview
+            url={input.isLocal ? input.preview : value || ""}
+            disabled={disabled}
+          />
           {!disabled ? (
             <>
               <div

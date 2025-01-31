@@ -11,6 +11,7 @@ import { detectCase } from "@/lib/utils/detectCase";
 import { useLocal } from "@/lib/utils/use-local";
 import { get_user } from "@/lib/utils/get_user";
 import { siteurl } from "@/lib/utils/siteurl";
+import { ScrollArea } from "../ui/scroll-area";
 interface TreeMenuItem {
   title: string;
   href?: string;
@@ -320,7 +321,7 @@ const SidebarTree: React.FC<TreeMenuProps> = ({ data, minimaze, mini }) => {
         <Sidebar
           aria-label="Sidebar with multi-level dropdown example"
           className={classNames(
-            "relative pt-0 sidebar rounded-none",
+            "relative pt-0 rounded-none",
             mini ? "w-20" : "",
             css`
               > div {
@@ -332,20 +333,22 @@ const SidebarTree: React.FC<TreeMenuProps> = ({ data, minimaze, mini }) => {
             `
           )}
         >
-          <div className="w-full h-full relative ">
-            <div className="flex h-full flex-col justify-between w-full absolute top-0 left-0">
-              <Sidebar.Items>
-                <Sidebar.ItemGroup
-                  className={cx(
-                    "border-none mt-0 pt-4",
-                    mini ? "flex flex-col gap-y-2" : ""
-                  )}
-                >
-                  {renderTree(data)}
-                </Sidebar.ItemGroup>
-              </Sidebar.Items>
+          <ScrollArea className="w-full h-full">
+            <div className="w-full h-full relative ">
+              <div className="flex h-full flex-col justify-between w-full">
+                <Sidebar.Items>
+                  <Sidebar.ItemGroup
+                    className={cx(
+                      "border-none mt-0 pt-4",
+                      mini ? "flex flex-col gap-y-2" : ""
+                    )}
+                  >
+                    {renderTree(data)}
+                  </Sidebar.ItemGroup>
+                </Sidebar.Items>
+              </div>
             </div>
-          </div>
+          </ScrollArea>
         </Sidebar>
       </div>
       <div className="flex flex-col">

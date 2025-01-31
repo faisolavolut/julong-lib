@@ -25,11 +25,11 @@ import get from "lodash.get";
 import { Checkbox } from "../ui/checkbox";
 import { getNumber } from "@/lib/utils/getNumber";
 import { formatMoney } from "../form/field/TypeInput";
+import { cloneFM } from "@/lib/utils/cloneFm";
 
-export const TableList: React.FC<any> = ({
+export const TableListBetter: React.FC<any> = ({
   name,
   column,
-  style = "UI",
   align = "center",
   onLoad,
   take = 20,
@@ -148,18 +148,7 @@ export const TableList: React.FC<any> = ({
   });
   const cloneListFM = (data: any[]) => {
     if (mode === "form") {
-      local.dataForm = data.map((e: any) => {
-        return {
-          ...fm,
-          data: e,
-          render: () => {
-            local.render();
-            fm.data[name] = local.data;
-            fm.render();
-            console.log(fm.data[name]);
-          },
-        };
-      });
+      local.dataForm = data.map((e: any) => cloneFM(fm, e));
       local.render();
     }
   };
@@ -192,38 +181,27 @@ export const TableList: React.FC<any> = ({
 
         local.render();
       }
-      if (mode === "form") {
-        local.data = fm.data?.[name] || [];
-        cloneListFM(fm.data?.[name] || []);
+
+      if (Array.isArray(onLoad)) {
+        local.data = onLoad;
+        cloneListFM(onLoad);
         local.render();
-        setData(fm.data?.[name] || []);
+        setData(onLoad);
       } else {
-        if (Array.isArray(onLoad)) {
-          local.data = onLoad;
-          cloneListFM(onLoad);
-          local.render();
-          setData(onLoad);
-        } else if (typeof onLoad === "function") {
-          const res: any = await onLoad({
-            search: local.search,
-            sort: local.sort,
-            take,
-            paging: 1,
-          });
-          local.data = res;
-          cloneListFM(res);
-          local.render();
-          setData(res);
-        } else {
-          local.data = onLoad;
-          cloneListFM(onLoad);
-          local.render();
-          setData(onLoad);
-        }
+        const res: any = await onLoad({
+          search: local.search,
+          sort: local.sort,
+          take,
+          paging: 1,
+        });
+        local.data = res;
+        cloneListFM(res);
+        local.render();
+        setData(res);
+        setTimeout(() => {
+          toast.dismiss();
+        }, 2000);
       }
-      setTimeout(() => {
-        toast.dismiss();
-      }, 2000);
     };
     if (typeof onInit === "function") {
       onInit(local);
@@ -415,7 +393,7 @@ export const TableList: React.FC<any> = ({
         )}
 
         <div className="flex flex-col flex-grow">
-          <div className="overflow-auto relative flex-grow flex-row">
+          <div className="container-table overflow-auto relative flex-grow flex-row">
             <div className="tbl absolute top-0 left-0 inline-block flex-grow w-full h-full align-middle">
               <div className="relative">
                 <Table
@@ -461,14 +439,7 @@ export const TableList: React.FC<any> = ({
                   )}
                 >
                   {!disabledHeadTable ? (
-                    <thead
-                      className={cx(
-                        "table-head-list  overflow-hidden text-md bg-primary text-white group/head text-md uppercase sticky top-0",
-                        css`
-                          z-index: 1;
-                        `
-                      )}
-                    >
+                    <thead className="table-head-list  overflow-hidden text-md bg-primary text-white group/head text-md uppercase sticky top-0">
                       {table.getHeaderGroups().map((headerGroup) => (
                         <tr
                           key={`${headerGroup.id}`}
@@ -612,7 +583,7 @@ export const TableList: React.FC<any> = ({
                                             : "  bg-primary"
                                         }`,
                                         css`
-                                          width: 5px;
+                                          width: 1px;
                                           cursor: e-resize !important;
                                         `
                                       ),
@@ -660,8 +631,7 @@ export const TableList: React.FC<any> = ({
                                 vertical-align: ${align};
                               }
                             `,
-                            "border-none ",
-                            style === "UI" ? "even:bg-linear-blue " : ""
+                            "border-none even:bg-linear-blue "
                           )}
                         >
                           {row.getVisibleCells().map((cell: any) => {
@@ -728,7 +698,7 @@ export const TableList: React.FC<any> = ({
             )}
           </div>
         </div>
-        <Pagination
+        <PaginationPage
           list={local}
           count={local.count}
           onNextPage={() => table.nextPage()}
@@ -775,7 +745,7 @@ export const Pagination: React.FC<any> = ({
     local.render();
   }, [page, count]);
   return (
-    <div className=" border-t border-gray-300 p-2 tbl-pagination sticky text-sm bottom-0 right-0 w-full grid grid-cols-3 gap-4 justify-end text-sm ">
+    <div className=" border-t border-gray-300 tbl-pagination sticky text-sm bottom-0 right-0 w-full grid grid-cols-3 gap-4 justify-end text-sm   pt-2">
       <div className="flex flex-row items-center text-gray-600">
         Showing {local.page * 20 - 19} to{" "}
         {list.data?.length >= 20
@@ -881,7 +851,7 @@ export const PaginationPage: React.FC<any> = ({
     local.render();
   }, [page, count]);
   return (
-    <div className=" tbl-pagination  text-sm bottom-0 right-0 w-full grid grid-cols-1 gap-4 justify-center text-sm   pt-2">
+    <div className="py-2 tbl-pagination  text-sm bottom-0 right-0 w-full grid grid-cols-1 gap-4 justify-center text-sm">
       <div className="flex flex-row items-center justify-center">
         <div className="flex items-center  flex-row gap-x-2 sm:mb-0 text-sm">
           <div

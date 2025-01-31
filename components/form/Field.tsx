@@ -3,7 +3,6 @@ import { FieldCheckbox } from "./field/TypeCheckbox";
 import { TypeDropdown } from "./field/TypeDropdown";
 import { TypeInput } from "./field/TypeInput";
 import { TypeUpload } from "./field/TypeUpload";
-import { FieldUploadMulti } from "./field/TypeUploadMulti";
 import { TypeRichText } from "./field/TypeRichText";
 import { TypeTag } from "./field/TypeTag";
 import get from "lodash.get";
@@ -23,6 +22,7 @@ export const Field: React.FC<any> = ({
   hidden_label,
   onChange,
   className,
+  classField,
   style,
   prefix,
   suffix,
@@ -98,11 +98,16 @@ export const Field: React.FC<any> = ({
         {!hidden_label ? (
           <label
             className={cx(
-              "block mb-2 text-md font-medium text-gray-900  text-sm",
+              "block mb-2 text-md font-medium text-gray-900  text-sm flex flex-row",
               style === "inline" ? "w-[100px]" : ""
             )}
           >
             {label}
+            {required ? (
+              <span className="flex flex-row px-0.5 text-red-500">*</span>
+            ) : (
+              <></>
+            )}
           </label>
         ) : (
           <></>
@@ -137,7 +142,8 @@ export const Field: React.FC<any> = ({
             ["upload"].includes(type) &&
               css`
                 padding: 0px !important;
-              `
+              `,
+            classField
           )}
         >
           {before && (
