@@ -1,5 +1,6 @@
 import day from "dayjs";
 import relative from "dayjs/plugin/relativeTime";
+import { empty } from "./isStringEmpty";
 
 day.extend(relative);
 
@@ -11,7 +12,8 @@ export const longDate = (date: string | Date) => {
 };
 
 export const dayDate = (date: string | Date) => {
-  if (date instanceof Date || typeof date === "string") {
+  console.log({ date });
+  if (date instanceof Date || (typeof date === "string" && !empty(date))) {
     return day(date).format("DD MMMM YYYY");
   }
   return "-";
@@ -32,7 +34,6 @@ export const normalDate = (date: string | Date) => {
   }
   return null;
 };
-
 
 export const timeAgo = (date: string | Date) => {
   if (date instanceof Date || typeof date === "string") {

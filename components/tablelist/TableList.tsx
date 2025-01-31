@@ -240,6 +240,7 @@ export const TableList: React.FC<any> = ({
             header: ({ table }) => (
               <Checkbox
                 id="terms"
+                className="text-white"
                 checked={table.getIsAllRowsSelected()}
                 onClick={(e) => {
                   table.getToggleAllRowsSelectedHandler();
