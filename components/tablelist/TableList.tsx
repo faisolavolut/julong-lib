@@ -189,7 +189,6 @@ export const TableList: React.FC<any> = ({
       if (typeof onCount === "function") {
         const res = await onCount();
         local.count = res;
-
         local.render();
       }
       if (mode === "form") {

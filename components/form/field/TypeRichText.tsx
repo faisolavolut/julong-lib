@@ -33,20 +33,30 @@ export const TypeRichText: React.FC<any> = ({
   const editorRef = useRef(null);
   const [content, setContent] = useState(``);
 
-  const input = useLocal({
-    value: `` as any,
-    ref: null as any,
-    open: false,
-    editor: null as any,
-  });
-  const [url, setUrl] = useState(null as any);
   const local = useLocal({
     open: false,
     data: ["General", "Table"],
     tab: 0,
     active: "General",
+    ready: true as boolean,
   });
 
+  const input = useLocal({
+    value: `` as any,
+    ref: null as any,
+    open: false,
+    editor: null as any,
+    ready: true as boolean,
+    reload: () => {
+      local.ready = false;
+      local.render();
+      setTimeout(() => {
+        local.ready = true;
+        local.render();
+      }, 500);
+    },
+  });
+  const [url, setUrl] = useState(null as any);
   useEffect(() => {
     try {
       fm.fields[name] = { ...fm.fields?.[name], ...input };
@@ -811,19 +821,23 @@ export const TypeRichText: React.FC<any> = ({
         `
       )}
     >
-      <EditorProvider
-        slotBefore={<MenuBar />}
-        extensions={extensions}
-        onUpdate={({ editor }) => {
-          fm.data[name] = editor.getHTML();
-          fm.render();
-          if (typeof onChange === "function") {
-            onChange(fm.data[name]);
-          }
-        }}
-        content={fm.data?.[name]}
-        editable={!disabled}
-      ></EditorProvider>
+      {local.ready ? (
+        <EditorProvider
+          slotBefore={<MenuBar />}
+          extensions={extensions}
+          onUpdate={({ editor }) => {
+            fm.data[name] = editor.getHTML();
+            fm.render();
+            if (typeof onChange === "function") {
+              onChange(fm.data[name]);
+            }
+          }}
+          content={fm.data?.[name]}
+          editable={!disabled}
+        ></EditorProvider>
+      ) : (
+        <></>
+      )}
     </div>
   );
 };

@@ -4,6 +4,12 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils/utils";
 import { FC } from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./tooltip";
 
 const btn = cva(
   " text-white px-4 py-1.5 group active-menu-icon relative flex items-stretch justify-center p-0.5 text-center border border-transparent text-white enabled:hover:bg-cyan-800  rounded-md"
@@ -43,11 +49,42 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  tooltip?: any;
 }
 
 const ButtonBetter = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    );
+  }
+);
+const ButtonBetterTooltip = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ tooltip, className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button";
+    if (tooltip) {
+      return (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Comp
+                className={cn(buttonVariants({ variant, size, className }))}
+                ref={ref}
+                {...props}
+              />
+            </TooltipTrigger>
+            <TooltipContent className="bg-linear-sidebar-active text-white  border border-primary shadow-md transition-all ">
+              <p>{tooltip}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      );
+    }
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
@@ -71,4 +108,10 @@ const ButtonContainer: FC<any> = ({
 };
 ButtonBetter.displayName = "Button";
 
-export { ButtonBetter, ButtonContainer, buttonVariants, btn };
+export {
+  ButtonBetter,
+  ButtonContainer,
+  buttonVariants,
+  btn,
+  ButtonBetterTooltip,
+};

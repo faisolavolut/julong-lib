@@ -63,7 +63,8 @@ export const actionToast = async (data: {
       <div className="flex flex-col w-full">
         <div className="flex text-red-600 items-center">
           <AlertTriangle className="h-4 w-4 mr-1" />
-          {msg_error ? msg_error : "Failed"} { get(ex, "response.data.meta.message") || ex.message}.
+          {msg_error ? msg_error : "Failed"}{" "}
+          {get(ex, "response.data.meta.message") || ex.message}.
         </div>
       </div>,
       {
@@ -74,6 +75,5 @@ export const actionToast = async (data: {
         `,
       }
     );
-    if (typeof after === "function") after();
   }
 };

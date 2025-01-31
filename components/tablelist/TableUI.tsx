@@ -45,7 +45,6 @@ export const TableUI: React.FC<any> = ({
                 <TabHeaderBetter
                   disabledPagination={true}
                   onLabel={(row: any) => {
-                    console.log({ row });
                     return (
                       <div className="flex flex-row items-center gap-x-2  font-bold">
                         <div className="text-3xl">

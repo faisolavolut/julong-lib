@@ -79,10 +79,7 @@ export const apix = async ({
           throw new Error(`Unsupported HTTP method: ${method}`);
       }
     } catch (ex: any) {
-      console.error(
-        "API Error:",
-        get(ex, "response.data.meta.message") || ex.message
-      );
+      throw new Error(get(ex, "response.data.meta.message") || ex.message);
     }
 
     const val = get(result, value);
