@@ -13,6 +13,7 @@ type apixType = {
     value?: string;
     label: string | ((item: any) => string);
   };
+  header?: "normal" | "form";
 };
 
 export const apix = async ({
@@ -23,6 +24,7 @@ export const apix = async ({
   path,
   validate = "object",
   type = "usual",
+  header = "normal",
   keys,
 }: apixType) => {
   const root_url = `${

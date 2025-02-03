@@ -299,13 +299,11 @@ export const Field: React.FC<any> = ({
             <div
               // ref={suffixRef}
               className={cx(
-                "px-1 py-1  items-center flex flex-row flex-grow rounded-l-md h-full",
+                "px-1 py-1  items-center flex flex-row flex-grow rounded-r-md h-full",
                 css`
                   height: 2.13rem;
                 `,
-                is_disable
-                  ? "bg-gray-200/50 border-l border-gray-300"
-                  : "bg-gray-200/50 border  border-gray-100"
+                is_disable ? "bg-gray-200/50 " : "bg-gray-200/50 "
               )}
             >
               {after}

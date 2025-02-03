@@ -11,7 +11,6 @@ export const flattenObject = (
     const newKey = parentKey
       ? `${parentKey}.${key}${idx ? `[${idx}]` : ``}`
       : key;
-    console.log({ newKey });
     if (Array.isArray(value)) {
       // Jika value adalah array, loop dan tambahkan indeks
       value.forEach((item, index) => {

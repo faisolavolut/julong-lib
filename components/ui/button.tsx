@@ -21,7 +21,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "border bg-primary text-white shadow hover:bg-primary/90 active-menu-icon",
+          "border-none bg-primary text-white shadow hover:bg-primary/90 active-menu-icon",
         reject:
           "bg-red-500 text-white shadow hover:bg-red-500 active-menu-icon",
         destructive: "bg-red-500 text-white shadow-sm hover:bg-destructive/90",
