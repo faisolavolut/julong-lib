@@ -1,6 +1,4 @@
-import { useLocal } from "@/lib/utils/use-local";
 import { Typeahead } from "./Typeahead";
-import { useEffect } from "react";
 
 export const TypeDropdown: React.FC<any> = ({
   required,
@@ -45,7 +43,6 @@ export const TypeDropdown: React.FC<any> = ({
           if (typeof onChange === "function" && item) {
             onChange(item);
           }
-          console.log(fm.data[name]);
           return item?.value || search;
         }}
         disabled={disabled}

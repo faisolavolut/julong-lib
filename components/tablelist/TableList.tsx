@@ -80,6 +80,7 @@ export const TableList: React.FC<any> = ({
     selection: {
       all: false,
       partial: [] as any[],
+      data: [] as any[],
     },
     renderRow: (row: any) => {
       setData((prev) => [...prev, row]);
@@ -156,7 +157,6 @@ export const TableList: React.FC<any> = ({
             local.render();
             fm.data[name] = local.data;
             fm.render();
-            console.log(fm.data[name]);
           },
         };
       });
@@ -210,14 +210,14 @@ export const TableList: React.FC<any> = ({
             paging: 1,
           });
           local.data = res;
-          cloneListFM(res);
+          if (mode === "form") cloneListFM(res);
           local.render();
-          setData(res);
+          setData(local.data);
         } else {
           local.data = onLoad;
-          cloneListFM(onLoad);
+          if (mode === "form") cloneListFM(onLoad);
           local.render();
-          setData(onLoad);
+          setData(local.data);
         }
       }
       setTimeout(() => {
@@ -237,20 +237,34 @@ export const TableList: React.FC<any> = ({
           {
             id: "select",
             width: 10,
-            header: ({ table }) => (
-              <Checkbox
-                id="terms"
-                className="text-white"
-                checked={table.getIsAllRowsSelected()}
-                onClick={(e) => {
-                  table.getToggleAllRowsSelectedHandler();
-                  const handler = table.getToggleAllRowsSelectedHandler();
-                  handler(e); // Pastikan ini memanggil fungsi handler yang benar
-                  local.selection.all = !local.selection.all;
-                  local.render();
-                }}
-              />
-            ),
+            header: ({ table }) => {
+              return (
+                <Checkbox
+                  id="terms"
+                  className="text-primary bg-white data-[state=checked]:bg-white data-[state=checked]:text-primary"
+                  checked={table.getIsAllRowsSelected()}
+                  onClick={(e) => {
+                    table.getToggleAllRowsSelectedHandler();
+                    const handler = table.getToggleAllRowsSelectedHandler();
+                    handler(e); // Pastikan ini memanggil fungsi handler yang benar
+                    local.selection.all = !local.selection.all;
+                    local.render();
+                    setTimeout(() => {
+                      if (!table.getIsAllRowsSelected()) {
+                        local.selection.all = false;
+                        local.selection.partial = [];
+                        local.selection.data = [];
+                        local.render();
+                      } else {
+                        local.selection.partial = local.data.map((e) => e?.id);
+                        local.selection.data = local.data;
+                        local.render();
+                      }
+                    }, 25);
+                  }}
+                />
+              );
+            },
             cell: ({ row }) => {
               const findCheck = (row: any) => {
                 if (row.getIsSelected()) return true;
@@ -262,6 +276,7 @@ export const TableList: React.FC<any> = ({
                 <div className="px-0.5 items-center justify-center flex flex-row">
                   <Checkbox
                     id="terms"
+                    className="border border-primary"
                     checked={findCheck(row)}
                     onClick={(e) => {
                       const handler = row.getToggleSelectedHandler();
@@ -272,6 +287,7 @@ export const TableList: React.FC<any> = ({
                         : local.selection.partial.find((e) => e === data?.id);
                       if (!checked) {
                         local.selection.partial.push(data?.id);
+                        local.selection.data.push(data);
                       } else {
                         if (
                           local.selection.partial.find((e) => e === data?.id)
@@ -280,6 +296,9 @@ export const TableList: React.FC<any> = ({
                             local.selection.partial.filter(
                               (e: any) => e !== data?.id
                             );
+                          local.selection.data = local.selection.data.filter(
+                            (e: any) => e?.id !== data?.id
+                          );
                         }
                         local.selection.all = false;
                       }
@@ -674,6 +693,10 @@ export const TableList: React.FC<any> = ({
                               tbl: local,
                               fm_row: fm_row,
                               onChange,
+                              render: () => {
+                                local.render();
+                                setData(local.data);
+                              },
                             };
                             const head = column.find(
                               (e: any) =>

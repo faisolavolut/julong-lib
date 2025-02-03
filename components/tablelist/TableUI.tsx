@@ -5,6 +5,7 @@ import { useLocal } from "@/lib/utils/use-local";
 import get from "lodash.get";
 import { TabHeaderBetter } from "../tablist/TabHeaderBetter";
 import { getNumber } from "@/lib/utils/getNumber";
+import { BreadcrumbBetterLink } from "../ui/breadcrumb-link";
 export const TableUI: React.FC<any> = ({
   name,
   column,
@@ -27,6 +28,7 @@ export const TableUI: React.FC<any> = ({
   title,
   tab,
   onTab,
+  breadcrumb,
 }) => {
   const local = useLocal({
     tab: get(tab, "[0].id"),
@@ -34,8 +36,13 @@ export const TableUI: React.FC<any> = ({
 
   return (
     <div className="flex flex-col flex-grow">
-      <div className="w-full flex flex-row p-4 py-6 pr-6 pl-3 text-2xl font-bold">
-        {title}
+      <div className="w-full p-4 py-6 pr-6 pl-3 ">
+        <div className="flex flex-row  text-2xl font-bold">{title}</div>
+        {breadcrumb?.length ? (
+          <BreadcrumbBetterLink data={breadcrumb} />
+        ) : (
+          <></>
+        )}
       </div>
       <div className="flex flex-col flex-grow  bg-card-layer rounded-lg border border-gray-300 shadow-md shadow-gray-300 overflow-hidden">
         <div className="flex flex-col flex-grow">

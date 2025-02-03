@@ -128,7 +128,9 @@ const SidebarBetterTree: React.FC<TreeMenuProps> = ({
                                   }
                                 `,
                                 mini
-                                  ? isActive
+                                  ? isParentActive
+                                    ? "bg-linear-sidebar-active text-white  font-normal  p-1 shadow-md w-[50px]"
+                                    : isActive
                                     ? !depth
                                       ? "bg-linear-sidebar-active text-white  font-normal  p-1 shadow-md"
                                       : " bg-layer text-primary font-bold  p-1 "

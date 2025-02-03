@@ -10,7 +10,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "./alert-dialog";
-import { X } from "lucide-react";
 
 export const Alert: FC<any> = ({
   type,
@@ -35,7 +34,9 @@ export const Alert: FC<any> = ({
           ) : (
             <>
               <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogTitle>
+                  Are you certain you want to continue?
+                </AlertDialogTitle>
                 <AlertDialogDescription>
                   {msg || message?.[type]}
                 </AlertDialogDescription>

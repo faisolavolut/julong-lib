@@ -5,7 +5,7 @@ import { Textarea } from "../../ui/text-area";
 import { useEffect, useRef, useState } from "react";
 import tinycolor from "tinycolor2";
 import { FieldColorPicker } from "../../ui/FieldColorPopover";
-import { FaRegEye, FaRegEyeSlash, FaRegStar, FaStar } from "react-icons/fa6";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { Rating } from "../../ui/ratings";
 import { getNumber } from "@/lib/utils/getNumber";
 import MaskedInput from "../../ui/MaskedInput";
@@ -48,6 +48,12 @@ export const TypeInput: React.FC<any> = ({
     if (textarea) {
       textarea.style.height = "auto"; // Reset height to calculate new height
       textarea.style.height = `${textarea.scrollHeight}px`; // Adjust height based on content
+    }
+  };
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      event.stopPropagation();
+      event.preventDefault();
     }
   };
   useEffect(() => {
@@ -153,40 +159,6 @@ export const TypeInput: React.FC<any> = ({
           />
         </div>
       );
-      return (
-        <>
-          <div className="flex">
-            {Array.from({ length: 5 }, (_, index) => index + 1).map(
-              (number) => (
-                <button
-                  key={number}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleClick(number);
-                  }}
-                  onMouseEnter={() => setHover(number)} // Set nilai hover saat mouse masuk
-                  onMouseLeave={() => setHover(number)} // Reset nilai hover saat mouse keluar
-                  className={cx(
-                    "focus:outline-none px-0.5",
-                    disabled ? "" : "transition-transform duration-200"
-                  )}
-                  style={{
-                    transform:
-                      hover === number && !disabled ? "scale(1.2)" : "scale(1)",
-                  }}
-                >
-                  {hover >= number || rating >= number ? (
-                    <FaStar className="text-yellow-400" /> // Star yang diisi (fill)
-                  ) : (
-                    <FaRegStar className="text-gray-400" /> // Star yang kosong (outline)
-                  )}
-                </button>
-              )
-            )}
-          </div>
-        </>
-      );
       break;
     case "color":
       return (
@@ -287,6 +259,7 @@ export const TypeInput: React.FC<any> = ({
             placeholder={placeholder || ""}
             value={formatCurrency(input.value)}
             type={"text"}
+            onKeyDown={handleKeyDown}
             onChange={(ev) => {
               const rawValue = ev.currentTarget.value
                 .replace(/[^0-9,-]/g, "")
@@ -328,6 +301,7 @@ export const TypeInput: React.FC<any> = ({
     <>
       <Input
         id={name}
+        onKeyDown={handleKeyDown}
         name={name}
         className={cx(
           "text-sm",

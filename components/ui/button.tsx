@@ -10,6 +10,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./tooltip";
+import { ButtonLink } from "./button-link";
 
 const btn = cva(
   " text-white px-4 py-1.5 group active-menu-icon relative flex items-stretch justify-center p-0.5 text-center border border-transparent text-white enabled:hover:bg-cyan-800  rounded-md"
@@ -50,6 +51,8 @@ export interface ButtonProps
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   tooltip?: any;
+  href?: string;
+  typeButton?: "button" | "container" | "tooltip";
 }
 
 const ButtonBetter = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -65,24 +68,76 @@ const ButtonBetter = React.forwardRef<HTMLButtonElement, ButtonProps>(
   }
 );
 const ButtonBetterTooltip = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ tooltip, className, variant, size, asChild = false, ...props }, ref) => {
+  (
+    {
+      typeButton = "button",
+      tooltip,
+      href,
+      className,
+      variant,
+      size,
+      asChild = false,
+      ...props
+    },
+    ref
+  ) => {
     const Comp = asChild ? Slot : "button";
     if (tooltip) {
       return (
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Comp
-                className={cn(buttonVariants({ variant, size, className }))}
-                ref={ref}
-                {...props}
-              />
+              <div className="flex flex-row items-center">
+                {href ? (
+                  <ButtonLink
+                    href={href}
+                    className={cn(buttonVariants({ variant, size, className }))}
+                    ref={ref}
+                    variant={variant}
+                  >
+                    {props.children}
+                  </ButtonLink>
+                ) : typeButton === "container" ? (
+                  <ButtonContainer
+                    className={className}
+                    variant={variant}
+                    children={props.children}
+                  />
+                ) : (
+                  <Comp
+                    className={cn(buttonVariants({ variant, size, className }))}
+                    ref={ref}
+                    {...props}
+                  />
+                )}
+              </div>
             </TooltipTrigger>
             <TooltipContent className="bg-linear-sidebar-active text-white  border border-primary shadow-md transition-all ">
               <p>{tooltip}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
+      );
+    }
+    if (href) {
+      return (
+        <ButtonLink
+          href={href}
+          className={cn(buttonVariants({ variant, size, className }))}
+          ref={ref}
+          variant={variant}
+        >
+          {props.children}
+        </ButtonLink>
+      );
+    }
+    if (typeButton === "container") {
+      return (
+        <ButtonContainer
+          className={className}
+          variant={variant}
+          children={props.children}
+        />
       );
     }
     return (
@@ -94,6 +149,7 @@ const ButtonBetterTooltip = React.forwardRef<HTMLButtonElement, ButtonProps>(
     );
   }
 );
+
 const ButtonContainer: FC<any> = ({
   children,
   className,

@@ -120,9 +120,11 @@ export const ThumbPreview = ({
 export const FilePreview = ({
   url,
   disabled,
+  limit_name,
 }: {
   url: any;
   disabled?: boolean;
+  limit_name?: number;
 }) => {
   let ural = url;
   if (url instanceof File) {
@@ -172,7 +174,8 @@ export const FilePreview = ({
   const getFileNameWithoutExtension = (filename: string) => {
     const parts = filename.split(".");
     parts.pop(); // Hapus bagian terakhir (ekstensi)
-    return parts.join("."); // Gabungkan kembali
+    const result = parts.join("."); // Gabungkan kembali
+    return limit_name ? result.substring(0, limit_name) : result;
   };
   const ura =
     ural && ural.startsWith("blob:") ? getFileNameWithoutExtension(ural) : ural;
@@ -234,7 +237,6 @@ export const FilePreview = ({
           onClick={() => {
             let _url: any =
               url && url.startsWith("blob:") ? ura : siteurl(ura || "");
-            console.log(_url);
             window.open(_url, "_blank");
           }}
         >
@@ -302,7 +304,6 @@ const getFileName = (url: string) => {
   }
 
   const fileName = url.substring(url.lastIndexOf("/") + 1);
-  console.log({ fileName });
   const dotIndex = fileName.lastIndexOf(".");
   const fullname = fileName;
   if (dotIndex === -1) {

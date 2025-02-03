@@ -12,7 +12,6 @@ export const longDate = (date: string | Date) => {
 };
 
 export const dayDate = (date: string | Date) => {
-  console.log({ date });
   if (date instanceof Date || (typeof date === "string" && !empty(date))) {
     return day(date).format("DD MMMM YYYY");
   }

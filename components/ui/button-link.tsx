@@ -61,11 +61,12 @@ const ButtonBetter = React.forwardRef<HTMLButtonElement, ButtonProps>(
 const ButtonLink: FC<any> = ({
   className,
   children,
+  target,
   href,
   variant = "default",
 }) => {
   return (
-    <Link href={href}>
+    <Link href={href} target={target}>
       <ButtonBetter className={cx(className)} variant={variant}>
         {children}
       </ButtonBetter>

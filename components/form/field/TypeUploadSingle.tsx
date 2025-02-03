@@ -172,22 +172,25 @@ export const FieldUploadSingle: FC<{
                 )}
               />
             )}
-
-            <div
-              onClick={() => {
-                if (input.ref) {
-                  input.ref.click();
-                }
-              }}
-              className="items-center flex text-base px-1 outline-none rounded cursor-pointer flex-row justify-center"
-            >
-              <div className="flex flex-row items-center px-2">
-                <Upload className="h-4 w-4" />
+            {!disabled ? (
+              <div
+                onClick={() => {
+                  if (input.ref) {
+                    input.ref.click();
+                  }
+                }}
+                className="items-center flex text-base px-1 outline-none rounded cursor-pointer flex-row justify-center"
+              >
+                <div className="flex flex-row items-center px-2">
+                  <Upload className="h-4 w-4" />
+                </div>
+                <div className="flex flex-row items-center  text-sm">
+                  Add File
+                </div>
               </div>
-              <div className="flex flex-row items-center  text-sm">
-                Add File
-              </div>
-            </div>
+            ) : (
+              <div className="flex flex-row items-center px-1.5 text-sm">-</div>
+            )}
           </div>
         </>
       ) : input.fase === "upload" ? (

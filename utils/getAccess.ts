@@ -1,8 +1,21 @@
 import get from "lodash.get";
-import { get_user } from "./get_user";
 import api from "./axios";
 
 export const getAccess = (keys: string, data: any[]) => {
+  if (!Array.isArray(data) || !data?.length) return false;
+  for (const role of data) {
+    const permissionExists = role.permissions.some(
+      (permission: any) => get(permission, "name") === keys
+    );
+    if (permissionExists) {
+      return true;
+    }
+  }
+  return false;
+};
+
+export const access = (keys: string) => {
+  const data = globalThis.userRole;
   if (!Array.isArray(data) || !data?.length) return false;
   for (const role of data) {
     const permissionExists = role.permissions.some(
