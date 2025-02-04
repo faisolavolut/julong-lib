@@ -25,6 +25,10 @@ export const TypeInput: React.FC<any> = ({
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   let value: any = fm.data?.[name] || "";
+
+  if (type === "time") {
+    value = convertToTimeOnly(value) || "";
+  }
   const [rating, setRating] = useState(value); // State untuk menyimpan nilai rating
   const handleClick = (index: number) => {
     setRating(index); // Update nilai rating
@@ -62,6 +66,12 @@ export const TypeInput: React.FC<any> = ({
       const convertColor = tinycolor(meta.inputValue);
       meta.rgbValue = convertColor.toRgbString();
       meta.render();
+    } else if (type === "time") {
+      if (fm.data?.[name]) fm.data[name] = convertToTimeOnly(fm.data[name]);
+      fm.render();
+      console.log({
+        data: fm.data,
+      });
     } else {
       setRating(value ? value - 1 : value);
     }
@@ -441,4 +451,14 @@ const hasNonZeroDigitAfterDecimal = (input: string) => {
   // Ekspresi reguler untuk mencocokkan angka 1-9 setelah koma atau titik
   const regex = /[.,]\d*[1-9]\d*/;
   return regex.test(input);
+};
+export const convertToTimeOnly = (isoString: any) => {
+  if (!isoString || isoString === "") return null;
+  const isoRegex = /^\d{4}-\d{2}-\d{2}T(\d{2}:\d{2}):\d{2}Z$/;
+
+  const match = isoString.match(isoRegex);
+  if (match) {
+    return match[1]; // Mengambil HH:mm dari format ISO
+  }
+  return isoString; // Jika format tidak sesuai, kembalikan string asli
 };

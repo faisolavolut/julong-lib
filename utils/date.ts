@@ -46,3 +46,10 @@ export const formatTime = (date: string | Date) => {
   }
   return "-";
 };
+
+export const time = (date: string | Date) => {
+  if (date instanceof Date || typeof date === "string") {
+    return day(date).format("hh:mm");
+  }
+  return null;
+};

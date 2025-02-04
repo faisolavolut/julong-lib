@@ -27,6 +27,7 @@ import { getNumber } from "@/lib/utils/getNumber";
 import { formatMoney } from "../form/field/TypeInput";
 
 export const TableList: React.FC<any> = ({
+  autoPagination = true,
   name,
   column,
   style = "UI",
@@ -115,35 +116,30 @@ export const TableList: React.FC<any> = ({
         </>
       );
       if (Array.isArray(onLoad)) {
-        local.data = onLoad;
+        let res = onLoad;
+        if (!autoPagination) {
+          res = paginateArray(res, take, 1);
+        }
+        local.data = res;
         local.render();
-        setData(onLoad);
+        setData(res);
       } else {
-        const res: any = onLoad({
+        let res: any = await onLoad({
           search: local.search,
           sort: local.sort,
           take,
           paging: 1,
         });
-        if (res instanceof Promise) {
-          res.then((e) => {
-            local.data = e;
-            cloneListFM(e);
-            local.render();
-            setData(e);
-            setTimeout(() => {
-              toast.dismiss();
-            }, 2000);
-          });
-        } else {
-          local.data = res;
-          cloneListFM(res);
-          local.render();
-          setData(res);
-          setTimeout(() => {
-            toast.dismiss();
-          }, 2000);
+        if (!autoPagination) {
+          res = paginateArray(res, take, 1);
         }
+        local.data = res;
+        cloneListFM(res);
+        local.render();
+        setData(res);
+        setTimeout(() => {
+          toast.dismiss();
+        }, 1000);
       }
     },
   });
@@ -203,19 +199,26 @@ export const TableList: React.FC<any> = ({
           local.render();
           setData(onLoad);
         } else if (typeof onLoad === "function") {
-          const res: any = await onLoad({
+          let res: any = await onLoad({
             search: local.search,
             sort: local.sort,
             take,
             paging: 1,
           });
+          if (!autoPagination) {
+            res = paginateArray(res, take, 1);
+          }
           local.data = res;
           if (mode === "form") cloneListFM(res);
           local.render();
           setData(local.data);
         } else {
-          local.data = onLoad;
-          if (mode === "form") cloneListFM(onLoad);
+          let res = onLoad;
+          if (!autoPagination) {
+            res = paginateArray(res, take, 1);
+          }
+          local.data = res;
+          if (mode === "form") cloneListFM(res);
           local.render();
           setData(local.data);
         }
@@ -1013,3 +1016,12 @@ const getPagination = (currentPage: number, totalPages: number) => {
 
   return pagination;
 };
+
+function paginateArray(array: any[], take: number, paging: number) {
+  if (!Array.isArray(array) || !array?.length) {
+    return [];
+  }
+  const startIndex = (paging - 1) * take;
+  const endIndex = startIndex + take;
+  return array.slice(startIndex, endIndex);
+}
