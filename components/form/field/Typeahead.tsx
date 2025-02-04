@@ -513,6 +513,7 @@ export const Typeahead: FC<{
               resetSearch();
             }
           }}
+          loading={local.loading}
           showEmpty={!allow_new}
           className={popupClassName}
           open={local.open}

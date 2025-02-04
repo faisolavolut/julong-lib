@@ -6,6 +6,7 @@ import { ButtonBetter } from "../../ui/button";
 export type OptionItem = { value: string; label: string };
 export const TypeaheadOptions: FC<{
   popup?: boolean;
+  loading?: boolean;
   open?: boolean;
   children: any;
   onOpenChange?: (open: boolean) => void;
@@ -25,6 +26,7 @@ export const TypeaheadOptions: FC<{
   fitur?: "search-add";
 }> = ({
   popup,
+  loading,
   children,
   open,
   onOpenChange,
@@ -61,33 +63,41 @@ export const TypeaheadOptions: FC<{
         `
       )}
     >
-      {options.map((item, idx) => {
-        const is_selected = selected?.({ item, options, idx });
+      {!loading ? (
+        <>
+          {options.map((item, idx) => {
+            const is_selected = selected?.({ item, options, idx });
 
-        if (is_selected) {
-          local.selectedIdx = idx;
-        }
+            if (is_selected) {
+              local.selectedIdx = idx;
+            }
 
-        return (
-          <div
-            tabIndex={0}
-            key={item.value + "_" + idx}
-            className={cx(
-              "opt-item px-3 py-1 cursor-pointer option-item text-sm",
-              is_selected ? "bg-blue-600 text-white" : "hover:bg-blue-50",
-              idx > 0 && "border-t"
-            )}
-            onClick={() => {
-              onSelect?.(item.value);
-            }}
-          >
-            {item.label || <>&nbsp;</>}
-          </div>
-        );
-      })}
+            return (
+              <div
+                tabIndex={0}
+                key={item.value + "_" + idx}
+                className={cx(
+                  "opt-item px-3 py-1 cursor-pointer option-item text-sm",
+                  is_selected ? "bg-blue-600 text-white" : "hover:bg-blue-50",
+                  idx > 0 && "border-t"
+                )}
+                onClick={() => {
+                  onSelect?.(item.value);
+                }}
+              >
+                {item.label || <>&nbsp;</>}
+              </div>
+            );
+          })}
+        </>
+      ) : (
+        <></>
+      )}
 
-      {searching ? (
-        <div className="px-4 w-full text-slate-400">Loading...</div>
+      {loading || searching ? (
+        <div className="px-4 w-full text-slate-400 text-sm py-2">
+          Loading...
+        </div>
       ) : (
         <>
           {options.length === 0 && (
