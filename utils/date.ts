@@ -42,14 +42,14 @@ export const timeAgo = (date: string | Date) => {
 };
 export const formatTime = (date: string | Date) => {
   if (date instanceof Date || typeof date === "string") {
-    return day(date).format("hh:mm");
+    return day(date).format("HH:mm");
   }
   return "-";
 };
 
 export const time = (date: string | Date) => {
   if (date instanceof Date || typeof date === "string") {
-    return day(date).format("hh:mm");
+    return day(date).format("HH:mm");
   }
   return null;
 };

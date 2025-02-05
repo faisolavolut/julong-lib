@@ -84,7 +84,9 @@ export const FieldUploadSingle: FC<{
         .pop()}`;
       input.isLocal = true;
       input.render();
-      console.log(input.preview);
+      if (typeof on_change === "function") {
+        on_change({});
+      }
       return;
       const formData = new FormData();
       formData.append("file", file);
