@@ -458,7 +458,7 @@ export const convertToTimeOnly = (isoString: any) => {
 
   const match = isoString.match(isoRegex);
   if (match) {
-    return match[1]; // Mengambil HH:mm dari format ISO
+    return match[1];
   }
-  return isoString; // Jika format tidak sesuai, kembalikan string asli
+  return isoString;
 };
