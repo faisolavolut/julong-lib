@@ -153,8 +153,12 @@ export const Field: React.FC<any> = ({
                 "px-1 py-1  items-center flex flex-row flex-grow rounded-l-md h-full",
                 css`
                   height: 2.13rem;
-                `,
-                is_disable ? "bg-gray-200/50 " : "bg-gray-200/50 "
+                `
+                // style === "gform"
+                //   ? ""
+                //   : is_disable
+                //   ? "bg-gray-200/50 "
+                //   : "bg-gray-200/50 "
               )}
             >
               {before}
