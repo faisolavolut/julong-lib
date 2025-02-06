@@ -22,7 +22,7 @@ export const TypeDropdown: React.FC<any> = ({
             : []
         }
         allowNew={allowNew}
-        unique={false}
+        unique={mode === "multi" ? true : false}
         disabledSearch={false}
         //   popupClassName={}
         required={required}
