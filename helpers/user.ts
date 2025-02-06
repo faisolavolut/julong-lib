@@ -21,12 +21,22 @@ export const userToken = async () => {
           `${process.env.NEXT_PUBLIC_API_PORTAL}/api/users/me`
         );
         const us = user.data.data;
-        console.log({ us });
         if (us) {
           localStorage.setItem("user", JSON.stringify(user.data.data));
           const roles = await userRoleMe();
         }
-      } catch (e) {}
-    } catch (ex) {}
+      } catch (e) {
+        throw new Error("Access Denied");
+      }
+    } catch (ex) {
+      try {
+        if (user) {
+          const w = window as any;
+          w.user = JSON.parse(user);
+        }
+      } catch (ex) {
+        throw new Error("Access Denied");
+      }
+    }
   }
 };
