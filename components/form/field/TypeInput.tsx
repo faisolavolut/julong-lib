@@ -69,9 +69,6 @@ export const TypeInput: React.FC<any> = ({
     } else if (type === "time") {
       if (fm.data?.[name]) fm.data[name] = convertToTimeOnly(fm.data[name]);
       fm.render();
-      console.log({
-        data: fm.data,
-      });
     } else {
       setRating(value ? value - 1 : value);
     }

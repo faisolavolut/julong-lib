@@ -1,7 +1,7 @@
 "use client";
 import { useLocal } from "@/lib/utils/use-local";
 import { AlertTriangle, Check, Loader2 } from "lucide-react";
-import { ReactNode, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { toast } from "sonner";
 import {
   ResizableHandle,
@@ -71,7 +71,7 @@ export const Form: React.FC<any> = ({
               </div>
             </div>
           );
-        }, 1000);
+        }, 100);
       } catch (ex: any) {
         const msg = get(ex, "response.data.meta.message") || ex.message;
         toast.error(
@@ -117,22 +117,26 @@ export const Form: React.FC<any> = ({
       );
       local.data = null;
       local.render();
-      const res = onLoad();
-      if (res instanceof Promise) {
-        res.then((data) => {
-          local.ready = true;
-          local.data = data;
-          local.render(); // Panggil render setelah data diperbarui
-          // toast.dismiss();
-          // toast.success("Data Loaded Successfully!");
-        });
-      } else {
-        local.ready = true;
-        local.data = res;
-        local.render(); // Panggil render untuk memicu re-render
-        toast.dismiss();
-        toast.success("Data Loaded Successfully!");
-      }
+      const res = await onLoad();
+      local.ready = true;
+      local.data = res;
+      local.render();
+      toast.dismiss();
+      // if (res instanceof Promise) {
+      //   res.then((data) => {
+      //     local.ready = true;
+      //     local.data = data;
+      //     local.render(); // Panggil render setelah data diperbarui
+      //     // toast.dismiss();
+      //     // toast.success("Data Loaded Successfully!");
+      //   });
+      // } else {
+      //   local.ready = true;
+      //   local.data = res;
+      //   local.render(); // Panggil render untuk memicu re-render
+      //   toast.dismiss();
+      //   toast.success("Data Loaded Successfully!");
+      // }
     },
     fields: {} as any,
     render: () => {},
@@ -144,48 +148,56 @@ export const Form: React.FC<any> = ({
     local.onChange();
   }, [local.data]);
   useEffect(() => {
-    if (typeof onInit === "function") {
-      onInit(local);
-    }
-    local.ready = false;
-    local.render();
-    toast.info(
-      <>
-        <Loader2
-          className={cx(
-            "h-4 w-4 animate-spin-important",
-            css`
-              animation: spin 1s linear infinite !important;
-              @keyframes spin {
-                0% {
-                  transform: rotate(0deg);
+    const run = async () => {
+      if (typeof onInit === "function") {
+        onInit(local);
+      }
+      local.ready = false;
+      local.render();
+      toast.info(
+        <>
+          <Loader2
+            className={cx(
+              "h-4 w-4 animate-spin-important",
+              css`
+                animation: spin 1s linear infinite !important;
+                @keyframes spin {
+                  0% {
+                    transform: rotate(0deg);
+                  }
+                  100% {
+                    transform: rotate(360deg);
+                  }
                 }
-                100% {
-                  transform: rotate(360deg);
-                }
-              }
-            `
-          )}
-        />
-        {"Loading..."}
-      </>
-    );
-    const res = onLoad();
-    if (res instanceof Promise) {
-      res.then((data) => {
-        local.ready = true;
-        local.data = data;
-        local.render(); // Panggil render setelah data diperbarui
-        // toast.dismiss();
-        // toast.success("Data Loaded Successfully!");
-      });
-    } else {
+              `
+            )}
+          />
+          {"Loading..."}
+        </>
+      );
+      const res = await onLoad();
+
       local.ready = true;
       local.data = res;
-      local.render(); // Panggil render untuk memicu re-render
+      local.render(); // Panggil render setelah data diperbarui
       toast.dismiss();
-      toast.success("Data Loaded Successfully!");
-    }
+      // if (res instanceof Promise) {
+      //   res.then((data) => {
+      //     local.ready = true;
+      //     local.data = data;
+      //     local.render(); // Panggil render setelah data diperbarui
+      //     toast.dismiss();
+      //     // toast.success("Data Loaded Successfully!");
+      //   });
+      // } else {
+      //   local.ready = true;
+      //   local.data = res;
+      //   local.render(); // Panggil render untuk memicu re-render
+      //   toast.dismiss();
+      //   toast.success("Data Loaded Successfully!");
+      // }
+    };
+    run();
   }, []);
 
   // Tambahkan dependency ke header agar reaktif

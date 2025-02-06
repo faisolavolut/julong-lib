@@ -139,7 +139,7 @@ export const TableList: React.FC<any> = ({
         setData(res);
         setTimeout(() => {
           toast.dismiss();
-        }, 1000);
+        }, 100);
       }
     },
   });

@@ -12,8 +12,7 @@ export const userToken = async () => {
         `${process.env.NEXT_PUBLIC_API_PORTAL}/api/check-jwt-token`
       );
       const jwt = res.data.data;
-      console.log({ jwt });
-      if (!jwt) return;
+      if (!jwt) return navigate(`${process.env.NEXT_PUBLIC_API_PORTAL}/login`);
       try {
         await api.post(process.env.NEXT_PUBLIC_BASE_URL + "/api/cookies", {
           token: jwt,

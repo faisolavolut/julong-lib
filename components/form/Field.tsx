@@ -154,7 +154,7 @@ export const Field: React.FC<any> = ({
                 css`
                   height: 2.13rem;
                 `,
-                is_disable ? "" : ""
+                is_disable ? "bg-gray-200/50 " : "bg-gray-200/50 "
               )}
             >
               {before}
