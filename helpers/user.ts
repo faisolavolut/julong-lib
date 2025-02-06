@@ -25,9 +25,7 @@ export const userToken = async () => {
           localStorage.setItem("user", JSON.stringify(user.data.data));
           const roles = await userRoleMe();
         }
-      } catch (e) {
-        throw new Error("Access Denied");
-      }
+      } catch (e) {}
     } catch (ex) {
       try {
         if (user) {
