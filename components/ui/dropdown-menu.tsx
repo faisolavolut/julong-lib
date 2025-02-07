@@ -213,12 +213,31 @@ const DropdownHamburgerBetter: React.FC<{
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           {list.map((e, idx) => {
+            if (typeof e?.children === "function") {
+              return (
+                <DropdownMenuItem
+                  key={"menu-group-" + idx}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    event.preventDefault();
+                  }}
+                  className={cn(
+                    "cursor-pointer hover:bg-gray-100 rounded-md",
+                    e?.className ? e?.className : ""
+                  )}
+                >
+                  {e.children()}
+                </DropdownMenuItem>
+              );
+            }
             return (
               <DropdownMenuItem
                 key={"menu-group-" + idx}
                 onClick={(event) => {
-                  event.stopPropagation();
-                  event.preventDefault();
+                  if (!e?.progration) {
+                    event.stopPropagation();
+                    event.preventDefault();
+                  }
                   if (typeof e?.onClick === "function") {
                     e?.onClick();
                   }

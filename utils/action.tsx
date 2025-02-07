@@ -50,7 +50,7 @@ export const actionToast = async (data: {
         >
           <div className="flex text-green-700 items-center success-title font-semibold">
             <Check className="h-6 w-6 mr-1 " />
-            {msg_succes ? msg_succes : "Success"}
+            {msg_succes ? msg_succes : " Success"}
           </div>
         </div>
       );
@@ -63,7 +63,7 @@ export const actionToast = async (data: {
       <div className="flex flex-col w-full">
         <div className="flex text-red-600 items-center">
           <AlertTriangle className="h-4 w-4 mr-1" />
-          {msg_error ? msg_error : "Failed"}{" "}
+          {msg_error ? msg_error : " Failed"}{" "}
           {get(ex, "response.data.meta.message") || ex.message}.
         </div>
       </div>,
