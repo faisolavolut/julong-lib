@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Star } from "lucide-react";
-import { cn } from "@/lib/utils/utils";
+import { cn } from "@/lib/utils";
 
 const ratingVariants = {
   default: {

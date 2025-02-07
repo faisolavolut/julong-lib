@@ -63,9 +63,9 @@ const ProgressChart: FC<ProgressChartProps> = ({
     },
   };
   return (
-    <div className="relative w-24 h-24">
+    <div className="relative w-16 h-16">
       <Doughnut data={data} options={options} plugins={[backgroundCircle]} />
-      <div className="absolute inset-0 flex items-center justify-center text-black font-bold">
+      <div className="absolute inset-0 flex items-center justify-center text-black font-bold text-sm">
         +{percentage}%
       </div>
     </div>

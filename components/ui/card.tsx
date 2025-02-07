@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { cn } from "@/lib/utils/utils";
+import { cn } from "@/lib/utils";
 
 const Card = React.forwardRef<
   HTMLDivElement,
@@ -74,7 +74,7 @@ const CardFooter = React.forwardRef<
 
 const CardBetter: React.FC<any> = ({ children, className }) => {
   return (
-    <Card className={className}>
+    <Card className={cn("bg-white", className)}>
       <CardContent className="flex flex-grow flex-col p-0">
         {children}
       </CardContent>
