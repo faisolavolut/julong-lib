@@ -14,6 +14,7 @@ type apixType = {
     label: string | ((item: any) => string);
   };
   header?: "normal" | "form";
+  options?: any;
 };
 
 export const apix = async ({
@@ -26,6 +27,7 @@ export const apix = async ({
   type = "usual",
   header = "normal",
   keys,
+  options,
 }: apixType) => {
   const root_url = `${
     port === "portal"
@@ -56,13 +58,16 @@ export const apix = async ({
     try {
       switch (method) {
         case "get":
-          result = await api.get(root_url);
+          result = await api.get(root_url, {
+            ...options,
+          });
           break;
 
         case "post":
           result = await api.post(root_url, requestData, {
             headers:
               type === "form" ? { "Content-Type": "multipart/form-data" } : {},
+            ...options,
           });
           break;
 
@@ -70,6 +75,7 @@ export const apix = async ({
           result = await api.put(root_url, requestData, {
             headers:
               type === "form" ? { "Content-Type": "multipart/form-data" } : {},
+            ...options,
           });
           break;
 
