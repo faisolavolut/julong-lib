@@ -7,6 +7,7 @@ export const userToken = async () => {
     if (user) {
       const w = window as any;
       w.user = JSON.parse(user);
+      return true;
     }
   } else {
     try {
@@ -29,15 +30,18 @@ export const userToken = async () => {
         localStorage.setItem("user", JSON.stringify(user.data.data));
         const w = window as any;
         w.user = JSON.parse(user.data.data);
+        return true;
       }
     } catch (ex) {
       const user = localStorage.getItem("user");
       if (user) {
         const w = window as any;
         w.user = JSON.parse(user);
+        return true;
       }
     }
   }
+  return false;
   // const user = localStorage.getItem("user");
   // if (user) {
   //   const w = window as any;

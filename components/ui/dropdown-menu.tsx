@@ -239,7 +239,11 @@ const DropdownHamburgerBetter: React.FC<{
                     event.preventDefault();
                   }
                   if (typeof e?.onClick === "function") {
-                    e?.onClick();
+                    e?.onClick({
+                      close: () => {
+                        setOpen(false);
+                      },
+                    });
                   }
                 }}
                 className={cn(

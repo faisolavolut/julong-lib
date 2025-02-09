@@ -72,6 +72,7 @@ export const TableList: React.FC<any> = ({
     listData: [] as any[],
     sort: {} as any,
     search: null as any,
+    paging: 1,
     count: 0 as any,
     addRow: (row: any) => {
       setData((prev) => [...prev, row]);
@@ -93,7 +94,7 @@ export const TableList: React.FC<any> = ({
       local.data = local.data.filter((item: any) => item !== row); // Hapus row dari local.data
       local.render(); // Panggil render untuk memperbarui UI
     },
-    reload: async () => {
+    refresh: async () => {
       toast.info(
         <>
           <Loader2
@@ -132,6 +133,55 @@ export const TableList: React.FC<any> = ({
         });
         if (!autoPagination) {
           res = paginateArray(res, take, 1);
+        }
+        local.data = res;
+        cloneListFM(res);
+        local.render();
+        setData(res);
+        setTimeout(() => {
+          toast.dismiss();
+        }, 100);
+      }
+    },
+    reload: async () => {
+      toast.info(
+        <>
+          <Loader2
+            className={cx(
+              "h-4 w-4 animate-spin-important",
+              css`
+                animation: spin 1s linear infinite !important;
+                @keyframes spin {
+                  0% {
+                    transform: rotate(0deg);
+                  }
+                  100% {
+                    transform: rotate(360deg);
+                  }
+                }
+              `
+            )}
+          />
+          {"Loading..."}
+        </>
+      );
+      if (Array.isArray(onLoad)) {
+        let res = onLoad;
+        if (!autoPagination) {
+          res = paginateArray(res, take, local.paging);
+        }
+        local.data = res;
+        local.render();
+        setData(res);
+      } else {
+        let res: any = await onLoad({
+          search: local.search,
+          sort: local.sort,
+          take,
+          paging: local.paging,
+        });
+        if (!autoPagination) {
+          res = paginateArray(res, take, local.paging);
         }
         local.data = res;
         cloneListFM(res);
@@ -372,7 +422,7 @@ export const TableList: React.FC<any> = ({
   }));
   const handleSearch = useCallback(
     debouncedHandler(() => {
-      local.reload();
+      local.refresh();
     }, 1000),
     []
   );
@@ -757,8 +807,18 @@ export const TableList: React.FC<any> = ({
         <Pagination
           list={local}
           count={local.count}
-          onNextPage={() => table.nextPage()}
-          onPrevPage={() => table.previousPage()}
+          onNextPage={() => {
+            table.nextPage();
+            local.paging = local.paging + 1;
+            local.render();
+            local.reload();
+          }}
+          onPrevPage={() => {
+            table.previousPage();
+            local.paging = local.paging - 1;
+            local.render();
+            local.reload();
+          }}
           disabledNextPage={!table.getCanNextPage()}
           disabledPrevPage={!table.getCanPreviousPage()}
           page={table.getState().pagination.pageIndex + 1}
@@ -767,6 +827,9 @@ export const TableList: React.FC<any> = ({
               pageIndex: page,
               pageSize: 20,
             });
+            local.paging = page;
+            local.render();
+            local.reload();
           }}
           countPage={table.getPageCount()}
           countData={local.data.length}
@@ -880,7 +943,7 @@ export const Pagination: React.FC<any> = ({
             {/* <span>Next</span> */}
             <HiChevronRight className="text-sm" />
           </div>
-        </div>
+        </div>  
       </div>
     </div>
   );

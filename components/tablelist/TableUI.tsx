@@ -8,6 +8,7 @@ import { getNumber } from "@/lib/utils/getNumber";
 import { BreadcrumbBetterLink } from "../ui/breadcrumb-link";
 export const TableUI: React.FC<any> = ({
   name,
+  modeTab,
   column,
   align = "center",
   onLoad,
@@ -54,13 +55,23 @@ export const TableUI: React.FC<any> = ({
                   onLabel={(row: any) => {
                     return (
                       <div className="flex flex-row items-center gap-x-2  font-bold">
-                        <div className="text-3xl">
-                          {getNumber(row?.count) > 999
-                            ? "99+"
-                            : getNumber(row?.count)}
-                        </div>
+                        {modeTab !== "only-title" ? (
+                          <div className="text-3xl">
+                            {getNumber(row?.count) > 999
+                              ? "99+"
+                              : getNumber(row?.count)}
+                          </div>
+                        ) : (
+                          <></>
+                        )}
+
                         <div className="flex flex-col justify-start ">
-                          <div className="text-start">Total</div>
+                          {modeTab !== "only-title" ? (
+                            <div className="text-start">Total</div>
+                          ) : (
+                            <></>
+                          )}
+
                           <div>{row.name}</div>
                         </div>
                       </div>
