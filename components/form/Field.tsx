@@ -10,12 +10,50 @@ import { getNumber } from "@/lib/utils/getNumber";
 import { useLocal } from "@/lib/utils/use-local";
 import { FieldRadio } from "./field/TypeRadio";
 
-export const Field: React.FC<any> = ({
+export const Field: React.FC<{
+  fm: any;
+  label: string;
+  name: string;
+  onLoad?: () => Promise<any> | any;
+  type?:
+    | "rating"
+    | "color"
+    | "single-checkbox"
+    | "radio"
+    | "checkbox"
+    | "upload"
+    | "multi-upload"
+    | "dropdown"
+    | "multi-dropdown"
+    | "checkbox"
+    | "radio"
+    | "single-checkbox"
+    | "richtext"
+    | "tag"
+    | "text"
+    | "money"
+    | "textarea"
+    | "time"
+    | "date"
+    | "password";
+  placeholder?: string;
+  disabled?: boolean;
+  required?: boolean;
+  hidden_label?: boolean;
+
+  onChange?: ({ data }: any) => Promise<void> | void;
+  className?: string;
+  classField?: string;
+  style?: string;
+  prefix?: string | any | (() => any);
+  suffix?: string | any | (() => any);
+  allowNew?: boolean;
+}> = ({
   fm,
   label,
   name,
   onLoad,
-  type,
+  type = "text",
   placeholder,
   required,
   disabled,

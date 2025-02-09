@@ -1,11 +1,12 @@
 "use client";
-
 import * as React from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { Check, ChevronRight, Circle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ButtonBetter } from "./button";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import { Alert } from "./alert";
+import { useLocal } from "@/lib/utils/use-local";
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 
@@ -187,93 +188,134 @@ const DropdownHamburgerBetter: React.FC<{
   list: any[];
   className?: string;
   classNameList?: string;
+  alert?: boolean;
+  message?: string;
 }> = ({ children, list, className, classNameList }) => {
+  const local = useLocal({
+    onClick: () => {},
+    msg: null as any,
+  });
   const [open, setOpen] = React.useState(false as boolean);
+  const [openAlert, setOpenAlert] = React.useState(false as boolean);
   const firstChild = list?.[0];
   const childs = list?.length > 1 ? list.slice(1) : [];
   return (
-    <DropdownMenu
-      open={open}
-      onOpenChange={(e) => {
-        setOpen(e);
-      }}
-    >
-      <DropdownMenuTrigger asChild>
-        <ButtonBetter
-          onClick={() => {
-            setOpen(!open);
-          }}
-        >
-          More Action
-          {open ? <IoIosArrowDown /> : <IoIosArrowUp />}
-        </ButtonBetter>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className={cn("w-56 bg-white", classNameList)}>
-        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          {list.map((e, idx) => {
-            if (typeof e?.children === "function") {
+    <>
+      <Alert
+        type={"delete"}
+        msg={local?.msg}
+        onClick={async () => {
+          if (typeof local.onClick === "function") {
+            await local.onClick();
+          }
+        }}
+        mode="manual"
+        open={openAlert}
+        onOpenChange={(e) => {
+          setOpenAlert(e);
+        }}
+      ></Alert>
+
+      <DropdownMenu
+        open={open}
+        onOpenChange={(e) => {
+          setOpen(e);
+        }}
+      >
+        <DropdownMenuTrigger asChild>
+          <ButtonBetter
+            onClick={() => {
+              setOpen(!open);
+            }}
+          >
+            More Actions
+            {open ? <IoIosArrowDown /> : <IoIosArrowUp />}
+          </ButtonBetter>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className={cn("w-56 bg-white", classNameList)}>
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            {list.map((e, idx) => {
+              if (typeof e?.children === "function") {
+                return (
+                  <DropdownMenuItem
+                    key={"menu-group-" + idx}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      event.preventDefault();
+                    }}
+                    className={cn(
+                      "cursor-pointer hover:bg-gray-100 rounded-md",
+                      e?.className ? e?.className : ""
+                    )}
+                  >
+                    {e.children()}
+                  </DropdownMenuItem>
+                );
+              }
               return (
                 <DropdownMenuItem
                   key={"menu-group-" + idx}
                   onClick={(event) => {
-                    event.stopPropagation();
-                    event.preventDefault();
+                    if (!e?.progration) {
+                      event.stopPropagation();
+                      event.preventDefault();
+                    }
+                    if (typeof e?.onClick === "function") {
+                      local.onClick = e?.onClick;
+                      e?.onClick({
+                        close: () => {
+                          setOpen(false);
+                        },
+                      });
+                    }
+                    const data = {
+                      alert: e?.alert ? true : false,
+                      onClick: e?.onClick,
+                      msg: e?.msg,
+                    };
+                    if (data?.alert) {
+                      setOpen(false);
+                      setOpenAlert(e);
+                      local.msg = data?.msg;
+                      local.onClick = async () => {
+                        if (typeof data?.onClick === "function") {
+                          await data?.onClick();
+                        }
+                      };
+                      local.render();
+                    }
                   }}
                   className={cn(
                     "cursor-pointer hover:bg-gray-100 rounded-md",
                     e?.className ? e?.className : ""
                   )}
                 >
-                  {e.children()}
-                </DropdownMenuItem>
-              );
-            }
-            return (
-              <DropdownMenuItem
-                key={"menu-group-" + idx}
-                onClick={(event) => {
-                  if (!e?.progration) {
-                    event.stopPropagation();
-                    event.preventDefault();
-                  }
-                  if (typeof e?.onClick === "function") {
-                    e?.onClick({
-                      close: () => {
-                        setOpen(false);
-                      },
-                    });
-                  }
-                }}
-                className={cn(
-                  "cursor-pointer hover:bg-gray-100 rounded-md",
-                  e?.className ? e?.className : ""
-                )}
-              >
-                {typeof e?.label === "function" ? (
-                  e?.label()
-                ) : e?.label ? (
-                  e?.label
-                ) : (
-                  <></>
-                )}
-                <DropdownMenuShortcut>
-                  {" "}
-                  {typeof e?.icon === "function" ? (
-                    e?.icon()
-                  ) : e?.icon ? (
-                    e?.icon
+                  {typeof e?.label === "function" ? (
+                    e?.label()
+                  ) : e?.label ? (
+                    e?.label
                   ) : (
                     <></>
                   )}
-                </DropdownMenuShortcut>
-              </DropdownMenuItem>
-            );
-          })}
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+                  <DropdownMenuShortcut>
+                    {" "}
+                    {typeof e?.icon === "function" ? (
+                      e?.icon()
+                    ) : e?.icon ? (
+                      e?.icon
+                    ) : (
+                      <></>
+                    )}
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+              );
+            })}
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
   );
 };
 DropdownMenuShortcut.displayName = "DropdownMenuShortcut";

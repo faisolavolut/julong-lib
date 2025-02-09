@@ -11,23 +11,48 @@ import {
   AlertDialogTrigger,
 } from "./alert-dialog";
 
-export const Alert: FC<any> = ({
+export const Alert: FC<{
+  type: string;
+  onClick?: () => Promise<void> | void;
+  children?: any;
+  className?: string;
+  content?: any;
+  msg?: any;
+  mode?: "auto" | "manual";
+  open?: boolean;
+  onOpenChange?: (event: boolean) => void;
+}> = ({
   type,
   onClick,
   children,
   className,
   content,
   msg,
+  mode,
+  open,
+  onOpenChange,
 }) => {
   const message: any = {
     save: "Your data will be saved securely. You can update it at any time if needed.",
     delete:
       "This action cannot be undone. This will permanently remove your data from our servers.",
   };
+  const param =
+    mode === "manual"
+      ? {
+          open: open,
+          onOpenChange: onOpenChange,
+        }
+      : {};
   return (
     <>
-      <AlertDialog>
-        <AlertDialogTrigger>{children}</AlertDialogTrigger>
+      <AlertDialog {...param}>
+        {mode === "manual" ? (
+          <></>
+        ) : (
+          <AlertDialogTrigger>{children}</AlertDialogTrigger>
+        )}
+
         <AlertDialogContent className={className}>
           {content ? (
             content
