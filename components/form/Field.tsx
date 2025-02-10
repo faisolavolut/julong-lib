@@ -36,7 +36,8 @@ export const Field: React.FC<{
     | "textarea"
     | "time"
     | "date"
-    | "password";
+    | "password"
+    | "email";
   placeholder?: string;
   disabled?: boolean;
   required?: boolean;
