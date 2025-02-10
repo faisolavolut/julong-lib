@@ -12,7 +12,7 @@ import { FieldRadio } from "./field/TypeRadio";
 
 export const Field: React.FC<{
   fm: any;
-  label: string;
+  label?: string;
   name: string;
   isBetter?: boolean;
   onLoad?: () => Promise<any> | any;
