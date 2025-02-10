@@ -14,6 +14,7 @@ export const Field: React.FC<{
   fm: any;
   label: string;
   name: string;
+  isBetter?: boolean;
   onLoad?: () => Promise<any> | any;
   type?:
     | "rating"
@@ -40,7 +41,6 @@ export const Field: React.FC<{
   disabled?: boolean;
   required?: boolean;
   hidden_label?: boolean;
-
   onChange?: ({ data }: any) => Promise<void> | void;
   className?: string;
   classField?: string;
@@ -48,9 +48,11 @@ export const Field: React.FC<{
   prefix?: string | any | (() => any);
   suffix?: string | any | (() => any);
   allowNew?: boolean;
+  unique?: boolean;
 }> = ({
   fm,
   label,
+  isBetter,
   name,
   onLoad,
   type = "text",
@@ -65,6 +67,7 @@ export const Field: React.FC<{
   prefix,
   suffix,
   allowNew,
+  unique = true,
 }) => {
   let result = null;
   const field = useLocal({
@@ -247,6 +250,8 @@ export const Field: React.FC<{
                 disabled={is_disable}
                 onChange={onChange}
                 mode="multi"
+                unique={unique}
+                isBetter={isBetter}
               />
             </>
           ) : ["checkbox"].includes(type) ? (

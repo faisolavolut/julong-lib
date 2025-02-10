@@ -40,6 +40,7 @@ export const Typeahead: FC<{
   note?: string;
   disabledSearch?: boolean;
   onInit?: (e: any) => void;
+  isBetter?: boolean;
 }> = ({
   value,
   fitur,
@@ -59,7 +60,9 @@ export const Typeahead: FC<{
   popupClassName,
   disabledSearch,
   onInit,
+  isBetter = false,
 }) => {
+  const maxLength = 4;
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedTerm, setDebouncedTerm] = useState("");
   const local = useLocal({
@@ -68,6 +71,10 @@ export const Typeahead: FC<{
     options: [] as OptItem[],
     loaded: false,
     loading: false,
+    selectBetter: {
+      all: false,
+      partial: [] as any[],
+    },
     search: {
       input: "",
       timeout: null as any,
@@ -102,9 +109,10 @@ export const Typeahead: FC<{
       }
       return true;
     });
-
-    if (!select_found) {
-      local.select = options[0];
+    if (Array.isArray(value) && value?.length) {
+      if (!select_found) {
+        local.select = options[0];
+      }
     }
   }
 
@@ -513,6 +521,25 @@ export const Typeahead: FC<{
               resetSearch();
             }
           }}
+          onRemove={(data) => {
+            local.value = local.value.filter((val) => data?.value !== val);
+            local.render();
+            input.current?.focus();
+
+            if (typeof onChange === "function") {
+              onChange(local.value);
+            }
+          }}
+          onSelectAll={(data: boolean) => {
+            local.value = data ? options.map((e) => e?.value) : [];
+            local.render();
+            input.current?.focus();
+            if (typeof onChange === "function") {
+              onChange(local.value);
+            }
+          }}
+          init={local}
+          isBetter={isBetter}
           loading={local.loading}
           showEmpty={!allow_new}
           className={popupClassName}
@@ -520,8 +547,89 @@ export const Typeahead: FC<{
           options={options}
           searching={local.search.searching}
           searchText={local.search.input}
+          onSearch={async (e) => {
+            const val = e.currentTarget.value;
+            if (!local.open) {
+              local.open = true;
+            }
+
+            local.search.input = val;
+            local.render();
+
+            if (local.search.promise) {
+              await local.search.promise;
+            }
+
+            local.search.searching = true;
+            local.render();
+            if (allow_new) {
+              setSearchTerm(val);
+            }
+            if (local.search.searching) {
+              if (local.local_search) {
+                if (!local.loaded) {
+                  await loadOptions();
+                }
+                const search = local.search.input.toLowerCase();
+                if (search) {
+                  local.search.result = options.filter((e) =>
+                    e.label.toLowerCase().includes(search)
+                  );
+
+                  if (
+                    local.search.result.length > 0 &&
+                    !local.search.result.find(
+                      (e) => e.value === local.select?.value
+                    )
+                  ) {
+                  }
+                } else {
+                  local.search.result = null;
+                }
+                local.search.searching = false;
+                local.render();
+              } else {
+                clearTimeout(local.search.timeout);
+                local.search.timeout = setTimeout(async () => {
+                  const result = options_fn?.({
+                    search: local.search.input,
+                    existing: options,
+                  });
+                  if (result) {
+                    if (result instanceof Promise) {
+                      local.search.promise = result;
+                      local.search.result = (await result).map((item) => {
+                        if (typeof item === "string")
+                          return { value: item, label: item };
+                        return item;
+                      });
+                      local.search.searching = false;
+                      local.search.promise = null;
+                    } else {
+                      local.search.result = result.map((item) => {
+                        if (typeof item === "string")
+                          return { value: item, label: item };
+                        return item;
+                      });
+                      local.search.searching = false;
+                    }
+
+                    if (
+                      local.search.result.length > 0 &&
+                      !local.search.result.find(
+                        (e) => e.value === local.select?.value
+                      )
+                    ) {
+                    }
+
+                    local.render();
+                  }
+                }, 100);
+              }
+            }
+          }}
           onSelect={(value) => {
-            local.open = false;
+            if (!isBetter) local.open = false;
             resetSearch();
             const item = options.find((item) => item.value === value);
             if (item) {
@@ -545,9 +653,20 @@ export const Typeahead: FC<{
           }
           isMulti={local.mode === "multi"}
           selected={({ item, options, idx }) => {
-            if (item.value === local.select?.value) {
+            // console.log(local.select);
+            if (isBetter) {
+              const val = local.value?.length ? local.value : [];
+              let isSelect = options.find((e) => {
+                return (
+                  e?.value === item?.value &&
+                  val.find((ex) => ex === item?.value)
+                );
+              });
+              return isSelect ? true : false;
+            } else if (item.value === local.select?.value) {
               return true;
             }
+
             return false;
           }}
         >
@@ -576,82 +695,51 @@ export const Typeahead: FC<{
               }
             }}
           >
-            <input
-              placeholder={
-                local.mode === "multi"
-                  ? placeholder
-                  : valueLabel[0]?.label || placeholder
-              }
-              type="text"
-              ref={input}
-              value={inputval}
-              onChange={async (e) => {
-                const val = e.currentTarget.value;
-                if (!local.open) {
-                  local.open = true;
+            {isBetter ? (
+              <div className="h-9 flex-grow flex flex-row items-start">
+                <div className="flex flex-grow"></div>
+                <div className="h-9 flex flex-row items-center px-2">
+                  <GoChevronDown size={14} />
+                </div>
+              </div>
+            ) : (
+              <input
+                placeholder={
+                  local.mode === "multi"
+                    ? placeholder
+                    : valueLabel[0]?.label || placeholder
                 }
+                type="text"
+                ref={input}
+                value={inputval}
+                onChange={async (e) => {
+                  const val = e.currentTarget.value;
+                  if (!local.open) {
+                    local.open = true;
+                  }
 
-                local.search.input = val;
-                local.render();
+                  local.search.input = val;
+                  local.render();
 
-                if (local.search.promise) {
-                  await local.search.promise;
-                }
+                  if (local.search.promise) {
+                    await local.search.promise;
+                  }
 
-                local.search.searching = true;
-                local.render();
-                if (allow_new) {
-                  setSearchTerm(val);
-                }
-                if (local.search.searching) {
-                  if (local.local_search) {
-                    if (!local.loaded) {
-                      await loadOptions();
-                    }
-                    const search = local.search.input.toLowerCase();
-                    if (search) {
-                      local.search.result = options.filter((e) =>
-                        e.label.toLowerCase().includes(search)
-                      );
-
-                      if (
-                        local.search.result.length > 0 &&
-                        !local.search.result.find(
-                          (e) => e.value === local.select?.value
-                        )
-                      ) {
-                        local.select = local.search.result[0];
+                  local.search.searching = true;
+                  local.render();
+                  if (allow_new) {
+                    setSearchTerm(val);
+                  }
+                  if (local.search.searching) {
+                    if (local.local_search) {
+                      if (!local.loaded) {
+                        await loadOptions();
                       }
-                    } else {
-                      local.search.result = null;
-                    }
-                    local.search.searching = false;
-                    local.render();
-                  } else {
-                    clearTimeout(local.search.timeout);
-                    local.search.timeout = setTimeout(async () => {
-                      const result = options_fn?.({
-                        search: local.search.input,
-                        existing: options,
-                      });
-                      if (result) {
-                        if (result instanceof Promise) {
-                          local.search.promise = result;
-                          local.search.result = (await result).map((item) => {
-                            if (typeof item === "string")
-                              return { value: item, label: item };
-                            return item;
-                          });
-                          local.search.searching = false;
-                          local.search.promise = null;
-                        } else {
-                          local.search.result = result.map((item) => {
-                            if (typeof item === "string")
-                              return { value: item, label: item };
-                            return item;
-                          });
-                          local.search.searching = false;
-                        }
+                      const search = local.search.input.toLowerCase();
+                      if (search) {
+                        local.search.result = options.filter((e) =>
+                          e.label.toLowerCase().includes(search)
+                        );
 
                         if (
                           local.search.result.length > 0 &&
@@ -661,24 +749,64 @@ export const Typeahead: FC<{
                         ) {
                           local.select = local.search.result[0];
                         }
-
-                        local.render();
+                      } else {
+                        local.search.result = null;
                       }
-                    }, 100);
+                      local.search.searching = false;
+                      local.render();
+                    } else {
+                      clearTimeout(local.search.timeout);
+                      local.search.timeout = setTimeout(async () => {
+                        const result = options_fn?.({
+                          search: local.search.input,
+                          existing: options,
+                        });
+                        if (result) {
+                          if (result instanceof Promise) {
+                            local.search.promise = result;
+                            local.search.result = (await result).map((item) => {
+                              if (typeof item === "string")
+                                return { value: item, label: item };
+                              return item;
+                            });
+                            local.search.searching = false;
+                            local.search.promise = null;
+                          } else {
+                            local.search.result = result.map((item) => {
+                              if (typeof item === "string")
+                                return { value: item, label: item };
+                              return item;
+                            });
+                            local.search.searching = false;
+                          }
+
+                          if (
+                            local.search.result.length > 0 &&
+                            !local.search.result.find(
+                              (e) => e.value === local.select?.value
+                            )
+                          ) {
+                            local.select = local.search.result[0];
+                          }
+
+                          local.render();
+                        }
+                      }, 100);
+                    }
                   }
-                }
-              }}
-              disabled={!disabled ? disabledSearch : disabled}
-              spellCheck={false}
-              className={cx(
-                "text-black flex h-9 w-full border-input bg-transparent px-3 py-1 text-base border-none shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground md:text-sm focus:outline-none focus:ring-0",
-                local.mode === "single" ? "cursor-pointer" : ""
-              )}
-              style={{
-                pointerEvents: disabledSearch ? "none" : "auto", // Mencegah input menangkap klik saat disabled
-              }}
-              onKeyDown={keydown}
-            />
+                }}
+                disabled={!disabled ? disabledSearch : disabled}
+                spellCheck={false}
+                className={cx(
+                  "text-black flex h-9 w-full border-input bg-transparent px-3 py-1 text-base border-none shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground md:text-sm focus:outline-none focus:ring-0",
+                  local.mode === "single" ? "cursor-pointer" : ""
+                )}
+                style={{
+                  pointerEvents: disabledSearch ? "none" : "auto", // Mencegah input menangkap klik saat disabled
+                }}
+                onKeyDown={keydown}
+              />
+            )}
           </div>
         </TypeaheadOptions>
       </div>

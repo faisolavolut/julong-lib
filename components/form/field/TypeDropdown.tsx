@@ -10,6 +10,8 @@ export const TypeDropdown: React.FC<any> = ({
   disabled,
   mode,
   allowNew = false,
+  unique = true,
+  isBetter = false,
 }) => {
   return (
     <>
@@ -22,7 +24,7 @@ export const TypeDropdown: React.FC<any> = ({
             : []
         }
         allowNew={allowNew}
-        unique={mode === "multi" ? true : false}
+        unique={mode === "multi" ? (isBetter ? false : true) : false}
         disabledSearch={false}
         //   popupClassName={}
         required={required}
