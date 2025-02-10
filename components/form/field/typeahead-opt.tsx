@@ -74,11 +74,9 @@ export const TypeaheadOptions: FC<{
           : width
           ? css`
               min-width: ${width}px;
-              height: 450px;
             `
           : css`
               min-width: 150px;
-              height: 450px;
             `,
         css`
           max-height: 400px;
@@ -207,7 +205,7 @@ export const TypeaheadOptions: FC<{
                 </>
               )}
             </div>
-          ) : (
+          ) : isBetter ? (
             <ScrollArea className="w-full flex-grow flex flex-col gap-y-2">
               {options.map((item, idx) => {
                 const is_selected = isBetter
@@ -261,10 +259,64 @@ export const TypeaheadOptions: FC<{
                 );
               })}
             </ScrollArea>
+          ) : (
+            <div className="w-full flex-grow flex flex-col">
+              {options.map((item, idx) => {
+                const is_selected = isBetter
+                  ? init.selectBetter.all
+                    ? true
+                    : selected?.({ item, options, idx })
+                  : selected?.({ item, options, idx });
+
+                if (is_selected) {
+                  local.selectedIdx = idx;
+                }
+                if (isBetter) {
+                  return (
+                    <div
+                      className="flex flex-row px-3 py-1 gap-x-2 items-center cursor-pointer"
+                      key={item.value + "_" + idx}
+                    >
+                      <Checkbox
+                        id="terms"
+                        className="border border-primary"
+                        checked={is_selected}
+                        onClick={() => {
+                          if (is_selected) {
+                            if (typeof onRemove === "function") onRemove(item);
+                          } else {
+                            onSelect?.(item.value);
+                          }
+                        }}
+                      />
+                      {item.label || <>&nbsp;</>}
+                    </div>
+                  );
+                }
+                return (
+                  <div
+                    tabIndex={0}
+                    key={item.value + "_" + idx}
+                    className={cx(
+                      "opt-item px-3 py-1 cursor-pointer option-item text-sm",
+                      is_selected
+                        ? "bg-blue-600 text-white"
+                        : "hover:bg-blue-50",
+                      idx > 0 && "border-t"
+                    )}
+                    onClick={() => {
+                      onSelect?.(item.value);
+                    }}
+                  >
+                    {item.label || <>&nbsp;</>}
+                  </div>
+                );
+              })}
+            </div>
           )}
         </>
       )}
-      {isBetter ? (
+      {false ? (
         <div className="w-full flex flex-row items-center justify-end p-1 border-t border-gray-200">
           <ButtonBetter className="rounded-md text-xs flex flex-row items-center gap-x-1">
             <IoCheckmark />

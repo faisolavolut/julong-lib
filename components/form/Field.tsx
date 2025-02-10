@@ -52,7 +52,7 @@ export const Field: React.FC<{
 }> = ({
   fm,
   label,
-  isBetter,
+  isBetter = false,
   name,
   onLoad,
   type = "text",

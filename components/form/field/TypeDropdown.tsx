@@ -23,6 +23,7 @@ export const TypeDropdown: React.FC<any> = ({
             ? [fm.data?.[name]]
             : []
         }
+        isBetter={isBetter}
         allowNew={allowNew}
         unique={mode === "multi" ? (isBetter ? false : true) : false}
         disabledSearch={false}

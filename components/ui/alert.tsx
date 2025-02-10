@@ -13,7 +13,7 @@ import {
 
 export const Alert: FC<{
   type: string;
-  onClick?: () => Promise<void> | void;
+  onClick?: (event?: any) => Promise<any> | any;
   children?: any;
   className?: string;
   content?: any;
