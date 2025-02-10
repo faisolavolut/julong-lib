@@ -33,6 +33,7 @@ export const TableUI: React.FC<any> = ({
 }) => {
   const local = useLocal({
     tab: get(tab, "[0].id"),
+    table: null as any,
   });
 
   return (
@@ -87,6 +88,11 @@ export const TableUI: React.FC<any> = ({
                     if (typeof onTab === "function") {
                       onTab(local.tab);
                     }
+                    if (typeof local?.table?.refresh === "function") {
+                      {
+                        local.table.refresh();
+                      }
+                    }
                   }}
                   tabContent={(data: any) => {
                     return <></>;
@@ -104,7 +110,13 @@ export const TableUI: React.FC<any> = ({
                 column={column}
                 onLoad={onLoad}
                 onCount={onCount}
-                onInit={onInit}
+                onInit={(e: any) => {
+                  local.table = e;
+                  local.render();
+                  if (typeof onInit === "function") {
+                    onInit(e);
+                  }
+                }}
               />
             </div>
           </div>
