@@ -1,30 +1,6 @@
 "use client";
-import {
-  ColumnDef,
-  ColumnResizeDirection,
-  ColumnResizeMode,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  SortingState,
-  useReactTable,
-} from "@tanstack/react-table";
-import React, { FC, useEffect } from "react";
-import {
-  Breadcrumb,
-  Button,
-  Checkbox,
-  Label,
-  Modal,
-  Table,
-  TextInput,
-} from "flowbite-react";
-import { FaArrowDownLong, FaArrowUp } from "react-icons/fa6";
-
-import { init_column } from "../tablelist/lib/column";
+import React, { useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import TabSlider from "../ui/tabslider";
 import { useLocal } from "@/lib/utils/use-local";
 
 export const TabHeader: React.FC<any> = ({

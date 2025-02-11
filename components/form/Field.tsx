@@ -9,6 +9,7 @@ import get from "lodash.get";
 import { getNumber } from "@/lib/utils/getNumber";
 import { useLocal } from "@/lib/utils/use-local";
 import { FieldRadio } from "./field/TypeRadio";
+import { cn } from "@/lib/utils";
 
 export const Field: React.FC<{
   fm: any;
@@ -155,7 +156,7 @@ export const Field: React.FC<{
           <></>
         )}
         <div
-          className={cx(
+          className={cn(
             error
               ? "flex flex-row rounded-md flex-grow border-red-500 border items-center"
               : "flex flex-row rounded-md flex-grow  items-center",
@@ -338,7 +339,8 @@ export const Field: React.FC<{
                       padding-right: ${getNumber(
                         get(suffixRef, "current.clientWidth")
                       ) + 10}px;
-                    `
+                    `,
+                  className
                 )}
               />
             </>

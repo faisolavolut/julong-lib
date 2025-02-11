@@ -9,6 +9,7 @@ import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { Rating } from "../../ui/ratings";
 import { getNumber } from "@/lib/utils/getNumber";
 import MaskedInput from "../../ui/MaskedInput";
+import { cn } from "@/lib/utils";
 
 export const TypeInput: React.FC<any> = ({
   name,
@@ -247,7 +248,7 @@ export const TypeInput: React.FC<any> = ({
             id={name}
             name={name}
             disabled={disabled}
-            className={cx(
+            className={cn(
               "text-sm text-right	",
               error
                 ? css`
