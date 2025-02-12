@@ -197,8 +197,9 @@ const DropdownHamburgerBetter: React.FC<{
   });
   const [open, setOpen] = React.useState(false as boolean);
   const [openAlert, setOpenAlert] = React.useState(false as boolean);
-  const firstChild = list?.[0];
-  const childs = list?.length > 1 ? list.slice(1) : [];
+  const items = list?.filter((e) =>
+    typeof e?.show === "boolean" ? e?.show : true
+  );
   return (
     <>
       <Alert
@@ -236,7 +237,7 @@ const DropdownHamburgerBetter: React.FC<{
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            {list.map((e, idx) => {
+            {items.map((e, idx) => {
               if (typeof e?.children === "function") {
                 return (
                   <DropdownMenuItem
