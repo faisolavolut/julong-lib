@@ -1,19 +1,4 @@
-import { useLocal } from "@/lib/utils/use-local";
-import { Input } from "../../ui/input";
 import { useEffect, useRef, useState } from "react";
-import {
-  useEditor,
-  EditorContent,
-  useCurrentEditor,
-  EditorProvider,
-} from "@tiptap/react";
-import Link from "@tiptap/extension-link";
-import StarterKit from "@tiptap/starter-kit";
-import { Color } from "@tiptap/extension-color";
-import ListItem from "@tiptap/extension-list-item";
-import TextStyle from "@tiptap/extension-text-style";
-import { Popover } from "../../Popover/Popover";
-import { ButtonBetter } from "../../ui/button";
 import get from "lodash.get";
 
 export const TypeTag: React.FC<any> = ({
@@ -31,17 +16,17 @@ export const TypeTag: React.FC<any> = ({
   const [editingIndex, setEditingIndex] = useState<number | null>(null); // Index tag yang sedang diedit
   const [tempValue, setTempValue] = useState<string>(""); // Nilai sementara untuk pengeditan
   const tagRefs = useRef<(HTMLDivElement | null)[]>([]);
-
+  const val = fm?.data?.[name];
   useEffect(() => {
     if (get(fm, `data.[${name}].length`)) {
       setTags(fm.data?.[name]);
     }
-  }, []);
+  }, [val]);
   useEffect(() => {
-    console.log("NEW");
+    console.log("MASUK", tags);
     fm.data[name] = tags;
     fm.render();
-
+    console.log("MASUK");
     if (typeof onChange === "function") {
       onChange(tags);
     }
