@@ -275,7 +275,7 @@ export const TableList: React.FC<any> = ({
       }
       setTimeout(() => {
         toast.dismiss();
-      }, 2000);
+      }, 100);
     };
     if (typeof onInit === "function") {
       onInit(local);
@@ -943,7 +943,7 @@ export const Pagination: React.FC<any> = ({
             {/* <span>Next</span> */}
             <HiChevronRight className="text-sm" />
           </div>
-        </div>  
+        </div>
       </div>
     </div>
   );

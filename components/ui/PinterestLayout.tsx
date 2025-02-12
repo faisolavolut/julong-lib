@@ -23,10 +23,11 @@ export const PinterestLayout: React.FC<{
       col: [] as string[],
       data: [] as string[],
     },
+    user: null as any,
+    ready: false as boolean,
   });
   useEffect(() => {
-    const columns: any[] = Array.from({ length: col }, () => []); // Inisialisasi array kosong sebanyak 'col'
-
+    const columns: any[] = Array.from({ length: col }, () => []);
     data.forEach((item, index) => {
       const targetColumn = index % col; // Menentukan kolom target berdasarkan indeks
       columns[targetColumn].push(item); // Memasukkan elemen ke kolom yang sesuai
@@ -34,7 +35,6 @@ export const PinterestLayout: React.FC<{
     local.data = columns;
     local.render();
   }, [data, col]);
-
   return (
     <>
       <div className="flex flex-grow flex-1 flex-col w-full h-full">

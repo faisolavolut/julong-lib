@@ -12,6 +12,7 @@ import {
 } from "./alert-dialog";
 
 export const Alert: FC<{
+  title?: string;
   type: string;
   onClick?: (event?: any) => Promise<any> | any;
   children?: any;
@@ -21,7 +22,9 @@ export const Alert: FC<{
   mode?: "auto" | "manual";
   open?: boolean;
   onOpenChange?: (event: boolean) => void;
+  hiddenFooter?: boolean;
 }> = ({
+  title = " Are you certain you want to continue?",
   type,
   onClick,
   children,
@@ -31,6 +34,7 @@ export const Alert: FC<{
   mode,
   open,
   onOpenChange,
+  hiddenFooter = false,
 }) => {
   const message: any = {
     save: "Your data will be saved securely. You can update it at any time if needed.",
@@ -59,22 +63,26 @@ export const Alert: FC<{
           ) : (
             <>
               <AlertDialogHeader>
-                <AlertDialogTitle>
-                  Are you certain you want to continue?
-                </AlertDialogTitle>
+                <AlertDialogTitle>{title}</AlertDialogTitle>
                 <AlertDialogDescription>
                   {msg || message?.[type]}
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>No</AlertDialogCancel>
-                <AlertDialogAction
-                  className={"bg-primary text-white"}
-                  onClick={onClick}
-                >
-                  Yes
-                </AlertDialogAction>
-              </AlertDialogFooter>
+              {!hiddenFooter ? (
+                <>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>No</AlertDialogCancel>
+                    <AlertDialogAction
+                      className={"bg-primary text-white"}
+                      onClick={onClick}
+                    >
+                      Yes
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </>
+              ) : (
+                <></>
+              )}
             </>
           )}
         </AlertDialogContent>

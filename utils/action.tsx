@@ -39,6 +39,7 @@ export const actionToast = async (data: {
     );
     if (typeof task === "function") await task();
     setTimeout(() => {
+      toast.dismiss();
       toast.success(
         <div
           className={cx(
@@ -57,23 +58,26 @@ export const actionToast = async (data: {
 
       if (typeof after === "function") after();
       if (typeof success === "function") success();
-    }, 1000);
+    }, 100);
   } catch (ex: any) {
-    toast.error(
-      <div className="flex flex-col w-full">
-        <div className="flex text-red-600 items-center">
-          <AlertTriangle className="h-4 w-4 mr-1" />
-          {msg_error ? msg_error : " Failed"}{" "}
-          {get(ex, "response.data.meta.message") || ex.message}.
-        </div>
-      </div>,
-      {
-        dismissible: true,
-        className: css`
-          background: #ffecec;
-          border: 2px solid red;
-        `,
-      }
-    );
+    setTimeout(() => {
+      toast.dismiss();
+      toast.error(
+        <div className="flex flex-col w-full">
+          <div className="flex text-red-600 items-center">
+            <AlertTriangle className="h-4 w-4 mr-1" />
+            {msg_error ? msg_error : " Failed"}{" "}
+            {get(ex, "response.data.meta.message") || ex.message}.
+          </div>
+        </div>,
+        {
+          dismissible: true,
+          className: css`
+            background: #ffecec;
+            border: 2px solid red;
+          `,
+        }
+      );
+    }, 100);
   }
 };
