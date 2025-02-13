@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,6 +36,7 @@ export const Alert: FC<{
   onOpenChange,
   hiddenFooter = false,
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
   const message: any = {
     save: "Your data will be saved securely. You can update it at any time if needed.",
     delete:
@@ -47,7 +48,12 @@ export const Alert: FC<{
           open: open,
           onOpenChange: onOpenChange,
         }
-      : {};
+      : {
+          open: isOpen,
+          onOpenChange: (e: boolean) => {
+            setIsOpen(e);
+          },
+        };
   return (
     <>
       <AlertDialog {...param}>
@@ -71,10 +77,21 @@ export const Alert: FC<{
               {!hiddenFooter ? (
                 <>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>No</AlertDialogCancel>
+                    <AlertDialogCancel
+                      onClick={() => {
+                        setIsOpen(false);
+                      }}
+                    >
+                      No
+                    </AlertDialogCancel>
                     <AlertDialogAction
                       className={"bg-primary text-white"}
-                      onClick={onClick}
+                      onClick={async (e) => {
+                        if (typeof onClick === "function") {
+                          await onClick(e);
+                        }
+                        setIsOpen(false);
+                      }}
                     >
                       Yes
                     </AlertDialogAction>
