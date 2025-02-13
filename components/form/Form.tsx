@@ -121,7 +121,10 @@ export const Form: React.FC<any> = ({
       local.ready = true;
       local.data = res;
       local.render();
-      toast.dismiss();
+      setTimeout(() => {
+        toast.dismiss();
+      }, 100);
+
       // if (res instanceof Promise) {
       //   res.then((data) => {
       //     local.ready = true;
@@ -180,7 +183,10 @@ export const Form: React.FC<any> = ({
       local.ready = true;
       local.data = res;
       local.render(); // Panggil render setelah data diperbarui
-      toast.dismiss();
+
+      setTimeout(() => {
+        toast.dismiss();
+      }, 100);
       // if (res instanceof Promise) {
       //   res.then((data) => {
       //     local.ready = true;

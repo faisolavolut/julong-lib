@@ -119,7 +119,7 @@ export const TableEditBetter: React.FC<any> = ({
             setData(e);
             setTimeout(() => {
               toast.dismiss();
-            }, 2000);
+            }, 100);
           });
         } else {
           local.data = res;
@@ -127,7 +127,7 @@ export const TableEditBetter: React.FC<any> = ({
           setData(res);
           setTimeout(() => {
             toast.dismiss();
-          }, 2000);
+          }, 100);
         }
       }
     },
