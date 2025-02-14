@@ -188,7 +188,7 @@ export const Form: React.FC<any> = ({
       local.data = res;
       local.render(); // Panggil render setelah data diperbarui
       if (typeof afterLoad === "function") {
-        afterLoad(local);
+        await afterLoad(local);
       }
       setTimeout(() => {
         toast.dismiss();
