@@ -27,6 +27,7 @@ export const Form: React.FC<any> = ({
   mode,
   className,
   onInit,
+  afterLoad,
 }) => {
   const local = useLocal({
     ready: false,
@@ -121,6 +122,9 @@ export const Form: React.FC<any> = ({
       local.ready = true;
       local.data = res;
       local.render();
+      if (typeof afterLoad === "function") {
+        afterLoad(local);
+      }
       setTimeout(() => {
         toast.dismiss();
       }, 100);
@@ -183,25 +187,12 @@ export const Form: React.FC<any> = ({
       local.ready = true;
       local.data = res;
       local.render(); // Panggil render setelah data diperbarui
-
+      if (typeof afterLoad === "function") {
+        afterLoad(local);
+      }
       setTimeout(() => {
         toast.dismiss();
       }, 100);
-      // if (res instanceof Promise) {
-      //   res.then((data) => {
-      //     local.ready = true;
-      //     local.data = data;
-      //     local.render(); // Panggil render setelah data diperbarui
-      //     toast.dismiss();
-      //     // toast.success("Data Loaded Successfully!");
-      //   });
-      // } else {
-      //   local.ready = true;
-      //   local.data = res;
-      //   local.render(); // Panggil render untuk memicu re-render
-      //   toast.dismiss();
-      //   toast.success("Data Loaded Successfully!");
-      // }
     };
     run();
   }, []);
