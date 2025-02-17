@@ -24,7 +24,7 @@ import { InputSearch } from "../ui/input-search";
 import get from "lodash.get";
 import { Checkbox } from "../ui/checkbox";
 import { getNumber } from "@/lib/utils/getNumber";
-import { formatMoney } from "../form/field/TypeInput";
+import { formatMoney } from "@/lib/components/form/field/TypeInput";
 
 export const TableList: React.FC<any> = ({
   autoPagination = true,
@@ -116,6 +116,12 @@ export const TableList: React.FC<any> = ({
           {"Loading..."}
         </>
       );
+
+      if (typeof onCount === "function") {
+        const res = await onCount();
+        local.count = res;
+        local.render();
+      }
       if (Array.isArray(onLoad)) {
         let res = onLoad;
         if (!autoPagination) {
@@ -282,7 +288,8 @@ export const TableList: React.FC<any> = ({
     }
     run();
   }, []);
-  const defaultColumns: ColumnDef<Person>[] = init_column(column);
+  const cols = typeof column === "function" ? column() : column;
+  const defaultColumns: ColumnDef<Person>[] = init_column(cols);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columns] = React.useState<typeof defaultColumns>(() =>
     checkbox
@@ -548,9 +555,7 @@ export const TableList: React.FC<any> = ({
                         >
                           {headerGroup.headers.map((header, index) => {
                             const name = header.column.id;
-                            const col = column.find(
-                              (e: any) => e?.name === name
-                            );
+                            const col = cols.find((e: any) => e?.name === name);
                             const isSort =
                               name === "select"
                                 ? false
@@ -751,7 +756,7 @@ export const TableList: React.FC<any> = ({
                                 setData(local.data);
                               },
                             };
-                            const head = column.find(
+                            const head = cols.find(
                               (e: any) =>
                                 e?.name ===
                                 get(ctx, "column.columnDef.accessorKey")

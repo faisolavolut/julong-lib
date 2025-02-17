@@ -1,7 +1,6 @@
-import { Button } from "flowbite-react";
 import type { FC } from "react";
 import { HiChevronLeft } from "react-icons/hi";
-import { ButtonLink } from "../ui/button-link";
+import { ButtonLink } from "@/lib/components/ui/button-link";
 import { siteurl } from "@/lib/utils/siteurl";
 
 const ServerErrorPage: FC = function () {

@@ -7,7 +7,7 @@ import { init_column } from "./lib/column";
 import { toast } from "sonner";
 import { Loader2, Sticker } from "lucide-react";
 import { getNumber } from "@/lib/utils/getNumber";
-import { formatMoney } from "../form/field/TypeInput";
+import { formatMoney } from "@/lib/components/form/field/TypeInput";
 export const TableEditBetter: React.FC<any> = ({
   name,
   column,

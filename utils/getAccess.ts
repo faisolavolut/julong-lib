@@ -49,7 +49,6 @@ export const accessMe = async (keys: string) => {
   );
   const data = user?.data.data;
   const roles = data.roles;
-
   if (!Array.isArray(roles) || !roles?.length) return false;
   for (const role of roles) {
     const permissionExists = role.permissions.some(
