@@ -7,12 +7,21 @@ export const actionToast = async (data: {
   before?: () => any;
   success?: () => any;
   after?: () => any;
+  failed?: () => any;
   msg_succes?: string;
   msg_error?: string;
   msg_load?: string;
 }) => {
-  const { task, before, after, success, msg_succes, msg_error, msg_load } =
-    data;
+  const {
+    task,
+    before,
+    after,
+    success,
+    msg_succes,
+    msg_error,
+    msg_load,
+    failed,
+  } = data;
 
   try {
     if (typeof before === "function") before();
@@ -61,6 +70,7 @@ export const actionToast = async (data: {
     }, 100);
   } catch (ex: any) {
     setTimeout(() => {
+      if (typeof failed === "function") failed();
       toast.dismiss();
       toast.error(
         <div className="flex flex-col w-full">
