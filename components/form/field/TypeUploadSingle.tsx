@@ -85,7 +85,7 @@ export const FieldUploadSingle: FC<{
       input.isLocal = true;
       input.render();
       if (typeof on_change === "function") {
-        on_change({});
+        await on_change({});
       }
       return;
       const formData = new FormData();

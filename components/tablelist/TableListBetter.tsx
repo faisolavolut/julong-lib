@@ -24,7 +24,7 @@ import { InputSearch } from "../ui/input-search";
 import get from "lodash.get";
 import { Checkbox } from "../ui/checkbox";
 import { getNumber } from "@/lib/utils/getNumber";
-import { formatMoney } from "../form/field/TypeInput";
+import { formatMoney } from "@/lib/components/form/field/TypeInput";
 import { cloneFM } from "@/lib/utils/cloneFm";
 
 export const TableListBetter: React.FC<any> = ({

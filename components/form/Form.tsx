@@ -27,6 +27,7 @@ export const Form: React.FC<any> = ({
   mode,
   className,
   onInit,
+  afterLoad,
 }) => {
   const local = useLocal({
     ready: false,
@@ -121,6 +122,9 @@ export const Form: React.FC<any> = ({
       local.ready = true;
       local.data = res;
       local.render();
+      if (typeof afterLoad === "function") {
+        afterLoad(local);
+      }
       setTimeout(() => {
         toast.dismiss();
       }, 100);
@@ -183,31 +187,18 @@ export const Form: React.FC<any> = ({
       local.ready = true;
       local.data = res;
       local.render(); // Panggil render setelah data diperbarui
-
+      if (typeof afterLoad === "function") {
+        await afterLoad(local);
+      }
       setTimeout(() => {
         toast.dismiss();
       }, 100);
-      // if (res instanceof Promise) {
-      //   res.then((data) => {
-      //     local.ready = true;
-      //     local.data = data;
-      //     local.render(); // Panggil render setelah data diperbarui
-      //     toast.dismiss();
-      //     // toast.success("Data Loaded Successfully!");
-      //   });
-      // } else {
-      //   local.ready = true;
-      //   local.data = res;
-      //   local.render(); // Panggil render untuk memicu re-render
-      //   toast.dismiss();
-      //   toast.success("Data Loaded Successfully!");
-      // }
     };
     run();
   }, []);
 
   // Tambahkan dependency ke header agar reaktif
-  const HeaderComponent = header(local);
+  const HeaderComponent = typeof header === "function" ? header(local) : <></>;
   if (!local.ready)
     return (
       <div className="flex flex-grow flex-row items-center justify-center">
@@ -219,7 +210,7 @@ export const Form: React.FC<any> = ({
     );
   return (
     <div className={`flex-grow flex-col flex ${className}`}>
-      <div className="flex flex-row">{header(local)}</div>
+      <div className="flex flex-row">{HeaderComponent}</div>
       {showResize ? (
         // Resize panels...
         <ResizablePanelGroup direction="vertical" className="rounded-lg border">

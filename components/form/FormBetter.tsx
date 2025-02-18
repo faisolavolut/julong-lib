@@ -14,6 +14,7 @@ export const FormBetter: React.FC<any> = ({
   mode,
   className,
   onInit,
+  afterLoad,
 }) => {
   const [fm, setFM] = useState<any>({
     data: null as any,
@@ -42,6 +43,7 @@ export const FormBetter: React.FC<any> = ({
                 showResize,
                 mode,
                 className: cx(className, "top-0 left-0 w-full"),
+                afterLoad,
                 onInit: (form: any) => {
                   setFM(form);
 

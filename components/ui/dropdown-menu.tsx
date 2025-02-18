@@ -205,10 +205,13 @@ const DropdownHamburgerBetter: React.FC<{
       <Alert
         type={"delete"}
         msg={local?.msg}
-        onClick={async () => {
+        onClick={async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
           if (typeof local.onClick === "function") {
             await local.onClick();
           }
+          setOpenAlert(false);
         }}
         mode="manual"
         open={openAlert}
@@ -263,19 +266,20 @@ const DropdownHamburgerBetter: React.FC<{
                       event.stopPropagation();
                       event.preventDefault();
                     }
-                    if (typeof e?.onClick === "function") {
-                      local.onClick = e?.onClick;
-                      e?.onClick({
-                        close: () => {
-                          setOpen(false);
-                        },
-                      });
-                    }
                     const data = {
                       alert: e?.alert ? true : false,
                       onClick: e?.onClick,
                       msg: e?.msg,
                     };
+                    if (typeof e?.onClick === "function") {
+                      local.onClick = e?.onClick;
+                      if (!data?.alert)
+                        e?.onClick({
+                          close: () => {
+                            setOpen(false);
+                          },
+                        });
+                    }
                     if (data?.alert) {
                       setOpen(false);
                       setOpenAlert(e);
