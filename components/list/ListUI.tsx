@@ -1,0 +1,90 @@
+"use client";
+import React from "react";
+import { useLocal } from "@/lib/utils/use-local";
+import get from "lodash.get";
+import { ListBetter } from "../tablelist/List";
+export const ListUI: React.FC<any> = ({
+  tabHeader,
+  name,
+  modeTab,
+  column,
+  align = "center",
+  onLoad,
+  take = 20,
+  header,
+  disabledPagination,
+  disabledHeader,
+  disabledHeadTable,
+  hiddenNoRow,
+  disabledHoverRow,
+  onInit,
+  onCount,
+  fm,
+  mode,
+  feature,
+  onChange,
+  delete_name,
+  title,
+  tab,
+  onTab,
+  breadcrumb,
+  content,
+  ready = true,
+}) => {
+  const local = useLocal({
+    tab: get(tab, "[0].id"),
+    table: {
+      count: 0 as number,
+    } as any,
+    show: true as boolean,
+    count: 0 as number,
+    readyTitle: true,
+  });
+  if (!ready) {
+    return (
+      <div className="flex-grow flex-grow flex flex-row items-center justify-center">
+        <div className="spinner-better"></div>
+      </div>
+    );
+  }
+  return (
+    <div className="flex flex-col flex-grow  rounded-lg border border-gray-200 py-2 overflow-hidden">
+      <div className="flex flex-col flex-grow">
+        <div className="flex flex-col  flex-grow">
+          {local?.readyTitle && (typeof title === "function" || title) ? (
+            <>
+              <div className="flex flex-col w-full px-4 pt-2">
+                {typeof title === "function"
+                  ? title({ ui: local, count: local.table.count })
+                  : title}
+              </div>
+            </>
+          ) : (
+            <></>
+          )}
+
+          <div className="w-full flex flex-row flex-grow  overflow-hidden ">
+            <ListBetter
+              name={name}
+              content={content}
+              onLoad={onLoad}
+              onCount={onCount}
+              onInit={(e: any) => {
+                local.readyTitle = false;
+                local.table = e;
+                local.render();
+                setTimeout(() => {
+                  local.readyTitle = true;
+                  local.render();
+                }, 100);
+                if (typeof onInit === "function") {
+                  onInit(e);
+                }
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

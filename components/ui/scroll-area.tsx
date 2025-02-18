@@ -6,20 +6,47 @@ import { cn } from "@/lib/utils";
 
 const ScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
->(({ className, children, ...props }, ref) => (
-  <ScrollAreaPrimitive.Root
-    ref={ref}
-    className={cn("relative overflow-hidden", className)}
-    {...props}
-  >
-    <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit] relative">
-      <div className="absolute top-0 left-0 w-full h-full">{children}</div>
-    </ScrollAreaPrimitive.Viewport>
-    <ScrollBar />
-    <ScrollAreaPrimitive.Corner />
-  </ScrollAreaPrimitive.Root>
-));
+  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> & {
+    reload?: any; // Trigger to force height update
+  }
+>(({ className, children, reload, ...props }, ref) => {
+  const viewportRef = React.useRef<HTMLDivElement | null>(null);
+
+  const childPort = React.useRef<HTMLDivElement | null>(null);
+  // Effect untuk memaksa ScrollArea mengupdate layout saat reload berubah
+  // React.useEffect(() => {
+  //   if (viewportRef?.current && childPort?.current) {
+  //     console.log(viewportRef.current);
+
+  //     console.log(childPort.current);
+  //     // viewportRef.current.style.height = "auto"; // Reset height
+  //     // requestAnimationFrame(() => {
+  //     //   viewportRef.current?.scrollHeight; // Trigger repaint
+  //     // });
+  //   }
+  // }, [reload]); // Dependensi pada reload untuk trigger ulang
+
+  return (
+    <ScrollAreaPrimitive.Root
+      ref={ref}
+      className={cn("relative overflow-hidden", className)}
+      {...props}
+    >
+      <ScrollAreaPrimitive.Viewport
+        ref={viewportRef}
+        className="h-full w-full rounded-[inherit] relative"
+      >
+        <div className="absolute top-0 left-0 w-full h-full">
+          <div className="w-full h-full" ref={childPort}>
+            {children}
+          </div>
+        </div>
+      </ScrollAreaPrimitive.Viewport>
+      <ScrollBar />
+      <ScrollAreaPrimitive.Corner />
+    </ScrollAreaPrimitive.Root>
+  );
+});
 ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName;
 
 const ScrollBar = React.forwardRef<
