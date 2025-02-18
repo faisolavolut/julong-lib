@@ -21,7 +21,6 @@ export const labelDocumentType = (value?: string) => {
     case "FINAL_INTERVIEW":
       return "Final Interview";
       break;
-
     case "KARYAWAN_TETAP":
       return "Karyawan Tetap";
     case "OFFERING_LETTER":
@@ -35,7 +34,9 @@ export const labelDocumentType = (value?: string) => {
     case "DOCUMENT_CHECKING":
       return "Document Checking";
       break;
-
+    case "FINAL_RESULT":
+      return "Final Result";
+      break;
     default:
       return value;
   }
