@@ -1,12 +1,31 @@
+import get from "lodash.get";
 import { apix } from "../utils/apix";
 import api from "../utils/axios";
+import { userRoleMe } from "../utils/getAccess";
 
 export const userToken = async () => {
   if (process.env.NEXT_PUBLIC_MODE === "dev") {
-    const user = localStorage.getItem("user");
+    let user = localStorage.getItem("user");
+
     if (user) {
-      const w = window as any;
-      w.user = JSON.parse(user);
+      try {
+        await userRoleMe();
+      } catch (ex: any) {
+        const error = get(ex, "response.data.meta.message") || ex.message;
+        if (error === "Request failed with status code 401") {
+          await apix({
+            port: "public",
+            method: "delete",
+            path: "/api/destroy-cookies",
+          });
+          localStorage.removeItem("user");
+          user = null;
+        }
+      }
+      if (user) {
+        const w = window as any;
+        w.user = JSON.parse(user);
+      }
       return true;
     }
   } else {
