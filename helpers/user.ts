@@ -6,7 +6,6 @@ import { userRoleMe } from "../utils/getAccess";
 export const userToken = async () => {
   if (process.env.NEXT_PUBLIC_MODE === "dev") {
     let user = localStorage.getItem("user");
-
     if (user) {
       try {
         await userRoleMe();
@@ -41,14 +40,29 @@ export const userToken = async () => {
       await api.post(process.env.NEXT_PUBLIC_BASE_URL + "/api/cookies", {
         token: jwt,
       });
-      const user = await api.get(
-        `${process.env.NEXT_PUBLIC_API_PORTAL}/api/users/me`
-      );
-      const us = user.data.data;
-      if (us) {
-        localStorage.setItem("user", JSON.stringify(user.data.data));
+      let user = await apix({
+        port: "portal",
+        value: "data.data",
+        path: "/api/users/me",
+      });
+      if (user) {
+        let profile = null;
+        try {
+          const data = await apix({
+            port: "recruitment",
+            value: "data.data",
+            path: "/api/user-profiles/user",
+          });
+          profile = data;
+          delete profile["user"];
+          user = {
+            ...user,
+            profile,
+          };
+        } catch (ex) {}
+        localStorage.setItem("user", JSON.stringify(user));
         const w = window as any;
-        w.user = JSON.parse(user.data.data);
+        w.user = JSON.parse(user);
         return true;
       }
     } catch (ex) {

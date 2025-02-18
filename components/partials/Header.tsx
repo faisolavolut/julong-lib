@@ -1,5 +1,6 @@
 "use client";
 
+import { siteurl } from "@/lib/utils/siteurl";
 import React from "react";
 
 interface HeaderProps {
@@ -23,6 +24,7 @@ const Header: React.FC<HeaderProps> = ({
       {author && <meta name="author" content={author} />}
       <meta name="generator" content="Next.js" />
       <title>{title}</title>
+      <link rel="icon" href={siteurl("/logo.ico")} type="image/x-icon" />
       <link
         rel="canonical"
         href="https://www.creative-tim.com/product/soft-ui-dashboard-pro-flowbite"

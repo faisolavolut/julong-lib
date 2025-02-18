@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Avatar, Sidebar } from "flowbite-react";
+import { Sidebar } from "flowbite-react";
 import { useEffect, useState } from "react";
 import classNames from "classnames";
 import { css } from "@emotion/css";
@@ -24,6 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+import ImageBetter from "../ui/Image";
 
 interface TreeMenuItem {
   title: string;
@@ -683,7 +684,16 @@ const SidebarBetterTree: React.FC<TreeMenuProps> = ({
               mini ? "py-4" : "p-4  bg-primary "
             )}
           >
-            <Avatar alt="" img={siteurl("/dog.jpg")} rounded size="sm" />
+            <ImageBetter
+              src={siteurl(
+                get_user("profile.avatar")
+                  ? get_user("profile.avatar")
+                  : get_user("photo")
+              )}
+              alt="Profile"
+              className="h-8 w-8 rounded-full object-cover"
+              defaultSrc={siteurl("/404-img.jpg")}
+            />
             {!mini && (
               <div className="flex flex-row items-center flex-grow font-bold text-white">
                 <div className=" px-2 h-full flex  flex-col text-xs flex-grow">
