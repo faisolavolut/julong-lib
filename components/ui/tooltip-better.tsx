@@ -6,7 +6,7 @@ import {
   TooltipTrigger,
 } from "./tooltip";
 
-export const TooltipBetter: FC<any> = ({ content, children }) => {
+export const TooltipBetter: FC<any> = ({ content, children, side = "top" }) => {
   if (content) {
     return (
       <TooltipProvider>
@@ -14,7 +14,10 @@ export const TooltipBetter: FC<any> = ({ content, children }) => {
           <TooltipTrigger asChild>
             <div className="w-full flex flex-grow flex-row">{children}</div>
           </TooltipTrigger>
-          <TooltipContent className="bg-linear-sidebar-active text-white  border border-primary shadow-md transition-all ">
+          <TooltipContent
+            side={side}
+            className="bg-linear-sidebar-active text-white  border border-primary shadow-md transition-all "
+          >
             <p>{content}</p>
           </TooltipContent>
         </Tooltip>
