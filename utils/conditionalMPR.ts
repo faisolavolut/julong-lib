@@ -1,8 +1,5 @@
 "use client";
-
-import get from "lodash.get";
 import { get_user } from "./get_user";
-import { fa } from "@faker-js/faker";
 
 export const showApprovel = (
   data: any,
@@ -44,6 +41,7 @@ export const showApprovel = (
   };
   const isBudget = data?.mp_planning_header_id ? true : false;
   const isField = data?.organization_category === "Non Field" ? false : true;
+  console.log(data?.status);
   if (data?.status === "NEED APPROVAL") {
     if (data?.department_head && !data?.vp_gm_director) {
       return {
@@ -63,7 +61,18 @@ export const showApprovel = (
       };
     }
   } else if (data?.status === "IN PROGRESS") {
-    const isYou = data?.requestor_id === get_user("m_employee.id");
+    console.log(data?.requestor_id, get_user("employee.id"));
+    const isYou = data?.requestor_id === get_user("employee.id");
+    if (role?.head)
+      return {
+        approve:
+          action === "reject"
+            ? "REJECTED"
+            : isBudget
+            ? "APPROVED"
+            : "NEED APPROVAL",
+        level: "Level Head Department",
+      };
     if (isYou) {
       return {
         approve:
@@ -77,7 +86,7 @@ export const showApprovel = (
     }
     return null;
   } else if (data?.status === "APPROVED") {
-    console.log(data?.status)
+    console.log(data?.status);
     if (data?.department_head && !data?.vp_gm_director) {
       return {
         approve:
