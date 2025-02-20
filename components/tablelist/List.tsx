@@ -41,6 +41,7 @@ export const ListBetter: React.FC<any> = ({
     paging: 1,
     maxPage: 1,
     count: 0 as any,
+    ready: false,
     addRow: (row: any) => {
       setData((prev) => [...prev, row]);
       local.data.push(row);
@@ -83,10 +84,13 @@ export const ListBetter: React.FC<any> = ({
           {"Loading..."}
         </>
       );
-
+      local.ready = false;
+      local.render();
       if (typeof onCount === "function") {
         const res = await onCount();
         local.count = res;
+        local.maxPage = Math.ceil(res / take);
+        local.paging = 1;
         local.render();
       }
       if (Array.isArray(onLoad)) {
@@ -108,6 +112,8 @@ export const ListBetter: React.FC<any> = ({
           toast.dismiss();
         }, 100);
       }
+      local.ready = true;
+      local.render();
     },
     reload: async () => {
       toast.info(
@@ -176,9 +182,10 @@ export const ListBetter: React.FC<any> = ({
           {"Loading..."}
         </>
       );
+      local.ready = false;
+      local.render();
       if (typeof onCount === "function") {
         const res = await onCount();
-        console.log(res, take, Math.ceil(res / take));
         setMaxPage(Math.ceil(res / take));
         local.maxPage = Math.ceil(res / take);
         local.count = res;
@@ -213,6 +220,8 @@ export const ListBetter: React.FC<any> = ({
       if (typeof onInit === "function") {
         onInit(local);
       }
+      local.ready = true;
+      local.render();
       setTimeout(() => {
         toast.dismiss();
       }, 100);
@@ -246,25 +255,33 @@ export const ListBetter: React.FC<any> = ({
           className="w-full h-full flex flex-col gap-y-4 p-4"
           reload={reload}
         >
-          <div className="flex-grow flex flex-col gap-y-4">
-            {Array.isArray(local.data) && local.data?.length ? (
-              local.data?.map((e, idx) => {
-                return (
-                  <div
-                    className="flex flex-col w-full"
-                    key={`items-${name}-${idx}`}
-                    ref={local.data?.length === idx + 1 ? lastPostRef : null}
-                  >
-                    {typeof content === "function"
-                      ? content({ item: e, idx, tbl: local })
-                      : content}
-                  </div>
-                );
-              })
-            ) : (
-              <></>
-            )}
-          </div>
+          {!local.ready ? (
+            <>
+              <div className="flex-grow h-full flex-grow flex flex-row items-center justify-center">
+                <div className="spinner-better"></div>
+              </div>
+            </>
+          ) : (
+            <div className="flex-grow flex flex-col gap-y-4">
+              {Array.isArray(local.data) && local.data?.length ? (
+                local.data?.map((e, idx) => {
+                  return (
+                    <div
+                      className="flex flex-col w-full"
+                      key={`items-${name}-${idx}`}
+                      ref={local.data?.length === idx + 1 ? lastPostRef : null}
+                    >
+                      {typeof content === "function"
+                        ? content({ item: e, idx, tbl: local })
+                        : content}
+                    </div>
+                  );
+                })
+              ) : (
+                <></>
+              )}
+            </div>
+          )}
         </ScrollArea>
       </div>
     </>

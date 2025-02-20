@@ -8,6 +8,8 @@ export const TypeUpload: React.FC<any> = ({
   mode,
   type,
   disabled,
+  valueKey = "url",
+  onDelete,
 }) => {
   if (type === "multi") {
     return (
@@ -20,6 +22,8 @@ export const TypeUpload: React.FC<any> = ({
           fm={fm}
           on_change={on_change}
           mode={mode}
+          valueKey={valueKey}
+          onDelete={onDelete}
         />
       </>
     );

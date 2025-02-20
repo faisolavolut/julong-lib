@@ -18,7 +18,9 @@ export const Field: React.FC<{
   name: string;
   isBetter?: boolean;
   tooltip?: string;
+  valueKey?: string;
   onLoad?: () => Promise<any> | any;
+  onDelete?: (item: any) => Promise<any> | any;
   type?:
     | "rating"
     | "color"
@@ -73,6 +75,8 @@ export const Field: React.FC<{
   allowNew,
   unique = true,
   tooltip,
+  valueKey,
+  onDelete,
 }) => {
   let result = null;
   const field = useLocal({
@@ -182,6 +186,7 @@ export const Field: React.FC<{
                 "single-checkbox",
                 "radio",
                 "checkbox",
+                "multi-upload",
               ].includes(type) &&
                 css`
                   border: 0px !important;
@@ -197,7 +202,7 @@ export const Field: React.FC<{
               <div
                 // ref={prefixRef}
                 className={cx(
-                  "px-1 py-1  items-center flex flex-row flex-grow rounded-l-md h-full",
+                  "px-1 py-1  items-center flex flex-row flex-grow rounded-l-md h-full prefix",
                   css`
                     height: 2.13rem;
                   `
@@ -231,6 +236,8 @@ export const Field: React.FC<{
                   mode={"upload"}
                   type="multi"
                   disabled={is_disable}
+                  valueKey={valueKey}
+                  onDelete={onDelete}
                 />
               </>
             ) : ["dropdown"].includes(type) ? (
@@ -354,7 +361,7 @@ export const Field: React.FC<{
               <div
                 // ref={suffixRef}
                 className={cx(
-                  "px-1 py-1  items-center flex flex-row flex-grow rounded-r-md h-full",
+                  "px-1 py-1  items-center flex flex-row flex-grow rounded-r-md h-full suffix",
                   css`
                     height: 2.13rem;
                   `,

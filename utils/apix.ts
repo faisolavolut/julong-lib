@@ -2,7 +2,7 @@ import get from "lodash.get";
 import api from "./axios";
 
 type apixType = {
-  port: "portal" | "recruitment" | "mpp" | "public";
+  port: "portal" | "recruitment" | "mpp" | "public" | "onboarding";
   path: string;
   method?: "get" | "delete" | "post" | "put";
   data?: any;
@@ -36,6 +36,8 @@ export const apix = async ({
       ? process.env.NEXT_PUBLIC_API_RECRUITMENT
       : port === "mpp"
       ? process.env.NEXT_PUBLIC_API_MPP
+      : port === "onboarding"
+      ? process.env.NEXT_PUBLIC_API_ONBOARDING
       : port === "public"
       ? process.env.NEXT_PUBLIC_BASE_URL
       : ""
@@ -49,10 +51,20 @@ export const apix = async ({
     const requestData =
       type === "form" && data
         ? Object.entries(data as any).reduce((formData, [key, value]) => {
-            formData.append(
-              key.includes("certificate") ? key : key.replace(/\[\d+\]/, ""),
-              value as any
-            );
+            if (Array.isArray(value) && value?.length) {
+              value.map((item: any) => {
+                formData.append(key, item as any);
+              });
+            } else if (value instanceof FormData) {
+              value.forEach((value, key) => {
+                formData.append(key, value);
+              });
+            } else {
+              formData.append(
+                key.includes("certificate") ? key : key.replace(/\[\d+\]/, ""),
+                value as any
+              );
+            }
             return formData;
           }, new FormData())
         : data;

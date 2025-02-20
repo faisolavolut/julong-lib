@@ -219,6 +219,7 @@ export function Popover({
       </PopoverTrigger>
       <PopoverContent
         className={cx(
+          "pointer-events-auto",
           popoverClassName
             ? popoverClassName
             : cx(
