@@ -3,7 +3,8 @@ import React from "react";
 import { useLocal } from "@/lib/utils/use-local";
 import get from "lodash.get";
 import { ListBetter } from "../tablelist/List";
-export const ListUI: React.FC<any> = ({
+import { cn } from "@/lib/utils";
+export const ListUIClean: React.FC<any> = ({
   tabHeader,
   name,
   modeTab,
@@ -30,6 +31,7 @@ export const ListUI: React.FC<any> = ({
   breadcrumb,
   content,
   ready = true,
+  classContainer,
 }) => {
   const local = useLocal({
     tab: get(tab, "[0].id"),
@@ -40,6 +42,10 @@ export const ListUI: React.FC<any> = ({
     count: 0 as number,
     readyTitle: true,
   });
+  const labelTitle =
+    typeof title === "function"
+      ? title({ ui: local, count: local.count })
+      : title;
   if (!ready) {
     return (
       <div className="flex-grow flex-grow flex flex-row items-center justify-center">
@@ -48,16 +54,27 @@ export const ListUI: React.FC<any> = ({
     );
   }
   return (
-    <div className="flex flex-col flex-grow  rounded-lg border border-gray-200 py-2 overflow-hidden">
+    <div
+      className={cn(
+        "flex flex-col flex-grow  rounded-lg border border-gray-200 py-2 overflow-hidden h-full",
+        classContainer
+      )}
+    >
       <div className="flex flex-col flex-grow">
         <div className="flex flex-col  flex-grow">
-          <div className="flex flex-col w-full px-4 pt-2">
-            {typeof title === "function"
-              ? title({ ui: local, count: local.count })
-              : title}
-          </div>
+          {labelTitle ? (
+            <>
+              <div className="flex flex-col w-full px-4 pt-2">
+                {typeof title === "function"
+                  ? title({ ui: local, count: local.table.count })
+                  : title}
+              </div>
+            </>
+          ) : (
+            <></>
+          )}
 
-          <div className="w-full flex flex-row flex-grow  overflow-hidden ">
+          <div className="w-full h-full flex flex-row flex-grow  overflow-hidden ">
             <ListBetter
               name={name}
               content={content}

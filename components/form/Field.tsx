@@ -11,6 +11,8 @@ import { useLocal } from "@/lib/utils/use-local";
 import { FieldRadio } from "./field/TypeRadio";
 import { cn } from "@/lib/utils";
 import { TooltipBetter } from "../ui/tooltip-better";
+import { TypeDropdownBetter } from "./field/TypeDropdownBetter";
+import { TypeAsyncDropdown } from "./field/TypeAsyncDropdown";
 
 export const Field: React.FC<{
   fm: any;
@@ -19,7 +21,8 @@ export const Field: React.FC<{
   isBetter?: boolean;
   tooltip?: string;
   valueKey?: string;
-  onLoad?: () => Promise<any> | any;
+  onLoad?: (params?: any) => Promise<any> | any;
+  onCount?: (param?: any) => Promise<any> | any;
   onDelete?: (item: any) => Promise<any> | any;
   type?:
     | "rating"
@@ -42,7 +45,9 @@ export const Field: React.FC<{
     | "time"
     | "date"
     | "password"
-    | "email";
+    | "email"
+    | "multi-dropdown-better"
+    | "multi-async";
   placeholder?: string;
   disabled?: boolean;
   required?: boolean;
@@ -55,6 +60,8 @@ export const Field: React.FC<{
   suffix?: string | any | (() => any);
   allowNew?: boolean;
   unique?: boolean;
+  onLabel?: string | ((item: any) => any);
+  onValue?: string | ((item: any) => any);
 }> = ({
   fm,
   label,
@@ -77,6 +84,9 @@ export const Field: React.FC<{
   tooltip,
   valueKey,
   onDelete,
+  onCount,
+  onLabel,
+  onValue,
 }) => {
   let result = null;
   const field = useLocal({
@@ -195,6 +205,11 @@ export const Field: React.FC<{
                 css`
                   padding: 0px !important;
                 `,
+              is_disable &&
+                ["multi-upload"].includes(type) &&
+                css`
+                  background: transparent !important;
+                `,
               classField
             )}
           >
@@ -216,7 +231,7 @@ export const Field: React.FC<{
                 {before}
               </div>
             )}
-
+            {/* "multi-dropdown-better" */}
             {["upload"].includes(type) ? (
               <>
                 <TypeUpload
@@ -266,6 +281,42 @@ export const Field: React.FC<{
                   mode="multi"
                   unique={unique}
                   isBetter={isBetter}
+                />
+              </>
+            ) : ["multi-async"].includes(type) ? (
+              <>
+                <div className="w-full">
+                  <TypeAsyncDropdown
+                    fm={fm}
+                    required={required}
+                    name={name}
+                    onLoad={onLoad}
+                    onLabel={onLabel}
+                    onValue={onValue}
+                    placeholder={placeholder}
+                    disabled={is_disable}
+                    onChange={onChange}
+                    mode="multi"
+                    unique={unique}
+                    isBetter={isBetter}
+                  />
+                </div>
+              </>
+            ) : ["multi-dropdown-better"].includes(type) ? (
+              <>
+                <TypeDropdownBetter
+                  fm={fm}
+                  required={required}
+                  name={name}
+                  onLoad={onLoad}
+                  placeholder={placeholder}
+                  disabled={is_disable}
+                  onChange={onChange}
+                  mode="multi"
+                  unique={unique}
+                  isBetter={isBetter}
+                  onCount={onCount}
+                  onLabel={onLabel}
                 />
               </>
             ) : ["checkbox"].includes(type) ? (

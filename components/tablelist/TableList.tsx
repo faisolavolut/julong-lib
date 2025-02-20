@@ -1012,8 +1012,8 @@ export const PaginationPage: React.FC<any> = ({
                         if (e?.label !== "...") {
                           local.page = getNumber(e?.label);
                           local.render();
-                          onChangePage(local.page - 1);
-                          setPage(local.page - 1);
+                          onChangePage(local.page);
+                          setPage(local.page);
                         }
                       }}
                       className={cx(

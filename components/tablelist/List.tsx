@@ -236,7 +236,6 @@ export const ListBetter: React.FC<any> = ({
       if (observerRef.current) observerRef.current.disconnect();
       observerRef.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting) {
-          console.log(local.paging, local.maxPage);
           if (local.paging < local.maxPage) {
             local.paging = local.paging + 1;
             local.render();

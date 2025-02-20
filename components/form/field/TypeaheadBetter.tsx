@@ -8,23 +8,26 @@ import {
 } from "react";
 
 import { useLocal } from "@/lib/utils/use-local";
-import { TypeaheadOptions } from "./typeahead-opt";
 import { Badge } from "../../ui/badge";
 import { GoChevronDown } from "react-icons/go";
 import { IoCloseOutline } from "react-icons/io5";
 import { X } from "lucide-react";
-import uniqBy from "lodash.uniqby";
+import { TypeaheadOptionsBetter } from "./typeahead-opt-better";
 
 type OptItem = { value: string; label: string; tag?: string };
 
 export const TypeaheadBetter: FC<{
   fitur?: "search-add";
+  onLoad?: any[] | ((param: any) => Promise<any[]> | any[]);
+  onLabel?: string | ((item: any) => string);
   value?: string[] | null;
   placeholder?: string;
   required?: boolean;
   options?: (arg: {
     search: string;
     existing: OptItem[];
+    paging?: number;
+    take?: number;
   }) => (string | OptItem)[] | Promise<(string | OptItem)[]>;
   onSelect?: (arg: { search: string; item?: null | OptItem }) => string | false;
   onChange?: (selected: string[]) => void;
@@ -41,6 +44,7 @@ export const TypeaheadBetter: FC<{
   disabledSearch?: boolean;
   onInit?: (e: any) => void;
   isBetter?: boolean;
+  onCount?: any | ((param: any) => Promise<any> | any);
 }> = ({
   value,
   fitur,
@@ -48,6 +52,7 @@ export const TypeaheadBetter: FC<{
   options: options_fn,
   onSelect,
   unique,
+  onLabel,
   allowNew: allow_new,
   focusOpen: on_focus_open,
   localSearch: local_search,
@@ -60,9 +65,10 @@ export const TypeaheadBetter: FC<{
   popupClassName,
   disabledSearch,
   onInit,
+  onLoad,
   isBetter = false,
+  onCount,
 }) => {
-  const maxLength = 4;
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedTerm, setDebouncedTerm] = useState("");
   const local = useLocal({
@@ -408,24 +414,7 @@ export const TypeaheadBetter: FC<{
     }
   }
 
-  const valueLabel = uniqBy(
-    local.value?.map((value) => {
-      if (local.mode === "single") {
-        const item = options.find((item) => item.value === value);
-
-        if (!local.open && !allow_new) {
-          local.select = item || null;
-
-          local.search.input = item?.tag || item?.label || "";
-        }
-        return item;
-      }
-
-      const item = local.options.find((e) => e.value === value);
-      return item;
-    }),
-    "value"
-  );
+  const valueLabel = [{ id: 1, name: "LABEL" }];
   let inputval = local.search.input;
 
   if (!local.open && local.mode === "single" && local.value?.length > 0) {
@@ -462,6 +451,7 @@ export const TypeaheadBetter: FC<{
         {local.mode === "multi" ? (
           <div
             className={cx(
+              "gap-2 px-1",
               css`
                 margin-top: 5px;
                 margin-bottom: -3px;
@@ -470,7 +460,13 @@ export const TypeaheadBetter: FC<{
               `
             )}
           >
-            {valueLabel.map((e, idx) => {
+            {valueLabel.map((e: any, idx) => {
+              const label =
+                typeof onLabel === "function"
+                  ? onLabel(e)
+                  : typeof onLabel === "string"
+                  ? e[onLabel]
+                  : "";
               return (
                 <Badge
                   key={idx}
@@ -481,24 +477,21 @@ export const TypeaheadBetter: FC<{
                       " cursor-pointer hover:bg-red-100 hover:border-red-100"
                   )}
                   onClick={(ev) => {
-                    if (!disabled) {
-                      ev.stopPropagation();
-                      ev.preventDefault();
-                      local.value = local.value.filter(
-                        (val) => e?.value !== val
-                      );
-                      local.render();
-                      input.current?.focus();
-
-                      if (typeof onChange === "function") {
-                        onChange(local.value);
-                      }
-                    }
+                    // if (!disabled) {
+                    //   ev.stopPropagation();
+                    //   ev.preventDefault();
+                    //   local.value = local.value.filter(
+                    //     (val) => e?.value !== val
+                    //   );
+                    //   local.render();
+                    //   input.current?.focus();
+                    //   if (typeof onChange === "function") {
+                    //     onChange(local.value);
+                    //   }
+                    // }
                   }}
                 >
-                  <div className="text-xs">
-                    {e?.tag || e?.label || <>&nbsp;</>}
-                  </div>
+                  <div className="text-xs">{label || <>&nbsp;</>}</div>
                   {!disabled && <IoCloseOutline size={12} />}
                 </Badge>
               );
@@ -507,7 +500,7 @@ export const TypeaheadBetter: FC<{
         ) : (
           <></>
         )}
-        <TypeaheadOptions
+        <TypeaheadOptionsBetter
           fitur={fitur}
           popup={true}
           onOpenChange={(open) => {
@@ -547,6 +540,7 @@ export const TypeaheadBetter: FC<{
           options={options}
           searching={local.search.searching}
           searchText={local.search.input}
+          onLabel={onLabel}
           onSearch={async (e) => {
             const val = e.currentTarget.value;
             if (!local.open) {
@@ -669,6 +663,8 @@ export const TypeaheadBetter: FC<{
 
             return false;
           }}
+          onLoad={onLoad}
+          onCount={onCount}
         >
           <div
             className={cx(
@@ -695,120 +691,14 @@ export const TypeaheadBetter: FC<{
               }
             }}
           >
-            {isBetter ? (
-              <div className="h-9 flex-grow flex flex-row items-start">
-                <div className="flex flex-grow"></div>
-                <div className="h-9 flex flex-row items-center px-2">
-                  <GoChevronDown size={14} />
-                </div>
+            <div className="h-9 flex-grow flex flex-row items-start">
+              <div className="flex flex-grow"></div>
+              <div className="h-9 flex flex-row items-center px-2">
+                <GoChevronDown size={14} />
               </div>
-            ) : (
-              <input
-                placeholder={
-                  local.mode === "multi"
-                    ? placeholder
-                    : valueLabel[0]?.label || placeholder
-                }
-                type="text"
-                ref={input}
-                value={inputval}
-                onChange={async (e) => {
-                  const val = e.currentTarget.value;
-                  if (!local.open) {
-                    local.open = true;
-                  }
-
-                  local.search.input = val;
-                  local.render();
-
-                  if (local.search.promise) {
-                    await local.search.promise;
-                  }
-
-                  local.search.searching = true;
-                  local.render();
-                  if (allow_new) {
-                    setSearchTerm(val);
-                  }
-                  if (local.search.searching) {
-                    if (local.local_search) {
-                      if (!local.loaded) {
-                        await loadOptions();
-                      }
-                      const search = local.search.input.toLowerCase();
-                      if (search) {
-                        local.search.result = options.filter((e) =>
-                          e.label.toLowerCase().includes(search)
-                        );
-
-                        if (
-                          local.search.result.length > 0 &&
-                          !local.search.result.find(
-                            (e) => e.value === local.select?.value
-                          )
-                        ) {
-                          local.select = local.search.result[0];
-                        }
-                      } else {
-                        local.search.result = null;
-                      }
-                      local.search.searching = false;
-                      local.render();
-                    } else {
-                      clearTimeout(local.search.timeout);
-                      local.search.timeout = setTimeout(async () => {
-                        const result = options_fn?.({
-                          search: local.search.input,
-                          existing: options,
-                        });
-                        if (result) {
-                          if (result instanceof Promise) {
-                            local.search.promise = result;
-                            local.search.result = (await result).map((item) => {
-                              if (typeof item === "string")
-                                return { value: item, label: item };
-                              return item;
-                            });
-                            local.search.searching = false;
-                            local.search.promise = null;
-                          } else {
-                            local.search.result = result.map((item) => {
-                              if (typeof item === "string")
-                                return { value: item, label: item };
-                              return item;
-                            });
-                            local.search.searching = false;
-                          }
-
-                          if (
-                            local.search.result.length > 0 &&
-                            !local.search.result.find(
-                              (e) => e.value === local.select?.value
-                            )
-                          ) {
-                            local.select = local.search.result[0];
-                          }
-
-                          local.render();
-                        }
-                      }, 100);
-                    }
-                  }
-                }}
-                disabled={!disabled ? disabledSearch : disabled}
-                spellCheck={false}
-                className={cx(
-                  "text-black flex h-9 w-full border-input bg-transparent px-3 py-1 text-base border-none shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground md:text-sm focus:outline-none focus:ring-0",
-                  local.mode === "single" ? "cursor-pointer" : ""
-                )}
-                style={{
-                  pointerEvents: disabledSearch ? "none" : "auto", // Mencegah input menangkap klik saat disabled
-                }}
-                onKeyDown={keydown}
-              />
-            )}
+            </div>
           </div>
-        </TypeaheadOptions>
+        </TypeaheadOptionsBetter>
       </div>
 
       {local.mode === "single" && fitur !== "search-add" && (

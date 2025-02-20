@@ -19,12 +19,15 @@ type OptItem = { value: string; label: string; tag?: string };
 
 export const Typeahead: FC<{
   fitur?: "search-add";
+  onLabel?: string | ((item: any) => string);
   value?: string[] | null;
   placeholder?: string;
   required?: boolean;
   options?: (arg: {
     search: string;
     existing: OptItem[];
+    paging?: number;
+    take?: number;
   }) => (string | OptItem)[] | Promise<(string | OptItem)[]>;
   onSelect?: (arg: { search: string; item?: null | OptItem }) => string | false;
   onChange?: (selected: string[]) => void;

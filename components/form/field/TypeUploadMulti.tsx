@@ -137,21 +137,27 @@ export const FieldUploadMulti: FC<{
                           disabled={disabled}
                         />
                       </div>
-                      <div
-                        className="hover:bg-gray-100 p-2 rounded-lg cursor-pointer"
-                        onClick={() => {
-                          fm.data[field.name] = value.filter(
-                            (_, i) => i !== idx
-                          );
-                          fm.render();
-                          if (typeof on_change === "function")
-                            on_change(fm.data?.[field.name]);
+                      {!disabled ? (
+                        <>
+                          <div
+                            className="hover:bg-gray-100 p-2 rounded-lg cursor-pointer"
+                            onClick={() => {
+                              fm.data[field.name] = value.filter(
+                                (_, i) => i !== idx
+                              );
+                              fm.render();
+                              if (typeof on_change === "function")
+                                on_change(fm.data?.[field.name]);
 
-                          if (typeof onDelete === "function") onDelete(e);
-                        }}
-                      >
-                        <MdDelete className="w-4 h-4 text-red-500" />
-                      </div>
+                              if (typeof onDelete === "function") onDelete(e);
+                            }}
+                          >
+                            <MdDelete className="w-4 h-4 text-red-500" />
+                          </div>
+                        </>
+                      ) : (
+                        <></>
+                      )}
                     </div>
                   </div>
                 </div>
