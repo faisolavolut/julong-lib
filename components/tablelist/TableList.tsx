@@ -238,11 +238,13 @@ export const TableList: React.FC<any> = ({
           {"Loading..."}
         </>
       );
-      if (typeof onCount === "function") {
-        const res = await onCount();
-        local.count = res;
-        local.render();
-      }
+      try {
+        if (typeof onCount === "function") {
+          const res = await onCount();
+          local.count = res;
+          local.render();
+        }
+      } catch (ex) {}
       if (mode === "form") {
         local.data = fm.data?.[name] || [];
         cloneListFM(fm.data?.[name] || []);
@@ -263,6 +265,9 @@ export const TableList: React.FC<any> = ({
           });
           if (!autoPagination) {
             res = paginateArray(res, take, 1);
+          }
+          if (!local.count) {
+            local.count = res?.length;
           }
           local.data = res;
           if (mode === "form") cloneListFM(res);
