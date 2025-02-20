@@ -1,5 +1,5 @@
 "use client";
-import React, { FC } from "react";
+import { FC } from "react";
 import {
   Page,
   Text,
@@ -9,7 +9,6 @@ import {
   Font,
   Image,
 } from "@react-pdf/renderer";
-import { Style } from "@react-pdf/types";
 import get from "lodash.get";
 import { dayDate } from "@/lib/utils/date";
 import { getNumber } from "@/lib/utils/getNumber";
@@ -85,8 +84,8 @@ const styles = StyleSheet.create({
   },
 });
 const extractMajors = (data: Array<{ Major: { Major: string } }>): string => {
-  if(!data?.length) return ""
-  return data.map(entry => get(entry, "Major.Major")).join(", ");
+  if (!data?.length) return "";
+  return data.map((entry) => get(entry, "Major.Major")).join(", ");
 };
 const splitText = (
   input: string
@@ -110,9 +109,15 @@ const handleInput = (input: string, mode: "cn" | "id" = "id"): string => {
   return ""; // Return empty string if the condition doesn't match the mode
 };
 // Create Document Component
-const DocumentMPR: FC<any> = ({ data }) => {
+const DocumentMPR: FC<any> = ({ data, onRender }) => {
   return (
-    <Document>
+    <Document
+      onRender={(e: any) => {
+        if (typeof onRender === "function") {
+          onRender();
+        }
+      }}
+    >
       <Page size="A4" style={styles.page}>
         <View
           style={{
@@ -626,12 +631,12 @@ const DocumentMPR: FC<any> = ({ data }) => {
               }}
             >
               {get(data, "marital_status") === "no rules"
-              ? "没问题"
-              : get(data, "marital_status") === "single"
-              ? "未婚"
-              : get(data, "marital_status") === "married"
-              ? "已婚"
-              : "-"}
+                ? "没问题"
+                : get(data, "marital_status") === "single"
+                ? "未婚"
+                : get(data, "marital_status") === "married"
+                ? "已婚"
+                : "-"}
             </Text>
           </Text>
         </View>
@@ -825,9 +830,7 @@ const DocumentMPR: FC<any> = ({ data }) => {
               </Text>
             </Text>
           </View>
-          <Text>
-            : {get(data, "minimum_education")}
-          </Text>
+          <Text>: {get(data, "minimum_education")}</Text>
         </View>
         {/* Jurusan */}
         <View
@@ -1156,7 +1159,9 @@ const DocumentMPR: FC<any> = ({ data }) => {
               </Text>
             </Text>
           </View>
-          <Text>: {get(data, "salary_min")} -  {get(data, "salary_max")} </Text>
+          <Text>
+            : {get(data, "salary_min")} - {get(data, "salary_max")}{" "}
+          </Text>
         </View>
 
         {/* FOOTER */}
