@@ -397,7 +397,7 @@ const UserDropdown: FC = function () {
         onClick={() => {
           if (typeof window === "object")
             navigate(
-              `${process.env.NEXT_PUBLIC_API_PORTAL}/choose-roles?state=manpower`
+              `${process.env.NEXT_PUBLIC_API_PORTAL}/choose-roles?state=${process.env.NEXT_PUBLIC_NAME}`
             );
         }}
       >

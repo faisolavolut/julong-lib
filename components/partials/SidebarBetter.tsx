@@ -727,14 +727,9 @@ const SidebarBetterTree: React.FC<TreeMenuProps> = ({
                       <div className="flex flex-col">
                         <div
                           onClick={async () => {
-                            await api.delete(
-                              process.env.NEXT_PUBLIC_BASE_URL +
-                                "/api/destroy-cookies"
-                            );
-                            localStorage.removeItem("user");
                             if (typeof window === "object")
                               navigate(
-                                `${process.env.NEXT_PUBLIC_API_PORTAL}/logout`
+                                `${process.env.NEXT_PUBLIC_API_PORTAL}/choose-roles?state=${process.env.NEXT_PUBLIC_NAME}`
                               );
                           }}
                           className="cursor-pointer px-4 py-2 flex border-y hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-600"
