@@ -28,10 +28,11 @@ export const PinterestLayout: React.FC<{
   });
   useEffect(() => {
     const columns: any[] = Array.from({ length: col }, () => []);
-    data.forEach((item, index) => {
-      const targetColumn = index % col; // Menentukan kolom target berdasarkan indeks
-      columns[targetColumn].push(item); // Memasukkan elemen ke kolom yang sesuai
-    });
+    if (Array.isArray(data) && data?.length)
+      data.forEach((item, index) => {
+        const targetColumn = index % col; // Menentukan kolom target berdasarkan indeks
+        columns[targetColumn].push(item); // Memasukkan elemen ke kolom yang sesuai
+      });
     local.data = columns;
     local.render();
   }, [data, col]);
