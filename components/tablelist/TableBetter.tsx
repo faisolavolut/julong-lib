@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { Table } from "flowbite-react";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
 import { useLocal } from "@/lib/utils/use-local";
@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { Loader2, Sticker } from "lucide-react";
 import { getNumber } from "@/lib/utils/getNumber";
 import { formatMoney } from "@/lib/components/form/field/TypeInput";
+import "react-resizable/css/styles.css";
+import { Resizable } from "react-resizable";
 export const TableEditBetter: React.FC<any> = ({
   name,
   column,
@@ -144,7 +146,7 @@ export const TableEditBetter: React.FC<any> = ({
       ? defaultColumns.map((e: any) => {
           return {
             ...e,
-            width: e?.width || "auto",
+            width: e?.width || 150,
           };
         })
       : ([] as any[]);
@@ -241,20 +243,19 @@ export const TableEditBetter: React.FC<any> = ({
                       <tr className={"table-header-tbl"}>
                         {columns.map((col, idx) => {
                           return (
-                            <th
+                            <HeaderColumn
+                              col={col}
                               key={`${col?.accessorKey}_${idx}`}
-                              className={"table-header-tbl capitalize"}
-                              style={{
-                                width:
-                                  col.width === "auto"
-                                    ? "auto"
-                                    : `${col.width}px`,
-                              }}
+                              width={col.width}
+                              height={0}
+                              onResize={(e: any, { size }: any) =>
+                                handleResize(idx, size.width)
+                              }
                             >
-                              <div className="flex items-center h-full flex-grow  p-2">
+                              <div className="flex items-center h-full flex-grow p-2">
                                 <span>{col?.header()}</span>
                               </div>
-                            </th>
+                            </HeaderColumn>
                           );
                         })}
                       </tr>
@@ -336,7 +337,62 @@ export const TableEditBetter: React.FC<any> = ({
     </>
   );
 };
+const HeaderColumn: FC<any> = ({ children, width, height, onResize, col }) => {
+  const [isResizing, setIsResizing] = useState(false);
 
+  const handleResizeStart = () => {
+    setIsResizing(true);
+  };
+
+  const handleResizeStop = () => {
+    setIsResizing(false);
+  };
+
+  return (
+    <Resizable
+      onResizeStart={handleResizeStart}
+      onResizeStop={handleResizeStop}
+      width={width}
+      height={height}
+      onResize={onResize}
+    >
+      <th
+        className="table-header-tbl capitalize relative"
+        style={{ width: col.width }}
+      >
+        {children}
+        <div
+          className={cx(
+            css`
+              position: absolute;
+              right: 0;
+              top: 0;
+              height: 100%;
+              width: 5px;
+              background: transparent;
+              cursor: e-resize;
+              transition: background 0.2s ease;
+
+              &:hover {
+                background: #4a90e2; /* Warna biru saat hover */
+              }
+
+              &:active {
+                background: #357abd; /* Warna biru lebih gelap saat di-resize */
+              }
+
+              ${isResizing &&
+              css`
+                background: #357abd; /* Warna biru lebih gelap saat resize aktif */
+                opacity: 0.8;
+              `}
+            `
+          )}
+        ></div>
+      </th>
+    </Resizable>
+  );
+};
 export const Pagination: React.FC<any> = ({
   onNextPage,
   onPrevPage,

@@ -32,7 +32,7 @@ export const showApprovel = (
       column: ["hrd_ho_unit"],
       level: ["Level HRD HO"],
     },
-  ]; // tiga status yang dapat memunculkan approval
+  ];
   const role = {
     head: permision.find((e) => e === "approval-mpr-dept-head"),
     dir: permision.find((e) => e === "approval-mpr-vp"),
