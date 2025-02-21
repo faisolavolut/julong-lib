@@ -17,6 +17,12 @@ export const dayDate = (date: string | Date) => {
   }
   return "-";
 };
+export const monthYearDate = (date: string | Date) => {
+  if (date instanceof Date || (typeof date === "string" && !empty(date))) {
+    return day(date).format("MMMM YYYY");
+  }
+  return "-";
+};
 export const shortDate = (date: string | Date) => {
   if (date instanceof Date || typeof date === "string") {
     const formattedDate = day(date);
