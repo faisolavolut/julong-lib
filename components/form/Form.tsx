@@ -312,7 +312,18 @@ export const Form: React.FC<any> = ({
             )}
           </form>
           {typeof onFooter === "function" ? (
-            <div className="flex flex-grow flex-col">{onFooter(local)}</div>
+            <div
+              className={cx(
+                "flex flex-grow flex-col",
+                css`
+                  .tbl {
+                    position: relative;
+                  }
+                `
+              )}
+            >
+              {onFooter(local)}
+            </div>
           ) : (
             <div className="flex flex-grow flex-col"></div>
           )}
