@@ -2,9 +2,10 @@ import { AsyncPaginate } from "react-select-async-paginate";
 import { components } from "react-select";
 import { useLocal } from "@/lib/utils/use-local";
 import { empty } from "@/lib/utils/isStringEmpty";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import debounce from "lodash.debounce";
 import get from "lodash.get";
+import { Popover } from "../../Popover/Popover";
 
 export const TypeAsyncDropdown: React.FC<any> = ({
   name,
@@ -23,13 +24,28 @@ export const TypeAsyncDropdown: React.FC<any> = ({
   search = "api",
   required = false,
 }) => {
-  const [cacheUniq, setCacheUniq] = useState(Date.now());
+  const [open, setOpen] = useState(false as boolean);
   const [refreshKey, setRefreshKey] = useState(Date.now());
-
+  const selectRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState<number>(0);
   const getValue =
-    typeof onValue === "string" ? (e: any) => get(e, onValue) : onValue;
+    typeof onValue === "string"
+      ? (e: any) => {
+          if (typeof e !== "object" && !Array.isArray(e)) {
+            return e;
+          }
+          return get(e, onValue);
+        }
+      : onValue;
   const getLabel =
-    typeof onLabel === "string" ? (e: any) => get(e, onLabel) : onLabel;
+    typeof onLabel === "string"
+      ? (e: any) => {
+          if (typeof e !== "object" && !Array.isArray(e)) {
+            return e;
+          }
+          return get(e, onLabel);
+        }
+      : onLabel;
   let placeholderField =
     mode === "multi"
       ? placeholder || `Add ${label}`
@@ -227,82 +243,125 @@ export const TypeAsyncDropdown: React.FC<any> = ({
       label: getLabel(value),
     };
   }
+  const CustomMenu = (props: any) => {
+    return (
+      <Popover
+        onMouseDown={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+        classNameTrigger={""}
+        arrow={false}
+        className="rounded-md"
+        onOpenChange={(open: any) => {}}
+        open={true}
+        content={
+          <div
+            className={cx(
+              "flex flex-col flex-grow",
+              css`
+                width: ${width}px;
+              `
+            )}
+          >
+            {props.children}
+          </div>
+        }
+      >
+        <></>
+      </Popover>
+    );
+  };
+  useEffect(() => {
+    if (selectRef.current) {
+      setWidth(selectRef.current.offsetWidth);
+    }
+  }, [selectRef]);
   return (
-    <AsyncPaginate
-      // menuIsOpen={true}
-      key={refreshKey}
-      placeholder={disabled ? "" : placeholderField}
-      isDisabled={disabled}
-      className={cx(
-        "rounded-md border-none text-sm",
-        css`
-          [role="listbox"] {
-            padding: 0px !important;
-            z-index: 5;
+    <div ref={selectRef} className="w-full">
+      <AsyncPaginate
+        menuIsOpen={open}
+        key={refreshKey}
+        placeholder={disabled ? "" : placeholderField}
+        isDisabled={disabled}
+        className={cx(
+          "rounded-md border-none text-sm",
+          css`
+            [role="listbox"] {
+              padding: 0px !important;
+              z-index: 5;
+            }
+            input:focus {
+              outline: 0px !important;
+              border: 0px !important;
+              outline-offset: 0px !important;
+              --tw-ring-color: transparent !important;
+            }
+            .css-13cymwt-control {
+              border-color: transparent;
+              border-width: 0px;
+              border-radius: 6px;
+            }
+            .css-t3ipsp-control {
+              border-color: transparent;
+              border-width: 0px;
+              box-shadow: none;
+              border-radius: 6px;
+            }
+            > :nth-child(4) {
+              z-index: 4 !important;
+            }
+          `,
+          disabled
+            ? css`
+                > div {
+                  border-width: 0px !important;
+                  background: transparent !important;
+                }
+                > div > div:last-child {
+                  display: none !important;
+                }
+                > div > div:first-child > div {
+                  color: black !important;
+                }
+              `
+            : ``
+        )}
+        isClearable={clearable}
+        onMenuOpen={() => {
+          setOpen(true);
+        }}
+        onMenuClose={() => {
+          setOpen(false);
+        }}
+        // closeMenuOnSelect={mode === "dropdown" ? true : false}
+        closeMenuOnSelect={false}
+        getOptionValue={(item) => item.value}
+        getOptionLabel={(item) => item.label}
+        value={value}
+        components={{ MultiValue, Option, Menu: CustomMenu }}
+        loadOptions={loadOptions}
+        isSearchable={true}
+        isMulti={mode === "multi"}
+        onChange={(e) => {
+          setOpen(mode === "dropdown" ? false : true);
+          if (target) {
+            fm.data[target] = getValue(e);
           }
-          input:focus {
-            outline: 0px !important;
-            border: 0px !important;
-            outline-offset: 0px !important;
-            --tw-ring-color: transparent !important;
+          if (mode === "dropdown" && !target) {
+            fm.data[name] = getValue(e);
+          } else {
+            fm.data[name] = e;
           }
-          .css-13cymwt-control {
-            border-color: transparent;
-            border-width: 0px;
-            border-radius: 6px;
+          fm.render();
+          if (typeof onChange === "function") {
+            onChange({ data: e });
           }
-          .css-t3ipsp-control {
-            border-color: transparent;
-            border-width: 0px;
-            box-shadow: none;
-            border-radius: 6px;
-          }
-          > :nth-child(4) {
-            z-index: 4 !important;
-          }
-        `,
-        disabled
-          ? css`
-              > div {
-                border-width: 0px !important;
-                background: transparent !important;
-              }
-              > div > div:last-child {
-                display: none !important;
-              }
-
-              > div > div:first-child > div {
-                color: black !important;
-              }
-            `
-          : ``
-      )}
-      isClearable={clearable}
-      closeMenuOnSelect={mode === "dropdown" ? true : false}
-      getOptionValue={(item) => item.value}
-      getOptionLabel={(item) => item.label}
-      value={value}
-      components={{ MultiValue, Option }}
-      loadOptions={loadOptions}
-      isSearchable={true}
-      isMulti={mode === "multi"}
-      onChange={(e) => {
-        if (target) {
-          fm.data[target] = getValue(e);
-        }
-        if (mode === "dropdown" && !target) {
-          fm.data[name] = getValue(e);
-        } else {
-          fm.data[name] = e;
-        }
-        fm.render();
-        if (typeof onChange === "function") {
-          onChange({ data: e });
-        }
-      }}
-      additional={{
-        page: 1,
-      }}
-    />
+        }}
+        additional={{
+          page: 1,
+        }}
+      />
+    </div>
   );
 };

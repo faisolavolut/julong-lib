@@ -9,6 +9,7 @@ export const userToken = async () => {
     if (user) {
       try {
         await userRoleMe();
+        return true;
       } catch (ex: any) {
         const error = get(ex, "response.data.meta.message") || ex.message;
         if (error === "Request failed with status code 401") {
@@ -26,6 +27,36 @@ export const userToken = async () => {
         w.user = JSON.parse(user);
       }
       return true;
+    } else {
+      try {
+        let user = await apix({
+          port: "portal",
+          value: "data.data",
+          path: "/api/users/me",
+        });
+        console.log(user);
+        if (user) {
+          let profile = null;
+          try {
+            const data = await apix({
+              port: "recruitment",
+              value: "data.data",
+              path: "/api/user-profiles/user",
+            });
+            profile = data;
+            delete profile["user"];
+            user = {
+              ...user,
+              profile,
+            };
+          } catch (ex) {}
+          const w = window as any;
+          w.user = JSON.parse(user);
+          return true;
+        }
+      } catch (ex: any) {
+        return false;
+      }
     }
   } else {
     try {

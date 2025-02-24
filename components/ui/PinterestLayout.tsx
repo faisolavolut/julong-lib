@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { useLocal } from "@/lib/utils/use-local";
 import { useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -40,11 +41,17 @@ export const PinterestLayout: React.FC<{
     <>
       <div className="flex flex-grow flex-1 flex-col w-full h-full">
         <div
-          className={cx(
+          className={cn(
             `grid gap-${gap}`,
             css`
-              grid-template-columns: repeat(${col}, minmax(0, 1fr));
-            `
+              @media (max-width: 768px) {
+                grid-template-columns: repeat(1, minmax(0, 1fr));
+              }
+              @media (min-width: 769px) {
+                grid-template-columns: repeat(${col}, minmax(0, 1fr));
+              }
+            `,
+            ""
           )}
         >
           {local.data.map((el, idx) => {

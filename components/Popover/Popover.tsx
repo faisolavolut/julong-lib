@@ -188,6 +188,7 @@ export function Popover({
   classNameTrigger,
   arrow,
   popoverClassName,
+  onMouseDown,
   ...restOptions
 }: {
   root?: HTMLElement;
@@ -197,6 +198,7 @@ export function Popover({
   content?: React.ReactNode;
   popoverClassName?: string;
   arrow?: boolean;
+  onMouseDown?: (event: any) => void;
 } & PopoverOptions) {
   const popover = usePopover({ modal, ...restOptions });
 
@@ -231,6 +233,7 @@ export function Popover({
                 `
               )
         )}
+        onMouseDown={onMouseDown}
       >
         {_content}
         {(typeof arrow === "undefined" || arrow) && <PopoverArrow />}

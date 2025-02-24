@@ -232,7 +232,7 @@ const DropdownHamburgerBetter: React.FC<{
               setOpen(!open);
             }}
           >
-            More Actions
+            Actions
             {open ? <IoIosArrowDown /> : <IoIosArrowUp />}
           </ButtonBetter>
         </DropdownMenuTrigger>

@@ -10,7 +10,7 @@ import { Rating } from "../../ui/ratings";
 import { getNumber } from "@/lib/utils/getNumber";
 import MaskedInput from "../../ui/MaskedInput";
 import { cn } from "@/lib/utils";
-import { getStatusLabel } from "@/constants/status-mpp";
+import { getLabel } from "@/lib/utils/getLabel";
 
 export const TypeInput: React.FC<any> = ({
   name,
@@ -332,7 +332,7 @@ export const TypeInput: React.FC<any> = ({
             disabled={disabled}
             required={required}
             placeholder={placeholder || ""}
-            value={getStatusLabel(value)}
+            value={getLabel(value)}
             type={!type ? "text" : type_field}
             onChange={(ev) => {
               fm.data[name] = ev.currentTarget.value;
