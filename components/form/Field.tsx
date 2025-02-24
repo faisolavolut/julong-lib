@@ -21,6 +21,7 @@ export const Field: React.FC<{
   isBetter?: boolean;
   tooltip?: string;
   valueKey?: string;
+  target?: string;
   onLoad?: (params?: any) => Promise<any> | any;
   onCount?: (param?: any) => Promise<any> | any;
   onDelete?: (item: any) => Promise<any> | any;
@@ -47,7 +48,9 @@ export const Field: React.FC<{
     | "password"
     | "email"
     | "multi-dropdown-better"
-    | "multi-async";
+    | "multi-async"
+    | "dropdown-async"
+    | "status";
   placeholder?: string;
   disabled?: boolean;
   required?: boolean;
@@ -62,6 +65,8 @@ export const Field: React.FC<{
   unique?: boolean;
   onLabel?: string | ((item: any) => any);
   onValue?: string | ((item: any) => any);
+  pagination?: boolean;
+  search?: "api" | "local";
 }> = ({
   fm,
   label,
@@ -86,7 +91,10 @@ export const Field: React.FC<{
   onDelete,
   onCount,
   onLabel,
-  onValue,
+  onValue = "id",
+  target,
+  pagination = true,
+  search = "api",
 }) => {
   let result = null;
   const field = useLocal({
@@ -94,27 +102,57 @@ export const Field: React.FC<{
   });
   const suffixRef = useRef<HTMLDivElement | null>(null);
   const prefixRef = useRef<HTMLDivElement | null>(null);
+  const initField = {
+    label,
+    isBetter,
+    name,
+    onLoad,
+    type,
+    placeholder,
+    required,
+    disabled,
+    hidden_label,
+    onChange,
+    className,
+    classField,
+    style,
+    prefix,
+    suffix,
+    allowNew,
+    unique,
+    tooltip,
+    valueKey,
+    onDelete,
+    onCount,
+    onLabel,
+    onValue,
+    target,
+    pagination,
+    search,
+  };
   const is_disable = fm.mode === "view" ? true : disabled;
   const error = fm.error?.[name];
   useEffect(() => {
-    if (typeof fm.fields?.[name] !== "object") {
-      const fields = fm.fields?.[name];
-      fm.fields[name] = {
-        ...fields,
-        label,
-        name,
-        onLoad,
-        type,
-        placeholder,
-        required,
-        disabled,
-        hidden_label,
-        onChange,
-        className,
-        style,
-      };
-      fm.render();
-    }
+    setTimeout(() => {
+      if (typeof fm.fields?.[name] !== "object") {
+        const fields = fm.fields?.[name];
+        fm.fields[name] = {
+          ...fields,
+          label,
+          name,
+          onLoad,
+          type,
+          placeholder,
+          required,
+          disabled,
+          hidden_label,
+          onChange,
+          className,
+          style,
+        };
+        fm.render();
+      }
+    }, 1000);
   }, []);
   const before = typeof prefix === "function" ? prefix() : prefix;
   const after = typeof suffix === "function" ? suffix() : suffix;
@@ -175,9 +213,6 @@ export const Field: React.FC<{
         <TooltipBetter content={tooltip} side="bottom">
           <div
             className={cn(
-              error
-                ? "flex flex-row rounded-md flex-grow border-red-500 border items-center"
-                : "flex flex-row rounded-md flex-grow  items-center",
               is_disable
                 ? "border border-gray-100 bg-gray-100"
                 : "border border-gray-300 ",
@@ -210,7 +245,10 @@ export const Field: React.FC<{
                 css`
                   background: transparent !important;
                 `,
-              classField
+              classField,
+              error
+                ? "flex flex-row rounded-md flex-grow border-red-500 border items-center"
+                : "flex flex-row rounded-md flex-grow  items-center"
             )}
           >
             {before && (
@@ -259,6 +297,7 @@ export const Field: React.FC<{
               <>
                 <TypeDropdown
                   fm={fm}
+                  fields={initField}
                   required={required}
                   name={name}
                   onLoad={onLoad}
@@ -272,6 +311,7 @@ export const Field: React.FC<{
               <>
                 <TypeDropdown
                   fm={fm}
+                  fields={initField}
                   required={required}
                   name={name}
                   onLoad={onLoad}
@@ -288,6 +328,9 @@ export const Field: React.FC<{
                 <div className="w-full">
                   <TypeAsyncDropdown
                     fm={fm}
+                    fields={initField}
+                    label={label}
+                    target={target}
                     required={required}
                     name={name}
                     onLoad={onLoad}
@@ -297,8 +340,32 @@ export const Field: React.FC<{
                     disabled={is_disable}
                     onChange={onChange}
                     mode="multi"
+                    pagination={pagination}
                     unique={unique}
                     isBetter={isBetter}
+                  />
+                </div>
+              </>
+            ) : ["dropdown-async"].includes(type) ? (
+              <>
+                <div className="w-full">
+                  <TypeAsyncDropdown
+                    label={label}
+                    fm={fm}
+                    fields={initField}
+                    required={required}
+                    name={name}
+                    target={target}
+                    onLoad={onLoad}
+                    onLabel={onLabel}
+                    onValue={onValue}
+                    placeholder={placeholder}
+                    disabled={is_disable}
+                    onChange={onChange}
+                    pagination={pagination}
+                    unique={unique}
+                    isBetter={isBetter}
+                    search={search}
                   />
                 </div>
               </>
@@ -306,6 +373,7 @@ export const Field: React.FC<{
               <>
                 <TypeDropdownBetter
                   fm={fm}
+                  fields={initField}
                   required={required}
                   name={name}
                   onLoad={onLoad}
@@ -323,6 +391,7 @@ export const Field: React.FC<{
               <>
                 <FieldCheckbox
                   fm={fm}
+                  fields={initField}
                   name={name}
                   onLoad={onLoad}
                   placeholder={placeholder}
@@ -334,6 +403,7 @@ export const Field: React.FC<{
             ) : ["radio"].includes(type) ? (
               <>
                 <FieldRadio
+                  fields={initField}
                   fm={fm}
                   name={name}
                   onLoad={onLoad}
@@ -347,6 +417,7 @@ export const Field: React.FC<{
               <>
                 <FieldCheckbox
                   fm={fm}
+                  fields={initField}
                   name={name}
                   onLoad={onLoad}
                   placeholder={placeholder}
@@ -360,6 +431,7 @@ export const Field: React.FC<{
               <>
                 <TypeRichText
                   fm={fm}
+                  fields={initField}
                   name={name}
                   disabled={is_disable}
                   className={className}
@@ -370,6 +442,7 @@ export const Field: React.FC<{
               <>
                 <TypeTag
                   fm={fm}
+                  fields={initField}
                   name={name}
                   disabled={is_disable}
                   className={className}
@@ -380,6 +453,7 @@ export const Field: React.FC<{
               <>
                 <TypeInput
                   fm={fm}
+                  fields={initField}
                   name={name}
                   placeholder={placeholder}
                   required={required}

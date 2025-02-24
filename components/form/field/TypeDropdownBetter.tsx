@@ -14,6 +14,7 @@ export const TypeDropdownBetter: React.FC<any> = ({
   isBetter = false,
   onCount,
   onLabel,
+  fields,
 }) => {
   return (
     <>
@@ -60,10 +61,7 @@ export const TypeDropdownBetter: React.FC<any> = ({
         placeholder={placeholder}
         options={onLoad}
         onInit={(e) => {
-          fm.fields[name] = {
-            ...fm.fields[name],
-            ...e,
-          };
+          fm.fields[name] = { ...fields, ...e };
         }}
       />
     </>

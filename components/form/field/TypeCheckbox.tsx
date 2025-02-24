@@ -1,6 +1,5 @@
 import { useLocal } from "@/lib/utils/use-local";
 import { FC, useEffect } from "react";
-import { ButtonBetter } from "../../ui/button";
 
 export const FieldCheckbox: FC<any> = ({
   fm,
@@ -11,11 +10,12 @@ export const FieldCheckbox: FC<any> = ({
   disabled,
   className,
   mode,
+  fields,
 }) => {
   const local = useLocal({
     list: [] as any[],
     reload: async () => {
-      fm.fields[name] = { ...fm.fields?.[name], ...local };
+      fm.fields[name] = { ...fields, ...local };
       fm.render();
       const callback = (res: any[]) => {
         if (Array.isArray(res)) {
@@ -32,7 +32,7 @@ export const FieldCheckbox: FC<any> = ({
     },
   });
   useEffect(() => {
-    fm.fields[name] = { ...fm.fields?.[name], ...local };
+    fm.fields[name] = { ...fields, ...local };
     const callback = (res: any[]) => {
       if (Array.isArray(res)) {
         local.list = res;

@@ -10,6 +10,7 @@ import {
 } from "../ui/resize";
 import get from "lodash.get";
 import { Skeleton } from "../ui/Skeleton";
+import { normalDate } from "@/lib/utils/date";
 
 type Local<T> = {
   data: T | null;
@@ -55,7 +56,58 @@ export const Form: React.FC<any> = ({
         </>
       );
       try {
-        await onSubmit(local);
+        const fieldDate: any = local?.fields;
+        try {
+          const dateFields = Object.values(fieldDate).filter(
+            (field: any) => get(field, "type") === "date"
+          );
+          if (Array.isArray(dateFields) && dateFields?.length) {
+            dateFields.map((e: any) => {
+              if (e?.name)
+                local.data[e?.name] = normalDate(local.data[e?.name]);
+            });
+            local.render();
+          }
+        } catch (ex) {}
+        const fieldRequired = Object.values(fieldDate).filter(
+          (field: any) => field?.required
+        );
+        let error = {} as any;
+        if (Array.isArray(fieldRequired) && fieldRequired?.length) {
+          fieldRequired.map((e: any) => {
+            const type = e?.type;
+            let keys = e?.name;
+            if (["dropdown-async", "multi-async"].includes(type)) {
+              keys = e?.target || e?.name;
+            }
+            if (
+              [
+                "multi-dropdown",
+                "checkbox",
+                "multi-upload",
+                "multi-async",
+              ].includes(type)
+            ) {
+              if (
+                !Array.isArray(get(local.data, keys)) ||
+                !get(local.data, `${keys}.length`)
+              ) {
+                error[e?.name] = `This field requires at least one item.`;
+              }
+            } else {
+              if (!get(local.data, keys)) {
+                error[e?.name] = `Please fill out this field.`;
+              }
+            }
+          });
+        }
+        local.error = error;
+        local.render();
+        if (Object.keys(error).length) {
+          throw new Error("please check your input field.");
+        } else {
+          await onSubmit(local);
+        }
         setTimeout(() => {
           toast.success(
             <div
@@ -209,7 +261,7 @@ export const Form: React.FC<any> = ({
       </div>
     );
   return (
-    <div className={`flex-grow flex-col flex ${className}`}>
+    <div className={`flex-grow flex-col flex h-full ${className}`}>
       <div className="flex flex-row">{HeaderComponent}</div>
       {showResize ? (
         // Resize panels...
@@ -242,7 +294,7 @@ export const Form: React.FC<any> = ({
       ) : (
         <>
           <form
-            className="flex flex-grow flex-col flex-grow"
+            className="flex flex-col "
             onSubmit={(e) => {
               e.preventDefault();
               local.submit();
@@ -259,7 +311,11 @@ export const Form: React.FC<any> = ({
               </div>
             )}
           </form>
-          {typeof onFooter === "function" ? onFooter(local) : null}
+          {typeof onFooter === "function" ? (
+            <div className="flex flex-grow flex-col">{onFooter(local)}</div>
+          ) : (
+            <div className="flex flex-grow flex-col"></div>
+          )}
         </>
       )}
     </div>

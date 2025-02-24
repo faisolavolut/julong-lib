@@ -12,6 +12,7 @@ export const TypeDropdown: React.FC<any> = ({
   allowNew = false,
   unique = true,
   isBetter = false,
+  fields,
 }) => {
   return (
     <>
@@ -57,7 +58,7 @@ export const TypeDropdown: React.FC<any> = ({
         options={onLoad}
         onInit={(e) => {
           fm.fields[name] = {
-            ...fm.fields[name],
+            ...fields,
             ...e,
           };
         }}

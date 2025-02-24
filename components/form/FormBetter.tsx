@@ -21,7 +21,7 @@ export const FormBetter: React.FC<any> = ({
   });
   useEffect(() => {}, [fm.data]);
   return (
-    <div className="flex flex-col flex-grow gap-y-3">
+    <div className="flex flex-col flex-grow gap-y-3 ">
       {typeof fm === "object" && typeof onTitle === "function" ? (
         <div className="flex flex-row p-3 items-center  rounded-lg">
           {onTitle(fm)}

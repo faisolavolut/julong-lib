@@ -28,6 +28,7 @@ export const TypeRichText: React.FC<any> = ({
   type,
   field,
   onChange,
+  fields,
 }) => {
   let value: any = fm.data?.[name] || "";
   const editorRef = useRef(null);
@@ -59,7 +60,7 @@ export const TypeRichText: React.FC<any> = ({
   const [url, setUrl] = useState(null as any);
   useEffect(() => {
     try {
-      fm.fields[name] = { ...fm.fields?.[name], ...input };
+      fm.fields[name] = { ...fields, ...input };
       fm.render();
     } catch (e) {}
   }, []);
@@ -75,7 +76,7 @@ export const TypeRichText: React.FC<any> = ({
         className={cx(
           "control-group sticky top-0  bg-white shadow rounded-t-lg",
           css`
-            z-index: 2;
+            z-index: 1;
           `
         )}
       >

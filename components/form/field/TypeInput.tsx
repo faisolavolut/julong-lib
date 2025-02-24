@@ -10,6 +10,7 @@ import { Rating } from "../../ui/ratings";
 import { getNumber } from "@/lib/utils/getNumber";
 import MaskedInput from "../../ui/MaskedInput";
 import { cn } from "@/lib/utils";
+import { getStatusLabel } from "@/constants/status-mpp";
 
 export const TypeInput: React.FC<any> = ({
   name,
@@ -304,6 +305,66 @@ export const TypeInput: React.FC<any> = ({
   let type_field = type;
   if (input.show_pass) {
     type_field = "text";
+  }
+  if (type === "status") {
+    if (disabled) {
+      return (
+        <>
+          <Input
+            id={name}
+            onKeyDown={handleKeyDown}
+            name={name}
+            className={cx(
+              "text-sm",
+              error
+                ? css`
+                    border-color: red !important;
+                  `
+                : ``,
+              css`
+                background-color: ${disabled
+                    ? "rgb(243 244 246)"
+                    : "transparant"}
+                  ? "";
+              `,
+              className
+            )}
+            disabled={disabled}
+            required={required}
+            placeholder={placeholder || ""}
+            value={getStatusLabel(value)}
+            type={!type ? "text" : type_field}
+            onChange={(ev) => {
+              fm.data[name] = ev.currentTarget.value;
+              fm.render();
+              if (typeof onChange === "function") {
+                onChange(fm.data[name]);
+              }
+            }}
+          />
+
+          {type === "password" && (
+            <div
+              className=" right-0 h-full flex items-center cursor-pointer px-2"
+              onClick={() => {
+                input.show_pass = !input.show_pass;
+                input.render();
+              }}
+            >
+              <div className="">
+                {input.show_pass ? (
+                  <FaRegEyeSlash className="h-4" />
+                ) : (
+                  <FaRegEye className="h-4" />
+                )}
+              </div>
+            </div>
+          )}
+        </>
+      );
+    } else {
+      type = "text";
+    }
   }
   return (
     <>

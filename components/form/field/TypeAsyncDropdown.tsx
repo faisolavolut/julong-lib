@@ -1,36 +1,129 @@
 import { AsyncPaginate } from "react-select-async-paginate";
 import { components } from "react-select";
+import { useLocal } from "@/lib/utils/use-local";
+import { empty } from "@/lib/utils/isStringEmpty";
+import { useEffect, useMemo, useState } from "react";
+import debounce from "lodash.debounce";
+import get from "lodash.get";
 
 export const TypeAsyncDropdown: React.FC<any> = ({
   name,
   fm,
-  on_change,
+  onChange,
+  label,
   disabled,
   onValue,
   onLabel,
   onLoad,
-  placeholder = "Select...",
+  fields,
+  target,
+  mode = "dropdown",
+  placeholder,
+  pagination = true,
+  search = "api",
+  required = false,
 }) => {
-  const loadOptions = async (
+  const [cacheUniq, setCacheUniq] = useState(Date.now());
+  const [refreshKey, setRefreshKey] = useState(Date.now());
+
+  const getValue =
+    typeof onValue === "string" ? (e: any) => get(e, onValue) : onValue;
+  const getLabel =
+    typeof onLabel === "string" ? (e: any) => get(e, onLabel) : onLabel;
+  let placeholderField =
+    mode === "multi"
+      ? placeholder || `Add ${label}`
+      : placeholder || `Select ${label}`;
+  const field = useLocal({
+    data: [] as any[],
+    reload: async () => {
+      setRefreshKey(Date.now());
+    },
+  });
+  const debouncedLoadOptions = useMemo(
+    () =>
+      debounce(async (searchQuery: string, page: number, resolve: any) => {
+        let paging = page;
+        if (pagination === false && paging > 1) {
+          resolve({
+            options: [],
+            hasMore: false,
+            additional: {
+              page: searchQuery ? 2 : page + 1,
+            },
+          });
+        } else {
+          let result: any = await onLoad(
+            search === "local"
+              ? {
+                  paging: page,
+                  take: 10,
+                }
+              : {
+                  paging: page,
+                  take: 10,
+                  search: searchQuery,
+                }
+          );
+          if (Array.isArray(result) && result.length) {
+            result = result.map((e) => {
+              return {
+                ...e,
+                label: getLabel(e),
+                value: getValue(e),
+              };
+            });
+          }
+          const respon = result;
+          if (
+            pagination === false &&
+            Array.isArray(respon) &&
+            !empty(searchQuery) &&
+            search === "local"
+          ) {
+            let filter = respon?.length
+              ? respon.filter((e: any) => {
+                  const label = getLabel(e) || "";
+                  return label
+                    .toLowerCase()
+                    .includes(searchQuery.toLowerCase());
+                })
+              : [];
+            resolve({
+              options: filter,
+              hasMore: filter.length >= 1,
+              additional: {
+                page: searchQuery ? 2 : page + 1,
+              },
+            });
+          } else {
+            resolve({
+              options: respon,
+              hasMore: respon.length >= 1,
+              additional: {
+                page: searchQuery ? 2 : page + 1,
+              },
+            });
+          }
+        }
+      }, 200),
+    []
+  );
+  const loadOptions: any = async (
     searchQuery: any,
     loadedOptions: any,
     { page }: any
   ) => {
-    const result: any = await onLoad({
-      paging: page,
-      take: 10,
-      search: searchQuery,
+    return new Promise((resolve) => {
+      debouncedLoadOptions(searchQuery, page, resolve);
     });
-    const responseJSON = result;
-    return {
-      options: responseJSON,
-      hasMore: responseJSON.length >= 1,
-      additional: {
-        page: searchQuery ? 2 : page + 1,
-      },
-    };
   };
-
+  useEffect(() => {
+    if (!fm?.fields?.[name]) {
+      fm.fields[name] = { ...fields, ...field };
+      fm.render();
+    }
+  }, []);
   const MultiValue = (props: any) => {
     return (
       <components.MultiValue
@@ -48,32 +141,107 @@ export const TypeAsyncDropdown: React.FC<any> = ({
   };
   const Option = (props: any) => {
     const { data, isSelected, isFocused } = props;
-    console.log({ data, isSelected, isFocused, props });
     return (
       <components.Option
         {...props}
         className={cx(
-          `pointer-events-auto opt-item px-3 py-1 cursor-pointer option-item text-xs hover:bg-blue-50 ${
-            isSelected ? "selected" : ""
-          } ${isFocused ? "focused" : ""}`,
-          "border-t"
+          css`
+            cursor: pointer !important;
+            padding: 0px !important;
+            background: transparent !important;
+            display: flex !important;
+            flex-direction: column !important;
+            width: 100% !imporatnt;
+          `
         )}
-        style={{
-          fontSize: "0.875rem",
-          cursor: "pointer",
-        }}
       >
-        {onLabel(data)}
+        <div
+          className={cx(
+            `pointer-events-auto opt-item px-3 py-1 cursor-pointer option-item text-sm  ${
+              isSelected
+                ? "selected bg-primary text-white"
+                : " hover:bg-blue-50"
+            } ${isFocused ? "focused" : ""}`,
+            "border-t"
+          )}
+        >
+          {getLabel(data)}
+        </div>
       </components.Option>
     );
   };
+  const clearable =
+    mode === "dropdown" && required ? false : mode === "multi" ? true : true;
+  let value = fm.data[name];
+  if (mode === "multi") {
+    if (Array.isArray(value) && value?.length) {
+      value = value.map((e) => {
+        return {
+          ...e,
+          value: getValue(e),
+          label: getLabel(e),
+        };
+      });
+    } else {
+      value = [];
+    }
+  } else if (
+    !target &&
+    typeof value !== "object" &&
+    typeof value === "string" &&
+    value
+  ) {
+    value =
+      onValue === onLabel
+        ? {
+            value: value,
+            label: value,
+          }
+        : {
+            value: value,
+            label: getLabel(value),
+          };
+  } else if (typeof value === "string") {
+    value =
+      onValue === onLabel
+        ? {
+            value: value,
+            label: value,
+          }
+        : {
+            value: value,
+            label: typeof onLabel === "string" ? value : getLabel(value),
+          };
+  } else if (Array.isArray(value) && value?.length) {
+    value = value.map((e) => {
+      return {
+        ...e,
+        value: getValue(e),
+        label: getLabel(e),
+      };
+    });
+  } else if (typeof value === "object" && value) {
+    value = {
+      ...value,
+      value: getValue(value),
+      label: getLabel(value),
+    };
+  }
+  if (mode === "multi") console.log({ value });
+
   return (
     <AsyncPaginate
-      placeholder={placeholder}
+      // menuIsOpen={true}
+      key={refreshKey}
+      placeholder={disabled ? "" : placeholderField}
       isDisabled={disabled}
       className={cx(
-        "rounded-md border-none",
+        "rounded-md border-none text-sm",
         css`
+          [role="listbox"] {
+            padding: 0px !important;
+            z-index: 5;
+          }
           input:focus {
             outline: 0px !important;
             border: 0px !important;
@@ -91,19 +259,48 @@ export const TypeAsyncDropdown: React.FC<any> = ({
             box-shadow: none;
             border-radius: 6px;
           }
-        `
+          > :nth-child(4) {
+            z-index: 4 !important;
+          }
+        `,
+        disabled
+          ? css`
+              > div {
+                border-width: 0px !important;
+                background: transparent !important;
+              }
+              > div > div:last-child {
+                display: none !important;
+              }
+
+              > div > div:first-child > div {
+                color: black !important;
+              }
+            `
+          : ``
       )}
-      getOptionValue={onValue}
-      getOptionLabel={onLabel}
-      value={fm.data[name]}
+      isClearable={clearable}
+      closeMenuOnSelect={mode === "dropdown" ? true : false}
+      getOptionValue={(item) => item.value}
+      getOptionLabel={(item) => item.label}
+      value={value}
       components={{ MultiValue, Option }}
       loadOptions={loadOptions}
       isSearchable={true}
-      isMulti
-      closeMenuOnSelect={false}
+      isMulti={mode === "multi"}
       onChange={(e) => {
-        fm.data[name] = e;
+        if (target) {
+          fm.data[target] = getValue(e);
+        }
+        if (mode === "dropdown" && !target) {
+          fm.data[name] = getValue(e);
+        } else {
+          fm.data[name] = e;
+        }
         fm.render();
+        if (typeof onChange === "function") {
+          onChange({ data: e });
+        }
       }}
       additional={{
         page: 1,
