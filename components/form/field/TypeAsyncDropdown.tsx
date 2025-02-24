@@ -227,8 +227,6 @@ export const TypeAsyncDropdown: React.FC<any> = ({
       label: getLabel(value),
     };
   }
-  if (mode === "multi") console.log({ value });
-
   return (
     <AsyncPaginate
       // menuIsOpen={true}
