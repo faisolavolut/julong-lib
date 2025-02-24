@@ -103,6 +103,7 @@ export const Form: React.FC<any> = ({
         }
         local.error = error;
         local.render();
+        console.log({ error });
         if (Object.keys(error).length) {
           throw new Error("please check your input field.");
         } else {
