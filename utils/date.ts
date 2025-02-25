@@ -11,6 +11,13 @@ export const longDate = (date: string | Date) => {
   return "-";
 };
 
+export const formatDay = (date: string | Date, format: string) => {
+  if (date instanceof Date || typeof date === "string") {
+    return day(date).format(format);
+  }
+  return null;
+};
+
 export const dayDate = (date: string | Date) => {
   if (date instanceof Date || (typeof date === "string" && !empty(date))) {
     return day(date).format("DD MMMM YYYY");
