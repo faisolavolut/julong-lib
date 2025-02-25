@@ -25,6 +25,7 @@ import get from "lodash.get";
 import { Checkbox } from "../ui/checkbox";
 import { getNumber } from "@/lib/utils/getNumber";
 import { formatMoney } from "@/lib/components/form/field/TypeInput";
+import { events } from "@/lib/utils/event";
 
 export const TableList: React.FC<any> = ({
   autoPagination = true,
@@ -71,6 +72,7 @@ export const TableList: React.FC<any> = ({
     dataForm: [] as any[],
     listData: [] as any[],
     sort: {} as any,
+    filter: {} as any,
     search: null as any,
     paging: 1,
     count: 0 as any,
@@ -118,7 +120,13 @@ export const TableList: React.FC<any> = ({
       );
 
       if (typeof onCount === "function") {
-        const res = await onCount();
+        const params = await events("onload-param", {
+          take: 1,
+          paging: 1,
+          search: local.search,
+          ...local.filter,
+        });
+        const res = await onCount(params);
         local.count = res;
         local.render();
       }
