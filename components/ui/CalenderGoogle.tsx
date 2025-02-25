@@ -22,6 +22,7 @@ interface PopupPos {
 }
 export const CalenderGoogle: FC<{ events: any[] }> = ({ events }) => {
   const [showDialog, setShowDialog] = useState(false as boolean);
+  const [canClose, setCanClose] = useState(true as boolean);
   const [detailDialog, setDetailDialog] = useState({
     title: "Judul",
     start: new Date(),
@@ -76,6 +77,9 @@ export const CalenderGoogle: FC<{ events: any[] }> = ({ events }) => {
         open={showDialog}
         onOpenChange={(e) => {
           setShowDialog(e);
+          setTimeout(() => {
+            setCanClose(true);
+          }, 100);
         }}
       >
         <DialogContent
@@ -87,6 +91,9 @@ export const CalenderGoogle: FC<{ events: any[] }> = ({ events }) => {
           )}
           onClick={() => {
             setShowDialog(false);
+            setTimeout(() => {
+              setCanClose(true);
+            }, 100);
           }}
         >
           <DialogHeader>
@@ -214,13 +221,18 @@ export const CalenderGoogle: FC<{ events: any[] }> = ({ events }) => {
 
                 setDetailDialog(event);
                 setShowDialog(true);
+                setCanClose(true);
                 // setSelectedEvent(info.event);
                 // setShowEventPopup(true);
               }}
             />
             {showPopup && (
               <CenteredPopup
-                onClose={() => setShowPopup(false)}
+                onClose={() => {
+                  if (canClose) {
+                    setShowPopup(false);
+                  }
+                }}
                 popupPos={popupPos}
               >
                 <div className="flex flex-col gap-y-1">
@@ -244,6 +256,7 @@ export const CalenderGoogle: FC<{ events: any[] }> = ({ events }) => {
                           onClick={() => {
                             setDetailDialog(evt);
                             setShowDialog(true);
+                            setCanClose(false);
                           }}
                         >
                           {evt?.title}
@@ -307,7 +320,6 @@ const CenteredPopup: React.FC<CenteredPopupProps> = ({
       // Jika bagian bawah popup melebihi tinggi viewport, geser ke atas
       if (newY + rect.height > window.innerHeight) {
         newY = window.innerHeight - rect.height - 10; // beri margin 10px
-        console.log("CEKKK");
         setClassname(css`
           bottom: 0;
           left: ${popupPos.x}px;
