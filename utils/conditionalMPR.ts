@@ -41,7 +41,6 @@ export const showApprovel = (
   };
   const isBudget = data?.mp_planning_header_id ? true : false;
   const isField = data?.organization_category === "Non Field" ? false : true;
-  console.log(data?.status);
   if (data?.status === "NEED APPROVAL") {
     if (data?.department_head && !data?.vp_gm_director) {
       return {
@@ -86,22 +85,34 @@ export const showApprovel = (
     }
     return null;
   } else if (data?.status === "APPROVED") {
-    console.log(data?.status);
-    if (data?.department_head && !data?.vp_gm_director) {
-      return {
-        approve:
-          action === "reject"
-            ? "REJECTED"
-            : isField
-            ? "APPROVED"
-            : "NEED APPROVAL",
-        level: "Level VP",
-      };
-    } else if (!data?.hrd_ho_unit) {
-      return {
-        approve: action === "reject" ? "REJECTED" : "COMPLETED",
-        level: "Level HRD HO",
-      };
+    if (role?.head) {
+      return null;
+    }
+    console.log({ role });
+    if (isBudget) {
+      if (!data?.hrd_ho_unit_name) {
+        return {
+          approve: action === "reject" ? "REJECTED" : "COMPLETED",
+          level: "Level HRD HO",
+        };
+      }
+    } else {
+      if (data?.department_head && !data?.vp_gm_director) {
+        return {
+          approve:
+            action === "reject"
+              ? "REJECTED"
+              : isField
+              ? "APPROVED"
+              : "NEED APPROVAL",
+          level: "Level VP",
+        };
+      } else if (!data?.hrd_ho_unit) {
+        return {
+          approve: action === "reject" ? "REJECTED" : "COMPLETED",
+          level: "Level HRD HO",
+        };
+      }
     }
   }
   return null;
