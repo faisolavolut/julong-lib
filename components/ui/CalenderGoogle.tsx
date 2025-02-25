@@ -29,6 +29,7 @@ export const CalenderGoogle: FC<{ events: any[] }> = ({ events }) => {
     end: new Date(),
     allDay: true,
     color: "#2196f3",
+    backgroundColor: "#2196f3",
     extendedProps: {
       id: 1,
       pic: [
@@ -104,7 +105,16 @@ export const CalenderGoogle: FC<{ events: any[] }> = ({ events }) => {
             <div className="w-full  flex flex-col flex-grow bg-white overflow-hidden ">
               <div className=" py-4 px-0 rounded-lg  max-w-sm">
                 <div className="flex items-center gap-2">
-                  <div className="w-[15px] h-[15px] bg-red-500 rounded-md"></div>
+                  <div
+                    className={cx(
+                      "w-[15px] h-[15px] rounded-md",
+                      detailDialog?.backgroundColor
+                        ? css`
+                            background-color: ${detailDialog?.backgroundColor};
+                          `
+                        : "bg-primary"
+                    )}
+                  ></div>
                   <h2 className="text-lg font-semibold">
                     {detailDialog.title || "No title"}
                   </h2>
@@ -249,19 +259,29 @@ export const CalenderGoogle: FC<{ events: any[] }> = ({ events }) => {
                   </div>
                   <div className="flex flex-col">
                     <div className="flex flex-col gap-y-1">
-                      {listMore.map((evt, idx) => (
-                        <div
-                          key={idx}
-                          className="bg-red-500 text-sm px-2 rounded-md text-white cursor-pointer"
-                          onClick={() => {
-                            setDetailDialog(evt);
-                            setShowDialog(true);
-                            setCanClose(false);
-                          }}
-                        >
-                          {evt?.title}
-                        </div>
-                      ))}
+                      {listMore.map((evt, idx) => {
+                        console.log(evt);
+                        return (
+                          <div
+                            key={idx}
+                            className={cx(
+                              ` text-sm px-2 rounded-md text-white cursor-pointer`,
+                              evt?.backgroundColor
+                                ? css`
+                                    background-color: ${evt?.backgroundColor};
+                                  `
+                                : "bg-primary"
+                            )}
+                            onClick={() => {
+                              setDetailDialog(evt);
+                              setShowDialog(true);
+                              setCanClose(false);
+                            }}
+                          >
+                            {evt?.title}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
 
