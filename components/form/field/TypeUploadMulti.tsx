@@ -48,7 +48,8 @@ export const FieldUploadMulti: FC<{
           });
         }
       }
-      fm.data[field.name] = list;
+      const existing = fm.data[field.name] || [];
+      fm.data[field.name] = existing.concat(list);
       fm.render();
       if (typeof on_change === "function") on_change(fm.data?.[field.name]);
       input.fase = "start";
