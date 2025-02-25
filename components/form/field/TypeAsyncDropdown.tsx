@@ -355,7 +355,7 @@ export const TypeAsyncDropdown: React.FC<any> = ({
           }
           fm.render();
           if (typeof onChange === "function") {
-            onChange({ data: e });
+            onChange({ ...e, data: e });
           }
         }}
         additional={{
