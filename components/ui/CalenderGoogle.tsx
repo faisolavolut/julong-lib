@@ -20,9 +20,13 @@ interface PopupPos {
   x: number;
   y: number;
 }
-export const CalenderGoogle: FC<{ events: any[] }> = ({ events }) => {
+export const CalenderGoogle: FC<{
+  events: any[];
+  onLoad: (date: Date) => Promise<any[]> | any[];
+}> = ({ events, onLoad }) => {
   const [showDialog, setShowDialog] = useState(false as boolean);
   const [canClose, setCanClose] = useState(true as boolean);
+  const [item, setItem] = useState([] as any[]);
   const [detailDialog, setDetailDialog] = useState({
     title: "Judul",
     start: new Date(),
@@ -46,12 +50,14 @@ export const CalenderGoogle: FC<{ events: any[] }> = ({ events }) => {
   const [now, setNow] = useState(new Date());
   const [detailDate, setDetailDate] = useState(new Date());
   const handlePrev = () => {
+    setItem([]);
     const calendarApi = calendarRef.current?.getApi();
     calendarApi?.prev();
     setNow(calendarApi?.getDate() || new Date());
   };
 
   const handleNext = () => {
+    setItem([]);
     const calendarApi = calendarRef.current?.getApi();
     calendarApi?.next();
     setNow(calendarApi?.getDate() || new Date());
@@ -69,9 +75,16 @@ export const CalenderGoogle: FC<{ events: any[] }> = ({ events }) => {
     return label;
   };
   const joinString = (data: any[], split?: string) => {
-    const label = data?.length ? data.map((e) => e?.name) : [];
+    const label = data?.length ? data.map((e) => e?.employee_name) : [];
     return label.join(`${split || " ,"}`);
   };
+  const reload = async () => {
+    const result = await onLoad(now);
+    setItem(result);
+  };
+  useEffect(() => {
+    reload();
+  }, [now]);
   return (
     <div className="flex flex-col w-full h-full">
       <Dialog
@@ -138,7 +151,7 @@ export const CalenderGoogle: FC<{ events: any[] }> = ({ events }) => {
                   <div className="flex items-center gap-2 mt-2">
                     <Calender className="w-5 h-5 text-gray-600" />
                     <p className="text-gray-700 font-medium text-md">
-                      {joinString(detailDialog?.extendedProps?.pic)}
+                      {joinString(detailDialog?.extendedProps?.project_pics)}
                     </p>
                   </div>
                 ) : (
@@ -170,7 +183,7 @@ export const CalenderGoogle: FC<{ events: any[] }> = ({ events }) => {
               headerToolbar={false}
               plugins={[dayGridPlugin]}
               initialView="dayGridMonth"
-              events={events}
+              events={item}
               height="100%"
               dayMaxEventRows={2}
               // expandRows={false}
@@ -257,10 +270,9 @@ export const CalenderGoogle: FC<{ events: any[] }> = ({ events }) => {
                       <X className="w-5 h-5" />
                     </div>
                   </div>
-                  <div className="flex flex-col">
+                  <div className="flex flex-col max-h-[200px] overflow-y-auto">
                     <div className="flex flex-col gap-y-1">
                       {listMore.map((evt, idx) => {
-                        console.log(evt);
                         return (
                           <div
                             key={idx}
