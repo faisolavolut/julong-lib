@@ -152,12 +152,11 @@ export const Form: React.FC<any> = ({
 
         local.error = error;
         local.render();
-        console.log(isError);
-        // if (isError) {
-        //   throw new Error("please check your input field.");
-        // } else {
-        //   await onSubmit(local);
-        // }
+        if (isError) {
+          throw new Error("please check your input field.");
+        } else {
+          await onSubmit(local);
+        }
         setTimeout(() => {
           toast.success(
             <div
