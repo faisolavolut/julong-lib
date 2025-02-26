@@ -201,6 +201,11 @@ export const TypeAsyncDropdown: React.FC<any> = ({
     } else {
       value = [];
     }
+  } else if (typeof value === "object") {
+    value = {
+      value: getLabel(value),
+      label: getLabel(value),
+    };
   } else if (
     !target &&
     typeof value !== "object" &&
