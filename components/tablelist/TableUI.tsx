@@ -10,7 +10,7 @@ export interface TableUIProps<T extends object> extends TableListProps<T> {
   tabHeader?: ((local: any) => React.ReactNode) | React.ReactNode;
   modeTab?: "default" | "only-title";
   tab?: { id: string; name: string; count?: number | null }[]; // ✅ Update count menjadi nullable
-  onTab?: (tabId: string | null | undefined) => void;
+  onTab?: (tabId: any) => void;
   breadcrumb?: { label: string; href: string }[];
   title?: string;
   ready?: boolean;
