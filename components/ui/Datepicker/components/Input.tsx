@@ -74,9 +74,7 @@ const Input: React.FC<Props> = (e: Props) => {
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const inputValue = e.target.value;
-
       const dates = [];
-
       if (asSingle) {
         const date = parseFormattedDate(inputValue, displayFormat);
         if (dateIsValid(date.toDate())) {
@@ -121,6 +119,8 @@ const Input: React.FC<Props> = (e: Props) => {
         if (dates[1])
           changeDayHover(dayjs(dates[1]).add(-1, "day").format(DATE_FORMAT));
         else changeDayHover(dates[0]);
+      } else {
+        changeDatepickerValue(null, e.target);
       }
 
       changeInputText(e.target.value);

@@ -230,6 +230,7 @@ export const TypeInput: React.FC<any> = ({
             asSingle={true}
             useRange={false}
             onChange={(value) => {
+              console.log(value);
               fm.data[name] = value?.startDate
                 ? new Date(value?.startDate)
                 : null;

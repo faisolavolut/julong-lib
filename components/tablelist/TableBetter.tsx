@@ -154,6 +154,12 @@ export const TableEditBetter: React.FC<any> = ({
     local.data = fm?.data[name] || [];
     local.render();
     console.log(columns);
+    fm.fields[name] = {
+      name: name,
+      type: "table",
+      fields: [],
+    };
+    fm.render();
   }, []);
 
   const handleResize = (index: any, width: any) => {
@@ -168,9 +174,11 @@ export const TableEditBetter: React.FC<any> = ({
       <div className="tbl-wrapper flex flex-grow flex-col">
         {!disabledHeader ? (
           <div className="head-tbl-list block items-start justify-between  bg-white px-0 py-4 sm:flex">
-            <div className="flex flex-row items-end">
-              <div className="sm:flex flex flex-col space-y-2">
-                <div className="flex">{sideLeft ? sideLeft(local) : <></>}</div>
+            <div className="flex flex-row h-full">
+              <div className="sm:flex flex flex-col space-y-2 flex-grow">
+                <div className="flex flex-grow flex-row">
+                  {sideLeft ? sideLeft(local) : <></>}
+                </div>
               </div>
             </div>
             <div className="ml-auto flex items-center flex-row">
@@ -265,10 +273,21 @@ export const TableEditBetter: React.FC<any> = ({
                   )}
                   <tbody>
                     {local.data.map((row: any, index: any) => {
+                      if (
+                        typeof fm.fields?.[name]?.fields?.[index]?.fields !==
+                        "object"
+                      ) {
+                        fm.fields[name].fields[index] = {
+                          fields: {},
+                        };
+                      }
                       const fm_row = {
                         ...fm,
-
+                        name: name,
+                        type: "table",
                         data: row,
+                        error: fm.fields?.[name]?.fields?.[index]?.error,
+                        fields: fm.fields?.[name]?.fields?.[index]?.fields,
                         render: () => {
                           local.render();
                           fm.data[name] = local.data;
@@ -302,7 +321,9 @@ export const TableEditBetter: React.FC<any> = ({
                             return (
                               <td
                                 key={`row_${name}_${index}_${col?.accessorKey}_${idx}`}
-                                className={"table-header-tbl capitalize"}
+                                className={
+                                  "table-header-tbl align-top capitalize"
+                                }
                               >
                                 <div className="p-1">{renderData}</div>
                               </td>

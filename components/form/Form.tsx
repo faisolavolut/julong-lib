@@ -57,58 +57,107 @@ export const Form: React.FC<any> = ({
       );
       try {
         const fieldDate: any = local?.fields;
+        let isError = false;
+        let error: Record<string, string> = {};
         try {
           const dateFields = Object.values(fieldDate).filter(
             (field: any) => get(field, "type") === "date"
           );
-          if (Array.isArray(dateFields) && dateFields?.length) {
-            dateFields.map((e: any) => {
-              if (e?.name)
-                local.data[e?.name] = normalDate(local.data[e?.name]);
+          if (dateFields.length) {
+            dateFields.forEach((e: any) => {
+              if (e?.name) {
+                local.data[e.name] = normalDate(local.data[e.name]);
+              }
             });
             local.render();
           }
-        } catch (ex) {}
+        } catch (ex) {
+          console.error("Error processing date fields:", ex);
+        }
+
         const fieldRequired = Object.values(fieldDate).filter(
-          (field: any) => field?.required
+          (field: any) => field?.required || field?.type === "table"
         );
-        let error = {} as any;
-        if (Array.isArray(fieldRequired) && fieldRequired?.length) {
-          fieldRequired.map((e: any) => {
-            const type = e?.type;
+
+        if (fieldRequired.length) {
+          fieldRequired.forEach((e: any) => {
             let keys = e?.name;
-            if (["dropdown-async", "multi-async"].includes(type)) {
-              keys = e?.target || e?.name;
-            }
-            if (
-              [
-                "multi-dropdown",
-                "checkbox",
-                "multi-upload",
-                "multi-async",
-              ].includes(type)
-            ) {
-              if (
-                !Array.isArray(get(local.data, keys)) ||
-                !get(local.data, `${keys}.length`)
-              ) {
-                error[e?.name] = `This field requires at least one item.`;
-              }
+            const type = e?.type;
+
+            if (type === "table" && e?.fields?.length) {
+              e.fields.forEach((item: any, index: number) => {
+                let errorChilds: Record<string, string> = {};
+                const fieldRequired = Object.values(item?.fields).filter(
+                  (field: any) => field?.required
+                );
+                console.log({ fieldRequired });
+                fieldRequired.forEach((subField: any) => {
+                  let keySub = subField?.name;
+                  const typeSub = subField?.type;
+                  const val = get(local.data, `${keys}[${index}].${keySub}`);
+                  if (["dropdown-async", "multi-async"].includes(typeSub)) {
+                    keySub = subField?.target || subField?.name;
+                  }
+                  if (
+                    [
+                      "multi-dropdown",
+                      "checkbox",
+                      "multi-upload",
+                      "multi-async",
+                    ].includes(typeSub)
+                  ) {
+                    if (!Array.isArray(get(local.data, keys)) || !val?.length) {
+                      errorChilds[subField.name] =
+                        "This field requires at least one item.";
+                      isError = true;
+                    }
+                  } else if (!val) {
+                    errorChilds[subField.name] = "Please fill out this field.";
+                    isError = true;
+                  }
+
+                  console.log({
+                    keySub,
+                    data: get(local.data, `${keys}[${index}]`),
+                    val,
+                  });
+                });
+
+                item.error = errorChilds;
+              });
             } else {
-              if (!get(local.data, keys)) {
-                error[e?.name] = `Please fill out this field.`;
+              if (["dropdown-async", "multi-async"].includes(type)) {
+                keys = e?.target || e?.name;
+              }
+              const val = get(local.data, keys);
+              if (
+                [
+                  "multi-dropdown",
+                  "checkbox",
+                  "multi-upload",
+                  "multi-async",
+                ].includes(type)
+              ) {
+                if (!Array.isArray(val) || !val?.length) {
+                  error[e.name] = "This field requires at least one item.";
+                  isError = true;
+                }
+              } else if (!val) {
+                error[e.name] = "Please fill out this field.";
+                isError = true;
               }
             }
           });
         }
+
         local.error = error;
         local.render();
-        console.log({ error });
-        if (Object.keys(error).length) {
-          throw new Error("please check your input field.");
-        } else {
-          await onSubmit(local);
-        }
+        console.log(isError);
+        // if (isError) {
+        //   throw new Error("please check your input field.");
+        // } else {
+        //   await onSubmit(local);
+        // }
         setTimeout(() => {
           toast.success(
             <div

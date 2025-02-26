@@ -285,7 +285,7 @@ export const TypeAsyncDropdown: React.FC<any> = ({
         placeholder={disabled ? "" : placeholderField}
         isDisabled={disabled}
         className={cx(
-          "rounded-md border-none text-sm",
+          "rounded-md border-none text-sm w-full",
           css`
             [role="listbox"] {
               padding: 0px !important;
