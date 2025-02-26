@@ -249,7 +249,13 @@ export const TableList: React.FC<any> = ({
       );
       try {
         if (typeof onCount === "function") {
-          const res = await onCount();
+          const params = await events("onload-param", {
+            take: 1,
+            paging: 1,
+            search: local.search,
+            ...local.filter,
+          });
+          const res = await onCount(params);
           local.count = res;
           local.render();
         }
