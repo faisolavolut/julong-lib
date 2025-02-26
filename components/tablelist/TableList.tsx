@@ -53,12 +53,12 @@ export interface Column<T = any> {
     fm_row?: any;
     onChange?: (data: any) => void;
     render: () => void;
-  }) => JSX.Element;
+  }) => JSX.Element | any;
   sortable?: boolean;
 }
 export interface TableListProps<T extends object> {
   autoPagination?: boolean;
-  name: string;
+  name?: string;
   column: Column<T>[] | (() => Column<T>[]);
   style?: "UI" | "Default";
   align?: "center" | "left" | "right";
@@ -103,7 +103,7 @@ export interface FieldFilterProps extends Omit<FieldProps, "fm"> {
 
 export const TableList = <T extends object>({
   autoPagination = true,
-  name,
+  name = "table",
   column,
   style = "UI",
   align = "center",
