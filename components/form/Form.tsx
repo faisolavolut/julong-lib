@@ -343,7 +343,10 @@ export const Form: React.FC<any> = ({
       ) : (
         <>
           <form
-            className="flex flex-col "
+            className={cx(
+              "flex flex-col ",
+              typeof onFooter === "function" ? "" : "flex-grow"
+            )}
             onSubmit={(e) => {
               e.preventDefault();
               local.submit();
@@ -374,7 +377,7 @@ export const Form: React.FC<any> = ({
               {onFooter(local)}
             </div>
           ) : (
-            <div className="flex flex-grow flex-col"></div>
+            <></>
           )}
         </>
       )}

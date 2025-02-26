@@ -30,7 +30,7 @@ export const FormBetter: React.FC<any> = ({
         <></>
       )}
       <div className="w-full flex-grow flex flex-row rounded-lg">
-        <div className="w-full flex flex-row flex-grow bg-white rounded-lg border border-gray-300 relative">
+        <div className="w-full flex flex-row flex-grow bg-white rounded-lg border border-gray-300 relative ">
           <ScrollArea className="flex-grow">
             <Form
               {...{
