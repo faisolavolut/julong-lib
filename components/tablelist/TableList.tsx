@@ -48,6 +48,7 @@ export const TableList: React.FC<any> = ({
   feature,
   onChange,
 }) => {
+  const [show, setShow] = useState(true as boolean);
   const [data, setData] = useState<any[]>([]);
   const sideLeft =
     typeof header?.sideLeft === "function" ? header.sideLeft : null;
@@ -472,7 +473,7 @@ export const TableList: React.FC<any> = ({
               </div>
             </div>
 
-            <div className="ml-auto flex items-center flex-row">
+            <div className="ml-auto flex items-center flex-row gap-x-1">
               <div className="tbl-search hidden items-center sm:mb-0 sm:flex sm:divide-x sm:divide-gray-100">
                 <form
                   onSubmit={async (e) => {
@@ -498,6 +499,26 @@ export const TableList: React.FC<any> = ({
                     />
                   </div>
                 </form>
+              </div>
+              <div className="flex flex-row items-center">
+                {/* <Popover
+                  classNameTrigger={""}
+                  arrow={false}
+                  className="rounded-md"
+                  onOpenChange={(open: any) => {
+                    setShow(true);
+                  }}
+                  open={show}
+                  content={
+                    <div className="flex flex-row px-2 py-4 gap-y-2 items-center">
+                      asdasd
+                    </div>
+                  }
+                >
+                  <ButtonContainer>
+                    <Filter />
+                  </ButtonContainer>
+                </Popover> */}
               </div>
               <div className="flex">{sideRight ? sideRight(local) : <></>}</div>
             </div>
