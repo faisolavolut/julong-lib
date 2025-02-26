@@ -30,5 +30,5 @@ export const events = async (action: EventActions, data: any) => {
     default:
       break;
   }
-  return null;
+  return "";
 };

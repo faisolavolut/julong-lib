@@ -13,8 +13,7 @@ import { cn } from "@/lib/utils";
 import { TooltipBetter } from "../ui/tooltip-better";
 import { TypeDropdownBetter } from "./field/TypeDropdownBetter";
 import { TypeAsyncDropdown } from "./field/TypeAsyncDropdown";
-
-export const Field: React.FC<{
+export interface FieldProps {
   fm: any;
   label?: string;
   name: string;
@@ -67,8 +66,11 @@ export const Field: React.FC<{
   onValue?: string | ((item: any) => any);
   pagination?: boolean;
   search?: "api" | "local";
-}> = ({
+  visibleLabel?: boolean;
+}
+export const Field: React.FC<FieldProps> = ({
   fm,
+  visibleLabel = false,
   label,
   isBetter = false,
   name,
@@ -196,8 +198,9 @@ export const Field: React.FC<{
         {!hidden_label ? (
           <label
             className={cx(
-              "block mb-2 text-md font-medium text-gray-900  text-sm flex flex-row",
-              style === "inline" ? "w-[100px]" : ""
+              "block mb-2 text-md font-medium   text-sm flex flex-row",
+              style === "inline" ? "w-[100px]" : "",
+              visibleLabel ? "text-transparent" : "text-gray-900"
             )}
           >
             {label}

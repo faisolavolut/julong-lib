@@ -22,6 +22,7 @@ export const TypeInput: React.FC<any> = ({
   field,
   onChange,
   className,
+  placeholderDate,
 }) => {
   const [hover, setHover] = useState(0); // State untuk menyimpan nilai hover
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -224,6 +225,7 @@ export const TypeInput: React.FC<any> = ({
             value={{ startDate: value, endDate: value }}
             disabled={disabled}
             displayFormat="DD MMM YYYY"
+            placeholder={placeholder || "DD MMM YYYY"}
             mode={"daily"}
             maxDate={field?.max_date instanceof Date ? field.max_date : null}
             minDate={field?.min_date instanceof Date ? field.min_date : null}
@@ -244,63 +246,61 @@ export const TypeInput: React.FC<any> = ({
       );
       break;
     case "money":
-      return (
-        <>
-          <Input
-            id={name}
-            name={name}
-            disabled={disabled}
-            className={cn(
-              "text-sm text-right	",
-              error
-                ? css`
-                    border-color: red !important;
-                  `
-                : ``,
-              css`
-                background-color: ${disabled
-                    ? "rgb(243 244 246)"
-                    : "transparant"}
-                  ? "";
-              `,
-              className
-            )}
-            required={required}
-            placeholder={placeholder || ""}
-            value={formatCurrency(input.value)}
-            type={"text"}
-            onKeyDown={handleKeyDown}
-            onChange={(ev) => {
-              const rawValue = ev.currentTarget.value
-                .replace(/[^0-9,-]/g, "")
-                .toString();
-              if (rawValue === "0") {
-                input.value = "0";
-                input.render();
+      return <>
+        <Input
+          id={name}
+          name={name}
+          disabled={disabled}
+          className={cn(
+            "text-sm text-right	",
+            error
+              ? css`
+                  border-color: red !important;
+                `
+              : ``,
+            css`
+              background-color: ${disabled
+                  ? "rgb(243 244 246)"
+                  : "transparant"}
+                ? "";
+            `,
+            className
+          )}
+          required={required}
+          placeholder={placeholder || ""}
+          value={formatCurrency(input.value)}
+          type={"text"}
+          onKeyDown={handleKeyDown}
+          onChange={(ev) => {
+            const rawValue = ev.currentTarget.value
+              .replace(/[^0-9,-]/g, "")
+              .toString();
+            if (rawValue === "0") {
+              input.value = "0";
+              input.render();
+            }
+            if (
+              (!rawValue.startsWith(",") || !rawValue.endsWith(",")) &&
+              !rawValue.endsWith("-") &&
+              convertionCurrencyNumber(rawValue) !==
+                convertionCurrencyNumber(input.value)
+            ) {
+              fm.data[name] = convertionCurrencyNumber(
+                formatCurrency(rawValue)
+              );
+              fm.render();
+              if (typeof onChange === "function") {
+                onChange(fm.data[name]);
               }
-              if (
-                (!rawValue.startsWith(",") || !rawValue.endsWith(",")) &&
-                !rawValue.endsWith("-") &&
-                convertionCurrencyNumber(rawValue) !==
-                  convertionCurrencyNumber(input.value)
-              ) {
-                fm.data[name] = convertionCurrencyNumber(
-                  formatCurrency(rawValue)
-                );
-                fm.render();
-                if (typeof onChange === "function") {
-                  onChange(fm.data[name]);
-                }
-                input.value = formatCurrency(fm.data[name]);
-                input.render();
-              } else {
-                input.value = rawValue;
-                input.render();
-              }
-            }}
-          />
-        </>
-      );
+              input.value = formatCurrency(fm.data[name]);
+              input.render();
+            } else {
+              input.value = rawValue;
+              input.render();
+            }
+          }}
+        />
+      </>;
       break;
   }
   let type_field = type;

@@ -29,6 +29,7 @@ export const Form: React.FC<any> = ({
   className,
   onInit,
   afterLoad,
+  toastMessage,
 }) => {
   const local = useLocal({
     ready: false,
@@ -52,7 +53,7 @@ export const Form: React.FC<any> = ({
               `
             )}
           />
-          {"Saving..."}
+          {toastMessage ? `${toastMessage}...` : "Saving..."}
         </>
       );
       try {
@@ -169,7 +170,8 @@ export const Form: React.FC<any> = ({
             >
               <div className="flex text-green-700 items-center success-title font-semibold">
                 <Check className="h-6 w-6 mr-1 " />
-                Record Saved
+
+                {toastMessage ? `${toastMessage} success` : "Record Saved"}
               </div>
             </div>
           );
@@ -180,7 +182,9 @@ export const Form: React.FC<any> = ({
           <div className="flex flex-col w-full">
             <div className="flex text-red-600 items-center">
               <AlertTriangle className="h-4 w-4 mr-1" />
-              Submit Failed {msg}.
+              {toastMessage
+                ? `${toastMessage} failed ${msg}.`
+                : `Submit Failed ${msg}.`}
             </div>
           </div>,
           {

@@ -26,8 +26,82 @@ import { Checkbox } from "../ui/checkbox";
 import { getNumber } from "@/lib/utils/getNumber";
 import { formatMoney } from "@/lib/components/form/field/TypeInput";
 import { events } from "@/lib/utils/event";
+import { Popover } from "../Popover/Popover";
+import { ButtonBetter, ButtonContainer } from "../ui/button";
+import { Filter } from "@/lib/svg/Filter";
+import { Form } from "../form/Form";
+import { Field, FieldProps } from "../form/Field";
+export interface Column<T = any> {
+  name: string; // Tetap string karena ini adalah identifier kolom
+  header: (() => JSX.Element) | string;
+  filter?: boolean;
+  resize?: boolean;
+  width?: number;
+  type?: "text" | "date" | "time" | "money" | "file";
+  nameFilter?: string;
+  onLoadFilter?: (params?: any) => Promise<any> | any;
+  onLabel?: string | ((item: any) => any);
+  onValue?: string | ((item: any) => any);
+  pagination?: boolean;
+  search?: "api" | "local";
+  renderCell: (params: {
+    row: T; // row tetap `T` agar lebih fleksibel
+    name: string; // name tetap string
+    cell: any;
+    idx: number;
+    tbl: any;
+    fm_row?: any;
+    onChange?: (data: any) => void;
+    render: () => void;
+  }) => JSX.Element;
+  sortable?: boolean;
+}
+export interface TableListProps<T extends object> {
+  autoPagination?: boolean;
+  name: string;
+  column: Column<T>[] | (() => Column<T>[]);
+  style?: "UI" | "Default";
+  align?: "center" | "left" | "right";
+  onLoad:
+    | ((params: {
+        search?: string;
+        sort?: SortingState;
+        take: number;
+        paging: number;
+      }) => Promise<any[]>)
+    | any[];
+  take?: number;
+  header?: {
+    sideLeft?: (local: any) => React.ReactNode;
+    sideRight?: (local: any) => React.ReactNode;
+  };
+  disabledPagination?: boolean;
+  disabledHeader?: boolean;
+  disabledHeadTable?: boolean;
+  hiddenNoRow?: boolean;
+  disabledHoverRow?: boolean;
+  onInit?: (local: any) => void;
+  onCount?: (
+    params?:
+      | {
+          search?: string;
+          take: number;
+          paging: number;
+        }
+      | string
+  ) => Promise<number>;
+  fm?: any;
+  mode?: "form" | "table";
+  feature?: string[];
+  onChange?: (data: any) => void;
+  filter?: boolean;
+}
 
-export const TableList: React.FC<any> = ({
+export interface FieldFilterProps extends Omit<FieldProps, "fm"> {
+  fm?: any; // Membuat `fm` nullable
+}
+
+export const TableList = <T extends object>({
   autoPagination = true,
   name,
   column,
@@ -44,11 +118,12 @@ export const TableList: React.FC<any> = ({
   onInit,
   onCount,
   fm,
-  mode,
+  mode = "table",
   feature,
   onChange,
-}) => {
-  const [show, setShow] = useState(true as boolean);
+  filter = true,
+}: TableListProps<T>) => {
+  const [show, setShow] = useState(false as boolean);
   const [data, setData] = useState<any[]>([]);
   const sideLeft =
     typeof header?.sideLeft === "function" ? header.sideLeft : null;
@@ -68,6 +143,8 @@ export const TableList: React.FC<any> = ({
       : false;
 
   const local = useLocal({
+    fieldFilter: [] as FieldFilterProps[],
+    fieldResultFilter: {} as any,
     table: null as any,
     data: [] as any[],
     dataForm: [] as any[],
@@ -119,13 +196,14 @@ export const TableList: React.FC<any> = ({
           {"Loading..."}
         </>
       );
-
+      console.log(local.fieldResultFilter);
       if (typeof onCount === "function") {
         const params = await events("onload-param", {
           take: 1,
           paging: 1,
           search: local.search,
           ...local.filter,
+          ...local.fieldResultFilter,
         });
         const res = await onCount(params);
         local.count = res;
@@ -145,6 +223,7 @@ export const TableList: React.FC<any> = ({
           sort: local.sort,
           take,
           paging: 1,
+          ...local.fieldResultFilter,
         });
         if (!autoPagination) {
           res = paginateArray(res, take, 1);
@@ -225,6 +304,33 @@ export const TableList: React.FC<any> = ({
     }
   };
   useEffect(() => {
+    try {
+      if (Array.isArray(column) && column?.length) {
+        const dateIndex = column.findIndex((e) => e.type === "date");
+        const result: FieldFilterProps[] = column
+          .filter(
+            (e, index) =>
+              e.filter !== false && (e.type !== "date" || index === dateIndex)
+          ) // Hapus jika `false`
+          .map((e) => ({
+            name: e?.nameFilter || e.name,
+            label: e?.header && typeof e?.header === "string" ? e.header : "", // Default null jika tidak ada label
+            type:
+              typeof e.onLoadFilter === "function"
+                ? "dropdown-async"
+                : e.type === "file"
+                ? "text"
+                : e.type ?? "text", // Default null jika tidak ada type
+            onLoad: e.onLoadFilter, // Jika `undefined`, `null`, atau bukan boolean, default `true`
+            onValue: e?.onValue,
+            onLabel: e?.onLabel,
+            pagination: e?.pagination,
+            search: e?.search,
+          }));
+        local.fieldFilter = result;
+        local.render();
+      }
+    } catch (ex) {}
     const run = async () => {
       toast.info(
         <>
@@ -285,16 +391,14 @@ export const TableList: React.FC<any> = ({
             local.count = res?.length;
           }
           local.data = res;
-          if (mode === "form") cloneListFM(res);
           local.render();
           setData(local.data);
         } else {
-          let res = onLoad;
+          let res: any[] = onLoad;
           if (!autoPagination) {
             res = paginateArray(res, take, 1);
           }
           local.data = res;
-          if (mode === "form") cloneListFM(res);
           local.render();
           setData(local.data);
         }
@@ -394,6 +498,7 @@ export const TableList: React.FC<any> = ({
         ]
       : [...defaultColumns]
   );
+
   const [columnResizeMode, setColumnResizeMode] =
     React.useState<ColumnResizeMode>("onChange");
 
@@ -506,26 +611,132 @@ export const TableList: React.FC<any> = ({
                   </div>
                 </form>
               </div>
-              <div className="flex flex-row items-center">
-                {/* <Popover
-                  classNameTrigger={""}
-                  arrow={false}
-                  className="rounded-md"
-                  onOpenChange={(open: any) => {
-                    setShow(true);
-                  }}
-                  open={show}
-                  content={
-                    <div className="flex flex-row px-2 py-4 gap-y-2 items-center">
-                      asdasd
-                    </div>
-                  }
-                >
-                  <ButtonContainer>
-                    <Filter />
-                  </ButtonContainer>
-                </Popover> */}
-              </div>
+              {mode === "table" && filter && local?.fieldFilter?.length ? (
+                <div className="flex flex-row items-center">
+                  <Popover
+                    classNameTrigger={""}
+                    arrow={show}
+                    className="rounded-md"
+                    onOpenChange={(open: any) => {
+                      setShow(open);
+                    }}
+                    open={show}
+                    content={
+                      <div className="flex flex-col p-4 w-80 gap-y-1">
+                        {/* <div className="text-md font-semibold">Filter</div> */}
+
+                        <Form
+                          toastMessage="Filter"
+                          onSubmit={async (fm: any) => {
+                            local.fieldResultFilter = fm?.data;
+                            local.render();
+                            local.refresh();
+                            setShow(false);
+                          }}
+                          onLoad={async () => {
+                            return { ...local.fieldResultFilter };
+                          }}
+                          showResize={false}
+                          header={(fm: any) => {
+                            return <></>;
+                          }}
+                          children={(fm: any) => {
+                            return (
+                              <>
+                                <div
+                                  className={cx(
+                                    "flex flex-col flex-wrap  rounded-sm"
+                                  )}
+                                >
+                                  <div className="flex-grow grid gap-y-2">
+                                    {local.fieldFilter?.map((e, idx) => {
+                                      if (e?.type === "date") {
+                                        const fm_row = {
+                                          data: fm?.data?.[e?.name],
+                                          ...fm,
+                                          render: () => {
+                                            fm.render();
+                                            fm.data[e?.name] = fm_row.data;
+                                            fm.render();
+                                          },
+                                        };
+                                        return (
+                                          <div
+                                            key={`field-filter-${idx}`}
+                                            className=" grid grid-cols-2 gap-2"
+                                          >
+                                            <Field
+                                              fm={fm}
+                                              name={"start_date"}
+                                              label={e?.label}
+                                              type={"date"}
+                                              placeholder={`From`}
+                                            />
+                                            <Field
+                                              fm={fm}
+                                              name={"end_date"}
+                                              label={e?.label}
+                                              type={"date"}
+                                              placeholder={`To`}
+                                              visibleLabel={true}
+                                            />
+                                          </div>
+                                        );
+                                      }
+                                      return (
+                                        <div key={`field-filter-${idx}`}>
+                                          <Field
+                                            fm={fm}
+                                            label={e?.label}
+                                            type={e?.type}
+                                            placeholder={`Search${
+                                              e?.label ? ` ${e?.label}` : "..."
+                                            }`}
+                                            {...e}
+                                          />
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                  <div className="flex flex-row items-center justify-end py-2 w-full gap-x-2">
+                                    <ButtonBetter
+                                      className="rounded-full w-full px-6 "
+                                      variant={"outline"}
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        fm.data = {};
+                                        fm.render();
+                                        fm.submit();
+                                      }}
+                                    >
+                                      Clear
+                                    </ButtonBetter>
+                                    <ButtonBetter className="rounded-full w-full px-6 ">
+                                      Apply
+                                    </ButtonBetter>
+                                  </div>
+                                </div>
+                              </>
+                            );
+                          }}
+                        />
+                      </div>
+                    }
+                  >
+                    <ButtonContainer
+                      onClick={() => {
+                        setShow(true);
+                      }}
+                    >
+                      <Filter />
+                    </ButtonContainer>
+                  </Popover>
+                </div>
+              ) : (
+                <></>
+              )}
+
               <div className="flex">{sideRight ? sideRight(local) : <></>}</div>
             </div>
           </div>

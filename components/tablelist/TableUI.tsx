@@ -1,12 +1,22 @@
 "use client";
 import React from "react";
-import { TableList } from "./TableList";
+import { TableList, TableListProps } from "./TableList";
 import { useLocal } from "@/lib/utils/use-local";
 import get from "lodash.get";
 import { TabHeaderBetter } from "../tablist/TabHeaderBetter";
 import { getNumber } from "@/lib/utils/getNumber";
 import { BreadcrumbBetterLink } from "../ui/breadcrumb-link";
-export const TableUI: React.FC<any> = ({
+export interface TableUIProps<T extends object> extends TableListProps<T> {
+  tabHeader?: ((local: any) => React.ReactNode) | React.ReactNode;
+  modeTab?: "default" | "only-title";
+  tab?: { id: string; name: string; count?: number | null }[]; // ✅ Update count menjadi nullable
+  onTab?: (tabId: string | null | undefined) => void;
+  breadcrumb?: { label: string; href: string }[];
+  title?: string;
+  ready?: boolean;
+}
+
+export const TableUI = <T extends object>({
   tabHeader,
   name,
   modeTab,
@@ -23,16 +33,15 @@ export const TableUI: React.FC<any> = ({
   onInit,
   onCount,
   fm,
-  mode,
+  mode = "table",
   feature,
   onChange,
-  delete_name,
-  title,
   tab,
   onTab,
   breadcrumb,
+  title,
   ready = true,
-}) => {
+}: TableUIProps<T>) => {
   const local = useLocal({
     tab: get(tab, "[0].id"),
     table: null as any,
