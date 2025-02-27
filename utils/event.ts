@@ -1,8 +1,9 @@
 import get from "lodash.get";
 import { generateQueryString } from "./generateQueryString";
+import { empty } from "./isStringEmpty";
 
 type EventActions = "before-onload" | "onload-param" | string;
-export const events = async (action: EventActions, data: any) => {
+export const events = async (action: EventActions, data: any, param?: any) => {
   switch (action) {
     case "onload-param":
       let params = {
@@ -23,7 +24,10 @@ export const events = async (action: EventActions, data: any) => {
       delete params["sort"];
       delete params["paging"];
       delete params["take"];
-      return generateQueryString(params);
+      const result = generateQueryString(params);
+      const parameter2 =
+        typeof param === "string" && param ? param?.replace(/^\?/, "") : "";
+      return `${result}${!empty(parameter2) ? `&${parameter2}` : ``}`;
       return;
       break;
 
