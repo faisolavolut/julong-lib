@@ -261,7 +261,11 @@ export const TableEditBetter: React.FC<any> = ({
                               }
                             >
                               <div className="flex items-center h-full flex-grow p-2">
-                                <span>{col?.header()}</span>
+                                <span>
+                                  {typeof col?.header === "function"
+                                    ? col?.header()
+                                    : col.header}
+                                </span>
                               </div>
                             </HeaderColumn>
                           );
