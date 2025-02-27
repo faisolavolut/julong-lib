@@ -10,11 +10,10 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Label, Table } from "flowbite-react";
 import { HiChevronLeft, HiChevronRight, HiPlus } from "react-icons/hi";
 import { useLocal } from "@/lib/utils/use-local";
-import { debouncedHandler } from "@/lib/utils/debounceHandler";
 import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa6";
 import Link from "next/link";
 import { init_column } from "./lib/column";
@@ -196,7 +195,6 @@ export const TableList = <T extends object>({
           {"Loading..."}
         </>
       );
-      console.log(local.fieldResultFilter);
       if (typeof onCount === "function") {
         const params = await events("onload-param", {
           take: 1,
@@ -273,6 +271,8 @@ export const TableList = <T extends object>({
           sort: local.sort,
           take,
           paging: local.paging,
+          ...local.filter,
+          ...local.fieldResultFilter,
         });
         if (!autoPagination) {
           res = paginateArray(res, take, local.paging);
@@ -360,6 +360,7 @@ export const TableList = <T extends object>({
             paging: 1,
             search: local.search,
             ...local.filter,
+            ...local.fieldResultFilter,
           });
           const res = await onCount(params);
           local.count = res;
@@ -383,6 +384,8 @@ export const TableList = <T extends object>({
             sort: local.sort,
             take,
             paging: 1,
+            ...local.filter,
+            ...local.fieldResultFilter,
           });
           if (!autoPagination) {
             res = paginateArray(res, take, 1);
@@ -552,12 +555,6 @@ export const TableList = <T extends object>({
     onStateChange: setState,
     debugTable: state.pagination.pageIndex > 2,
   }));
-  const handleSearch = useCallback(
-    debouncedHandler(() => {
-      local.refresh();
-    }, 1000),
-    []
-  );
   return (
     <>
       <div className="tbl-wrapper flex flex-grow flex-col">
@@ -586,7 +583,7 @@ export const TableList = <T extends object>({
 
             <div className="ml-auto flex items-center flex-row gap-x-1">
               <div className="tbl-search hidden items-center sm:mb-0 sm:flex sm:divide-x sm:divide-gray-100">
-                <form
+                <div
                   onSubmit={async (e) => {
                     e.preventDefault();
                     await local.reload();
@@ -597,19 +594,19 @@ export const TableList = <T extends object>({
                   </Label>
                   <div className="relative  lg:w-56">
                     <InputSearch
-                      // className="bg-white search text-xs "
                       id="users-search"
+                      delay={1000}
                       name="users-search"
                       placeholder={`Search`}
                       onChange={(e) => {
                         const value = e.target.value;
                         local.search = value;
                         local.render();
-                        handleSearch();
+                        local.refresh();
                       }}
                     />
                   </div>
-                </form>
+                </div>
               </div>
               {mode === "table" && filter && local?.fieldFilter?.length ? (
                 <div className="flex flex-row items-center">
