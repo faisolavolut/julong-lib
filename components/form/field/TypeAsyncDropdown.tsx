@@ -341,7 +341,6 @@ export const TypeAsyncDropdown: React.FC<any> = ({
         isClearable={clearable}
         onMenuOpen={() => {
           if (autoRefresh) {
-            setAdditionalData((prev) => ({ page: 1, uniq: prev.uniq + 1 })); // Refresh API saat menu dibuka jika autoRefresh true
           } else {
           }
           console.log(additionalData);
