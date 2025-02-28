@@ -290,7 +290,6 @@ export const TypeAsyncDropdown: React.FC<any> = ({
   return (
     <div ref={selectRef} className="w-full">
       <AsyncPaginate
-        isLoading={true}
         menuIsOpen={open}
         key={refreshKey}
         placeholder={disabled ? "" : placeholderField}
