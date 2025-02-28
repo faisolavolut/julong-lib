@@ -23,10 +23,8 @@ export const TypeTag: React.FC<any> = ({
     }
   }, [val]);
   useEffect(() => {
-    console.log("MASUK", tags);
     fm.data[name] = tags;
     fm.render();
-    console.log("MASUK");
     if (typeof onChange === "function") {
       onChange(tags);
     }
