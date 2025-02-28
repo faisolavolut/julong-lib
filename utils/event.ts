@@ -27,8 +27,10 @@ export const events = async (action: EventActions, data: any, param?: any) => {
       const result = generateQueryString(params);
       const parameter2 =
         typeof param === "string" && param ? param?.replace(/^\?/, "") : "";
-      return `${result}${!empty(parameter2) ? `&${parameter2}` : ``}`;
-      return;
+      if (result)
+        return `${result}${!empty(parameter2) ? `&${parameter2}` : ``}`;
+      if (empty(result) && !empty(param)) return param;
+      return "";
       break;
 
     default:

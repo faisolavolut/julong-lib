@@ -25,6 +25,8 @@ export const TypeAsyncDropdown: React.FC<any> = ({
   required = false,
   autoRefresh = false,
 }) => {
+  const [additionalData, setAdditionalData] = useState({ page: 1, cache: 0 });
+
   const [open, setOpen] = useState(false as boolean);
   const [refreshKey, setRefreshKey] = useState(Date.now());
   const selectRef = useRef<HTMLDivElement>(null);
@@ -288,6 +290,7 @@ export const TypeAsyncDropdown: React.FC<any> = ({
   return (
     <div ref={selectRef} className="w-full">
       <AsyncPaginate
+        isLoading={true}
         menuIsOpen={open}
         key={refreshKey}
         placeholder={disabled ? "" : placeholderField}
@@ -337,10 +340,12 @@ export const TypeAsyncDropdown: React.FC<any> = ({
         )}
         isClearable={clearable}
         onMenuOpen={() => {
-          setOpen(true);
           if (autoRefresh) {
-            setRefreshKey(Date.now()); // Refresh API saat menu dibuka jika autoRefresh true
+            setAdditionalData((prev) => ({ page: 1, uniq: prev.uniq + 1 })); // Refresh API saat menu dibuka jika autoRefresh true
+          } else {
           }
+          console.log(additionalData);
+          setOpen(true);
         }}
         onMenuClose={() => {
           setOpen(false);
@@ -369,9 +374,7 @@ export const TypeAsyncDropdown: React.FC<any> = ({
             onChange({ ...e, data: e });
           }
         }}
-        additional={{
-          page: 1,
-        }}
+        additional={additionalData}
       />
     </div>
   );
