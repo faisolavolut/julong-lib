@@ -515,7 +515,7 @@ const SidebarBetterTree: React.FC<TreeMenuProps> = ({
             mini ? "justify-center" : "px-4"
           )}
         >
-          <div className="flex flex-row justify-center flex-grow">
+          <div className="flex flex-row justify-center flex-grow hidden">
             <Popover
               classNameTrigger={cx("flex flex-row justify-center flex-grow")}
               popoverClassName={cx(
