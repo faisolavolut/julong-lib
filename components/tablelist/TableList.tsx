@@ -518,12 +518,12 @@ export const TableList = <T extends object>({
       };
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
-    pageSize: 20,
+    pageSize: take,
   });
   const table = useReactTable({
     data: data,
     columnResizeMode,
-    pageCount: Math.ceil(local.count / 20),
+    pageCount: Math.ceil(local.count / take),
     manualPagination: true,
     columnResizeDirection,
     columns,
@@ -534,7 +534,7 @@ export const TableList = <T extends object>({
     initialState: {
       pagination: {
         pageIndex: 0,
-        pageSize: 20, //custom default page size
+        pageSize: take, //custom default page size
       },
     },
     state: {
@@ -1078,7 +1078,7 @@ export const TableList = <T extends object>({
           setPage={(page: any) => {
             setPagination({
               pageIndex: page,
-              pageSize: 20,
+              pageSize: take,
             });
             local.paging = page;
             local.render();

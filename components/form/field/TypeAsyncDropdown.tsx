@@ -23,6 +23,7 @@ export const TypeAsyncDropdown: React.FC<any> = ({
   pagination = true,
   search = "api",
   required = false,
+  autoRefresh = false,
 }) => {
   const [open, setOpen] = useState(false as boolean);
   const [refreshKey, setRefreshKey] = useState(Date.now());
@@ -203,7 +204,7 @@ export const TypeAsyncDropdown: React.FC<any> = ({
     }
   } else if (typeof value === "object") {
     value = {
-      value: getLabel(value),
+      value: getValue(value),
       label: getLabel(value),
     };
   } else if (
@@ -258,7 +259,9 @@ export const TypeAsyncDropdown: React.FC<any> = ({
         classNameTrigger={""}
         arrow={false}
         className="rounded-md"
-        onOpenChange={(open: any) => {}}
+        onOpenChange={(open: any) => {
+          setOpen(open);
+        }}
         open={true}
         content={
           <div
@@ -335,12 +338,15 @@ export const TypeAsyncDropdown: React.FC<any> = ({
         isClearable={clearable}
         onMenuOpen={() => {
           setOpen(true);
+          if (autoRefresh) {
+            setRefreshKey(Date.now()); // Refresh API saat menu dibuka jika autoRefresh true
+          }
         }}
         onMenuClose={() => {
           setOpen(false);
         }}
-        // closeMenuOnSelect={mode === "dropdown" ? true : false}
-        closeMenuOnSelect={false}
+        closeMenuOnSelect={mode === "dropdown" ? true : false}
+        // closeMenuOnSelect={false}
         getOptionValue={(item) => item.value}
         getOptionLabel={(item) => item.label}
         value={value}

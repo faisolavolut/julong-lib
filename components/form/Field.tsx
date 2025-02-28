@@ -67,6 +67,7 @@ export interface FieldProps {
   pagination?: boolean;
   search?: "api" | "local";
   visibleLabel?: boolean;
+  autoRefresh?: boolean;
 }
 export const Field: React.FC<FieldProps> = ({
   fm,
@@ -97,6 +98,7 @@ export const Field: React.FC<FieldProps> = ({
   target,
   pagination = true,
   search = "api",
+  autoRefresh = false,
 }) => {
   let result = null;
   const field = useLocal({
@@ -217,7 +219,7 @@ export const Field: React.FC<FieldProps> = ({
           <div
             className={cn(
               is_disable
-                ? "border border-gray-100 bg-gray-100"
+                ? "border border-gray-100 bg-gray-100 is_disable"
                 : "border border-gray-300 ",
               "relative field",
               !is_disable
@@ -355,6 +357,7 @@ export const Field: React.FC<FieldProps> = ({
                   <TypeAsyncDropdown
                     label={label}
                     fm={fm}
+                    autoRefresh={autoRefresh}
                     fields={initField}
                     required={required}
                     name={name}
