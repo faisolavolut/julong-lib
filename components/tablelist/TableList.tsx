@@ -1074,7 +1074,7 @@ export const TableList = <T extends object>({
           }}
           disabledNextPage={!table.getCanNextPage()}
           disabledPrevPage={!table.getCanPreviousPage()}
-          page={table.getState().pagination.pageIndex + 1}
+          page={local.paging}
           setPage={(page: any) => {
             setPagination({
               pageIndex: page,
