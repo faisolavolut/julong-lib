@@ -25,8 +25,7 @@ export const TypeAsyncDropdown: React.FC<any> = ({
   required = false,
   autoRefresh = false,
 }) => {
-  const [additionalData, setAdditionalData] = useState({ page: 1, cache: 0 });
-
+  const [cacheUniq, setCacheUniq] = useState(0);
   const [open, setOpen] = useState(false as boolean);
   const [refreshKey, setRefreshKey] = useState(Date.now());
   const selectRef = useRef<HTMLDivElement>(null);
@@ -287,6 +286,13 @@ export const TypeAsyncDropdown: React.FC<any> = ({
       setWidth(selectRef.current.offsetWidth);
     }
   }, [selectRef]);
+  const customFilterOption = (option: any, rawInput: any) => {
+    // option.data berisi data opsi, misalnya label dan value
+    // rawInput adalah string yang diketik pengguna
+    console.log(option, rawInput);
+    return true;
+  };
+  const increaseUniq = (uniq: number) => uniq + 1;
   return (
     <div ref={selectRef} className="w-full">
       <AsyncPaginate
@@ -339,10 +345,7 @@ export const TypeAsyncDropdown: React.FC<any> = ({
         )}
         isClearable={clearable}
         onMenuOpen={() => {
-          if (autoRefresh) {
-          } else {
-          }
-          console.log(additionalData);
+          if (autoRefresh) setCacheUniq(increaseUniq);
           setOpen(true);
         }}
         onMenuClose={() => {
@@ -350,12 +353,14 @@ export const TypeAsyncDropdown: React.FC<any> = ({
         }}
         closeMenuOnSelect={mode === "dropdown" ? true : false}
         // closeMenuOnSelect={false}
+        cacheUniqs={[cacheUniq]}
         getOptionValue={(item) => item.value}
         getOptionLabel={(item) => item.label}
         value={value}
         components={{ MultiValue, Option, Menu: CustomMenu }}
         loadOptions={loadOptions}
         isSearchable={true}
+        // filterOption={customFilterOption}
         isMulti={mode === "multi"}
         onChange={(e) => {
           setOpen(mode === "dropdown" ? false : true);
@@ -372,7 +377,9 @@ export const TypeAsyncDropdown: React.FC<any> = ({
             onChange({ ...e, data: e });
           }
         }}
-        additional={additionalData}
+        additional={{
+          page: 1,
+        }}
       />
     </div>
   );

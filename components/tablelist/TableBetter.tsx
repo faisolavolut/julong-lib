@@ -153,7 +153,6 @@ export const TableEditBetter: React.FC<any> = ({
     setColumns(col);
     local.data = fm?.data[name] || [];
     local.render();
-    console.log(columns);
     fm.fields[name] = {
       name: name,
       type: "table",
@@ -173,7 +172,7 @@ export const TableEditBetter: React.FC<any> = ({
     <>
       <div className="tbl-wrapper flex flex-grow flex-col">
         {!disabledHeader ? (
-          <div className="head-tbl-list block items-start justify-between  bg-white px-0 py-4 sm:flex">
+          <div className="px-2 head-tbl-list block items-start justify-between  bg-white px-0 py-4 sm:flex">
             <div className="flex flex-row h-full">
               <div className="sm:flex flex flex-col space-y-2 flex-grow">
                 <div className="flex flex-grow flex-row">
