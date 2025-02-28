@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from "react";
-import get from "lodash.get";
+import { useRef, useState } from "react";
 
 export const TypeTag: React.FC<any> = ({
   name,
@@ -11,24 +10,12 @@ export const TypeTag: React.FC<any> = ({
   field,
   onChange,
 }) => {
-  const [tags, setTags] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>(fm.data?.[name] || []);
   const [inputValue, setInputValue] = useState("");
   const [editingIndex, setEditingIndex] = useState<number | null>(null); // Index tag yang sedang diedit
   const [tempValue, setTempValue] = useState<string>(""); // Nilai sementara untuk pengeditan
   const tagRefs = useRef<(HTMLDivElement | null)[]>([]);
   const val = fm?.data?.[name];
-  useEffect(() => {
-    if (get(fm, `data.[${name}].length`)) {
-      setTags(fm.data?.[name]);
-    }
-  }, [val]);
-  useEffect(() => {
-    fm.data[name] = tags;
-    fm.render();
-    if (typeof onChange === "function") {
-      onChange(tags);
-    }
-  }, [inputValue]);
   const handleSaveEdit = (index: number) => {
     if (!disabled) return;
     const updatedTags = [...tags];
@@ -36,6 +23,9 @@ export const TypeTag: React.FC<any> = ({
     setTags(updatedTags);
     setEditingIndex(null); // Keluar dari mode edit
     setTempValue(""); // Reset nilai sementara
+
+    fm.data[name] = updatedTags;
+    fm.render();
     if (typeof onChange === "function") {
       onChange(tags);
     }
@@ -51,6 +41,11 @@ export const TypeTag: React.FC<any> = ({
       e.stopPropagation();
       setTags([...tags, inputValue]);
       setInputValue("");
+      fm.data[name] = [...tags, inputValue];
+      fm.render();
+      if (typeof onChange === "function") {
+        onChange(tags);
+      }
     } else if (e.key === "Backspace" && !inputValue && tags.length > 0) {
       setTags(tags.slice(0, -1));
     }
