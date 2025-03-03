@@ -43,24 +43,23 @@ export const showApprovel = (
   const isField = data?.organization_category === "Non Field" ? false : true;
   if (data?.status === "NEED APPROVAL") {
     if (data?.department_head && !data?.vp_gm_director) {
-      return {
-        approve:
-          action === "reject"
-            ? "REJECTED"
-            : isField
-            ? "APPROVED"
-            : "NEED APPROVAL",
-        level: "Level VP",
-      };
+      if (role.dir) {
+        return {
+          approve:
+            action === "reject"
+              ? "REJECTED"
+              : isField
+              ? "APPROVED"
+              : "NEED APPROVAL",
+          level: "Level VP",
+        };
+      } else {
+        return null;
+      }
     } else if (data?.vp_gm_director && !data?.ceo) {
       return null;
-      return {
-        approve: action === "reject" ? "REJECTED" : "APPROVED",
-        level: "Level VP",
-      };
     }
   } else if (data?.status === "IN PROGRESS") {
-    console.log(data?.requestor_id, get_user("employee.id"));
     const isYou = data?.requestor_id === get_user("employee.id");
     if (role?.head)
       return {
@@ -88,7 +87,6 @@ export const showApprovel = (
     if (role?.head) {
       return null;
     }
-    console.log({ role });
     if (isBudget) {
       if (!data?.hrd_ho_unit_name) {
         return {
@@ -97,6 +95,7 @@ export const showApprovel = (
         };
       }
     } else {
+      // off budget
       if (data?.department_head && !data?.vp_gm_director) {
         return {
           approve:
