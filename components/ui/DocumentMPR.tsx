@@ -278,7 +278,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
                     height: 20,
                   }}
                 >
-                  <Text>1</Text>
+                  <Text>{getNumber(get(data, "revised"))}</Text>
                 </View>
               </View>
               <View
@@ -366,7 +366,11 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
                     borderColor: "black",
                   }}
                 >
-                  <Text>1 dari 1</Text>
+                  <Text
+                    render={({ pageNumber, totalPages }) =>
+                      `${pageNumber} dari ${totalPages}`
+                    }
+                  />
                 </View>
               </View>
             </View>
@@ -1310,8 +1314,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
             <View
               style={{
                 display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
+                flexDirection: "row",
                 borderBottom: 1,
                 borderRight: 1,
                 borderColor: "black",
@@ -1322,6 +1325,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
                   display: "flex",
                   flexDirection: "row",
                   alignItems: "center",
+                  justifyContent: "center",
                   flexGrow: 1,
                 }}
               >
@@ -1340,7 +1344,6 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
               style={{
                 display: "flex",
                 flexDirection: "row",
-                alignItems: "center",
                 flexGrow: 1,
               }}
             >
@@ -1367,7 +1370,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
                   style={{
                     display: "flex",
                     flexDirection: "row",
-                    alignItems: "center",
+                    alignItems: "flex-start",
                   }}
                 >
                   <View
@@ -1467,7 +1470,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
                   style={{
                     display: "flex",
                     flexDirection: "row",
-                    alignItems: "center",
+                    alignItems: "flex-start",
                   }}
                 >
                   <View
@@ -1694,7 +1697,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
                   style={{
                     display: "flex",
                     flexDirection: "row",
-                    alignItems: "center",
+                    alignItems: "flex-start",
                   }}
                 >
                   <View
