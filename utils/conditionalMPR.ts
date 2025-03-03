@@ -97,20 +97,24 @@ export const showApprovel = (
     } else {
       // off budget
       if (data?.department_head && !data?.vp_gm_director) {
-        return {
-          approve:
-            action === "reject"
-              ? "REJECTED"
-              : isField
-              ? "APPROVED"
-              : "NEED APPROVAL",
-          level: "Level VP",
-        };
+        if (role.dir) {
+          return {
+            approve:
+              action === "reject"
+                ? "REJECTED"
+                : isField
+                ? "APPROVED"
+                : "NEED APPROVAL",
+            level: "Level VP",
+          };
+        }
       } else if (!data?.hrd_ho_unit) {
-        return {
-          approve: action === "reject" ? "REJECTED" : "COMPLETED",
-          level: "Level HRD HO",
-        };
+        if (role.ho_unit) {
+          return {
+            approve: action === "reject" ? "REJECTED" : "COMPLETED",
+            level: "Level HRD HO",
+          };
+        }
       }
     }
   }
