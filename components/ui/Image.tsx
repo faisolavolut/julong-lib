@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface ImageWithFallbackProps {
   src: string;
@@ -14,6 +14,11 @@ const ImageBetter = ({
   className,
 }: ImageWithFallbackProps) => {
   const [imageSrc, setImageSrc] = useState(src);
+
+  // Menangani perubahan `src` agar selalu diperbarui ke `imageSrc`
+  useEffect(() => {
+    setImageSrc(src);
+  }, [src]);
 
   return (
     <img
