@@ -228,7 +228,7 @@ export const Field: React.FC<FieldProps> = ({
                   : "focus-within:border focus-within:border-primary"
                 : "",
               style === "underline" || style === "gform"
-                ? "rounded-none border-transparent border-b-gray-300"
+                ? "rounded-none border-transparent border-b-gray-300 "
                 : "",
               [
                 "rating",
@@ -253,6 +253,8 @@ export const Field: React.FC<FieldProps> = ({
               classField,
               error
                 ? "flex flex-row rounded-md flex-grow border-red-500 border items-center"
+                : style === "underline"
+                ? "flex flex-row rounded-none flex-grow  items-center"
                 : "flex flex-row rounded-md flex-grow  items-center"
             )}
           >
