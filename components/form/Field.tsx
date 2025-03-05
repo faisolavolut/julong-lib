@@ -134,7 +134,8 @@ export const Field: React.FC<FieldProps> = ({
     pagination,
     search,
   };
-  const is_disable = fm.mode === "view" ? true : disabled;
+  const is_disable =
+    disabled === false ? false : fm.mode === "view" ? true : disabled;
   const error = fm.error?.[name];
   useEffect(() => {
     setTimeout(() => {
