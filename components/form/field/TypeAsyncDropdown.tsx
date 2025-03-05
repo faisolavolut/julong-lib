@@ -191,8 +191,55 @@ export const TypeAsyncDropdown: React.FC<any> = ({
   const clearable =
     mode === "dropdown" && required ? false : mode === "multi" ? true : true;
   let value = fm.data[name];
-  if (mode === "multi") {
-    if (Array.isArray(value) && value?.length) {
+  if (value) {
+    if (mode === "multi") {
+      if (Array.isArray(value) && value?.length) {
+        value = value.map((e) => {
+          return {
+            ...e,
+            value: getValue(e),
+            label: getLabel(e),
+          };
+        });
+      } else {
+        value = [];
+      }
+    } else if (typeof value === "object") {
+      value = value
+        ? {
+            value: getValue(value),
+            label: getLabel(value),
+          }
+        : null;
+    } else if (
+      !target &&
+      typeof value !== "object" &&
+      typeof value === "string" &&
+      value
+    ) {
+      value = value
+        ? onValue === onLabel
+          ? {
+              value: value,
+              label: value,
+            }
+          : {
+              value: value,
+              label: getLabel(value),
+            }
+        : null;
+    } else if (typeof value === "string") {
+      value =
+        onValue === onLabel
+          ? {
+              value: value,
+              label: value,
+            }
+          : {
+              value: value,
+              label: typeof onLabel === "string" ? value : getLabel(value),
+            };
+    } else if (Array.isArray(value) && value?.length) {
       value = value.map((e) => {
         return {
           ...e,
@@ -200,55 +247,15 @@ export const TypeAsyncDropdown: React.FC<any> = ({
           label: getLabel(e),
         };
       });
-    } else {
-      value = [];
-    }
-  } else if (typeof value === "object") {
-    value = {
-      value: getValue(value),
-      label: getLabel(value),
-    };
-  } else if (
-    !target &&
-    typeof value !== "object" &&
-    typeof value === "string" &&
-    value
-  ) {
-    value =
-      onValue === onLabel
+    } else if (typeof value === "object" && value) {
+      value = value
         ? {
-            value: value,
-            label: value,
-          }
-        : {
-            value: value,
+            ...value,
+            value: getValue(value),
             label: getLabel(value),
-          };
-  } else if (typeof value === "string") {
-    value =
-      onValue === onLabel
-        ? {
-            value: value,
-            label: value,
           }
-        : {
-            value: value,
-            label: typeof onLabel === "string" ? value : getLabel(value),
-          };
-  } else if (Array.isArray(value) && value?.length) {
-    value = value.map((e) => {
-      return {
-        ...e,
-        value: getValue(e),
-        label: getLabel(e),
-      };
-    });
-  } else if (typeof value === "object" && value) {
-    value = {
-      ...value,
-      value: getValue(value),
-      label: getLabel(value),
-    };
+        : value;
+    }
   }
   const CustomMenu = (props: any) => {
     return (
