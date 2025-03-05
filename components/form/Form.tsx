@@ -34,6 +34,7 @@ export const Form: React.FC<any> = ({
   const local = useLocal({
     ready: false,
     data: null as any | null,
+    btn_ready: true,
     submit: async () => {
       toast.info(
         <>
@@ -56,6 +57,8 @@ export const Form: React.FC<any> = ({
           {toastMessage ? `${toastMessage}...` : "Saving..."}
         </>
       );
+      local.btn_ready = false;
+      local.render();
       try {
         const fieldDate: any = local?.fields;
         let isError = false;
@@ -201,6 +204,8 @@ export const Form: React.FC<any> = ({
           }
         );
       }
+      local.btn_ready = true;
+      local.render();
     },
     reload: async () => {
       local.ready = false;
@@ -296,7 +301,7 @@ export const Form: React.FC<any> = ({
 
       local.ready = true;
       local.data = res;
-      local.render(); // Panggil render setelah data diperbarui
+      local.render();
       if (typeof afterLoad === "function") {
         await afterLoad(local);
       }
