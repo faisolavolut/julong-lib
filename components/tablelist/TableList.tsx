@@ -743,7 +743,7 @@ export const TableList = <T extends object>({
 
         <div className="flex flex-col flex-grow">
           <div className="overflow-auto relative flex-grow flex-row">
-            <div className="tbl absolute top-0 left-0 inline-block flex-grow w-full h-full align-middle">
+            <div className="tablelist absolute top-0 left-0 inline-block flex-grow w-full h-full align-middle">
               <div className="relative">
                 <Table
                   className={cx(
