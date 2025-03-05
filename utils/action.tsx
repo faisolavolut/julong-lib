@@ -11,6 +11,7 @@ export const actionToast = async (data: {
   msg_succes?: string;
   msg_error?: string;
   msg_load?: string;
+  hidden_icon?: boolean;
 }) => {
   const {
     task,
@@ -21,6 +22,7 @@ export const actionToast = async (data: {
     msg_error,
     msg_load,
     failed,
+    hidden_icon,
   } = data;
 
   try {
@@ -75,7 +77,11 @@ export const actionToast = async (data: {
       toast.error(
         <div className="flex flex-col w-full">
           <div className="flex text-red-600 items-center">
-            <AlertTriangle className="h-4 w-4 mr-1" />
+            {hidden_icon !== true ? (
+              <AlertTriangle className="h-4 w-4 mr-1" />
+            ) : (
+              <></>
+            )}
             {msg_error ? msg_error : " Failed"}{" "}
             {get(ex, "response.data.meta.message") || ex.message}.
           </div>
