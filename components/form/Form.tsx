@@ -92,7 +92,6 @@ export const Form: React.FC<any> = ({
                   const fieldRequired = Object.values(item?.fields).filter(
                     (field: any) => field?.required
                   );
-                  console.log({ fieldRequired });
                   fieldRequired.forEach((subField: any) => {
                     let keySub = subField?.name;
                     const typeSub = subField?.type;
