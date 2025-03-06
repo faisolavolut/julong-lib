@@ -111,39 +111,52 @@ export const TableListBetter: React.FC<any> = ({
             )}
           />
           {"Loading..."}
-        </>
+        </>,
+        {
+          duration: Infinity,
+        }
       );
-      if (Array.isArray(onLoad)) {
-        local.data = onLoad;
-        local.render();
-        setData(onLoad);
-      } else {
-        const res: any = onLoad({
-          search: local.search,
-          sort: local.sort,
-          take,
-          paging: 1,
-        });
-        if (res instanceof Promise) {
-          res.then((e) => {
-            local.data = e;
-            cloneListFM(e);
-            local.render();
-            setData(e);
-            setTimeout(() => {
-              toast.dismiss();
-            }, 2000);
-          });
-        } else {
-          local.data = res;
-          cloneListFM(res);
+      try {
+        if (Array.isArray(onLoad)) {
+          local.data = onLoad;
           local.render();
-          setData(res);
+          setData(onLoad);
           setTimeout(() => {
             toast.dismiss();
-          }, 2000);
+          }, 100);
+        } else {
+          const res: any = onLoad({
+            search: local.search,
+            sort: local.sort,
+            take,
+            paging: 1,
+          });
+          if (res instanceof Promise) {
+            res.then((e) => {
+              local.data = e;
+              cloneListFM(e);
+              local.render();
+              setData(e);
+              setTimeout(() => {
+                toast.dismiss();
+              }, 100);
+            });
+          } else {
+            local.data = res;
+            cloneListFM(res);
+            local.render();
+            setData(res);
+            setTimeout(() => {
+              toast.dismiss();
+            }, 100);
+          }
         }
+      } catch (ex: any) {
+        console.error(get(ex, "response.data.meta.message") || ex.message);
       }
+      setTimeout(() => {
+        toast.dismiss();
+      }, 100);
     },
   });
   const cloneListFM = (data: any[]) => {
@@ -173,35 +186,48 @@ export const TableListBetter: React.FC<any> = ({
             )}
           />
           {"Loading..."}
-        </>
+        </>,
+        {
+          duration: Infinity,
+        }
       );
-      if (typeof onCount === "function") {
-        const res = await onCount();
-        local.count = res;
+      try {
+        if (typeof onCount === "function") {
+          const res = await onCount();
+          local.count = res;
 
-        local.render();
-      }
+          local.render();
+        }
 
-      if (Array.isArray(onLoad)) {
-        local.data = onLoad;
-        cloneListFM(onLoad);
-        local.render();
-        setData(onLoad);
-      } else {
-        const res: any = await onLoad({
-          search: local.search,
-          sort: local.sort,
-          take,
-          paging: 1,
-        });
-        local.data = res;
-        cloneListFM(res);
-        local.render();
-        setData(res);
-        setTimeout(() => {
-          toast.dismiss();
-        }, 2000);
+        if (Array.isArray(onLoad)) {
+          local.data = onLoad;
+          cloneListFM(onLoad);
+          local.render();
+          setData(onLoad);
+          setTimeout(() => {
+            toast.dismiss();
+          }, 100);
+        } else {
+          const res: any = await onLoad({
+            search: local.search,
+            sort: local.sort,
+            take,
+            paging: 1,
+          });
+          local.data = res;
+          cloneListFM(res);
+          local.render();
+          setData(res);
+          setTimeout(() => {
+            toast.dismiss();
+          }, 100);
+        }
+      } catch (ex: any) {
+        console.error(get(ex, "response.data.meta.message") || ex.message);
       }
+      setTimeout(() => {
+        toast.dismiss();
+      }, 100);
     };
     if (typeof onInit === "function") {
       onInit(local);

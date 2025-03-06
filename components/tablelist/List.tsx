@@ -4,6 +4,7 @@ import { useLocal } from "@/lib/utils/use-local";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
+import get from "lodash.get";
 
 export const ListBetter: React.FC<any> = ({
   autoPagination = true,
@@ -82,36 +83,46 @@ export const ListBetter: React.FC<any> = ({
             )}
           />
           {"Loading..."}
-        </>
+        </>,
+        {
+          duration: Infinity,
+        }
       );
       local.ready = false;
       local.render();
-      if (typeof onCount === "function") {
-        const res = await onCount();
-        local.count = res;
-        local.maxPage = Math.ceil(res / take);
-        local.paging = 1;
-        local.render();
+      try {
+        if (typeof onCount === "function") {
+          const res = await onCount();
+          local.count = res;
+          local.maxPage = Math.ceil(res / take);
+          local.paging = 1;
+          local.render();
+        }
+        if (Array.isArray(onLoad)) {
+          let res = onLoad;
+          local.data = res;
+          local.render();
+          setData(res);
+        } else {
+          let res: any = await onLoad({
+            search: local.search,
+            sort: local.sort,
+            take,
+            paging: 1,
+          });
+          local.data = res;
+          local.render();
+          setData(res);
+          setTimeout(() => {
+            toast.dismiss();
+          }, 100);
+        }
+      } catch (ex: any) {
+        console.error(get(ex, "response.data.meta.message") || ex.message);
       }
-      if (Array.isArray(onLoad)) {
-        let res = onLoad;
-        local.data = res;
-        local.render();
-        setData(res);
-      } else {
-        let res: any = await onLoad({
-          search: local.search,
-          sort: local.sort,
-          take,
-          paging: 1,
-        });
-        local.data = res;
-        local.render();
-        setData(res);
-        setTimeout(() => {
-          toast.dismiss();
-        }, 100);
-      }
+      setTimeout(() => {
+        toast.dismiss();
+      }, 100);
       local.ready = true;
       local.render();
     },
@@ -135,28 +146,38 @@ export const ListBetter: React.FC<any> = ({
             )}
           />
           {"Loading..."}
-        </>
+        </>,
+        {
+          duration: Infinity,
+        }
       );
       const listData = local.data || [];
-      if (Array.isArray(onLoad)) {
-        let res = onLoad;
-        local.data = listData.concat(res);
-        local.render();
-        setData(res);
-      } else {
-        let res: any = await onLoad({
-          search: local.search,
-          sort: local.sort,
-          take,
-          paging: local.paging,
-        });
-        local.data = listData.concat(res);
-        local.render();
-        setData(res);
-        setTimeout(() => {
-          toast.dismiss();
-        }, 100);
+      try {
+        if (Array.isArray(onLoad)) {
+          let res = onLoad;
+          local.data = listData.concat(res);
+          local.render();
+          setData(res);
+        } else {
+          let res: any = await onLoad({
+            search: local.search,
+            sort: local.sort,
+            take,
+            paging: local.paging,
+          });
+          local.data = listData.concat(res);
+          local.render();
+          setData(res);
+          setTimeout(() => {
+            toast.dismiss();
+          }, 100);
+        }
+      } catch (ex: any) {
+        console.error(get(ex, "response.data.meta.message") || ex.message);
       }
+      setTimeout(() => {
+        toast.dismiss();
+      }, 100);
     },
   });
   useEffect(() => {
@@ -180,42 +201,49 @@ export const ListBetter: React.FC<any> = ({
             )}
           />
           {"Loading..."}
-        </>
+        </>,
+        {
+          duration: Infinity,
+        }
       );
       local.ready = false;
       local.render();
-      if (typeof onCount === "function") {
-        const res = await onCount();
-        setMaxPage(Math.ceil(res / take));
-        local.maxPage = Math.ceil(res / take);
-        local.count = res;
-        local.render();
-      }
-      if (mode === "form") {
-        local.data = fm.data?.[name] || [];
-        local.render();
-        setData(fm.data?.[name] || []);
-      } else {
-        if (Array.isArray(onLoad)) {
-          local.data = onLoad;
+      try {
+        if (typeof onCount === "function") {
+          const res = await onCount();
+          setMaxPage(Math.ceil(res / take));
+          local.maxPage = Math.ceil(res / take);
+          local.count = res;
           local.render();
-          setData(onLoad);
-        } else if (typeof onLoad === "function") {
-          let res: any = await onLoad({
-            search: local.search,
-            sort: local.sort,
-            take,
-            paging: 1,
-          });
-          local.data = res;
-          local.render();
-          setData(local.data);
-        } else {
-          let res = onLoad;
-          local.data = res;
-          local.render();
-          setData(local.data);
         }
+        if (mode === "form") {
+          local.data = fm.data?.[name] || [];
+          local.render();
+          setData(fm.data?.[name] || []);
+        } else {
+          if (Array.isArray(onLoad)) {
+            local.data = onLoad;
+            local.render();
+            setData(onLoad);
+          } else if (typeof onLoad === "function") {
+            let res: any = await onLoad({
+              search: local.search,
+              sort: local.sort,
+              take,
+              paging: 1,
+            });
+            local.data = res;
+            local.render();
+            setData(local.data);
+          } else {
+            let res = onLoad;
+            local.data = res;
+            local.render();
+            setData(local.data);
+          }
+        }
+      } catch (ex: any) {
+        console.error(get(ex, "response.data.meta.message") || ex.message);
       }
       if (typeof onInit === "function") {
         onInit(local);

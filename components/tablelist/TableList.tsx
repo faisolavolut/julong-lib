@@ -193,7 +193,10 @@ export const TableList = <T extends object>({
             )}
           />
           {"Loading..."}
-        </>
+        </>,
+        {
+          duration: Infinity,
+        }
       );
       if (typeof onCount === "function") {
         const params = await events("onload-param", {
@@ -255,7 +258,10 @@ export const TableList = <T extends object>({
             )}
           />
           {"Loading..."}
-        </>
+        </>,
+        {
+          duration: Infinity,
+        }
       );
       if (Array.isArray(onLoad)) {
         let res = onLoad;
@@ -285,6 +291,9 @@ export const TableList = <T extends object>({
           toast.dismiss();
         }, 100);
       }
+      setTimeout(() => {
+        toast.dismiss();
+      }, 100);
     },
   });
   const cloneListFM = (data: any[]) => {
@@ -351,61 +360,66 @@ export const TableList = <T extends object>({
             )}
           />
           {"Loading..."}
-        </>
+        </>,
+        {
+          duration: Infinity,
+        }
       );
       try {
-        if (typeof onCount === "function") {
-          const params = await events("onload-param", {
-            take: 1,
-            paging: 1,
-            search: local.search,
-            ...local.filter,
-            ...local.fieldResultFilter,
-          });
-          const res = await onCount(params);
-          local.count = res;
+        try {
+          if (typeof onCount === "function") {
+            const params = await events("onload-param", {
+              take: 1,
+              paging: 1,
+              search: local.search,
+              ...local.filter,
+              ...local.fieldResultFilter,
+            });
+            const res = await onCount(params);
+            local.count = res;
+            local.render();
+          }
+        } catch (ex) {}
+        if (mode === "form") {
+          local.data = fm.data?.[name] || [];
+          cloneListFM(fm.data?.[name] || []);
           local.render();
+          setData(fm.data?.[name] || []);
+        } else {
+          if (Array.isArray(onLoad)) {
+            local.data = onLoad;
+            cloneListFM(onLoad);
+            local.render();
+            setData(onLoad);
+          } else if (typeof onLoad === "function") {
+            let res: any = await onLoad({
+              search: local.search,
+              sort: local.sort,
+              take,
+              paging: 1,
+              ...local.filter,
+              ...local.fieldResultFilter,
+            });
+            if (!autoPagination) {
+              res = paginateArray(res, take, 1);
+            }
+            if (!local.count) {
+              local.count = res?.length;
+            }
+            local.data = res;
+            local.render();
+            setData(local.data);
+          } else {
+            let res: any[] = onLoad;
+            if (!autoPagination) {
+              res = paginateArray(res, take, 1);
+            }
+            local.data = res;
+            local.render();
+            setData(local.data);
+          }
         }
       } catch (ex) {}
-      if (mode === "form") {
-        local.data = fm.data?.[name] || [];
-        cloneListFM(fm.data?.[name] || []);
-        local.render();
-        setData(fm.data?.[name] || []);
-      } else {
-        if (Array.isArray(onLoad)) {
-          local.data = onLoad;
-          cloneListFM(onLoad);
-          local.render();
-          setData(onLoad);
-        } else if (typeof onLoad === "function") {
-          let res: any = await onLoad({
-            search: local.search,
-            sort: local.sort,
-            take,
-            paging: 1,
-            ...local.filter,
-            ...local.fieldResultFilter,
-          });
-          if (!autoPagination) {
-            res = paginateArray(res, take, 1);
-          }
-          if (!local.count) {
-            local.count = res?.length;
-          }
-          local.data = res;
-          local.render();
-          setData(local.data);
-        } else {
-          let res: any[] = onLoad;
-          if (!autoPagination) {
-            res = paginateArray(res, take, 1);
-          }
-          local.data = res;
-          local.render();
-          setData(local.data);
-        }
-      }
       setTimeout(() => {
         toast.dismiss();
       }, 100);

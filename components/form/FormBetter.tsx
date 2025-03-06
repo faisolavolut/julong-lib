@@ -1,7 +1,9 @@
 "use client";
+import { notFound } from "next/navigation";
 import { ScrollArea } from "../ui/scroll-area";
 import { Form } from "./Form";
 import { useEffect, useState } from "react";
+import get from "lodash.get";
 
 export const FormBetter: React.FC<any> = ({
   children,
@@ -19,6 +21,10 @@ export const FormBetter: React.FC<any> = ({
   const [fm, setFM] = useState<any>({
     data: null as any,
   });
+  const [show, setShow] = useState(true as boolean);
+  if (!show) {
+    notFound();
+  }
   useEffect(() => {}, [fm.data]);
   return (
     <div className="flex flex-col flex-grow gap-y-3 ">
@@ -37,7 +43,17 @@ export const FormBetter: React.FC<any> = ({
                 children,
                 header,
                 onTitle,
-                onLoad,
+                onLoad: async () => {
+                  try {
+                    const res = await onLoad();
+                    return res;
+                  } catch (ex: any) {
+                    setShow(false);
+                    throw new Error(
+                      get(ex, "response.data.meta.message") || ex.message
+                    );
+                  }
+                },
                 onSubmit,
                 onFooter,
                 showResize,

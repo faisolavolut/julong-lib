@@ -55,7 +55,10 @@ export const Form: React.FC<any> = ({
             )}
           />
           {toastMessage ? `${toastMessage}...` : "Saving..."}
-        </>
+        </>,
+        {
+          duration: Infinity,
+        }
       );
       local.btn_ready = false;
       local.render();
@@ -167,42 +170,50 @@ export const Form: React.FC<any> = ({
           await onSubmit(local);
         }
         setTimeout(() => {
-          toast.success(
-            <div
-              className={cx(
-                "cursor-pointer flex flex-col select-none items-stretch flex-1 w-full"
-              )}
-              onClick={() => {
-                toast.dismiss();
-              }}
-            >
-              <div className="flex text-green-700 items-center success-title font-semibold">
-                <Check className="h-6 w-6 mr-1 " />
+          toast.dismiss();
+          setTimeout(() => {
+            toast.success(
+              <div
+                className={cx(
+                  "cursor-pointer flex flex-col select-none items-stretch flex-1 w-full"
+                )}
+                onClick={() => {
+                  toast.dismiss();
+                }}
+              >
+                <div className="flex text-green-700 items-center success-title font-semibold">
+                  <Check className="h-6 w-6 mr-1 " />
 
-                {toastMessage ? `${toastMessage} success` : "Record Saved"}
+                  {toastMessage ? `${toastMessage} success` : "Record Saved"}
+                </div>
               </div>
-            </div>
-          );
+            );
+          }, 100);
         }, 100);
       } catch (ex: any) {
         const msg = get(ex, "response.data.meta.message") || ex.message;
-        toast.error(
-          <div className="flex flex-col w-full">
-            <div className="flex text-red-600 items-center">
-              <AlertTriangle className="h-4 w-4 mr-1" />
-              {toastMessage
-                ? `${toastMessage} failed ${msg}.`
-                : `Submit Failed ${msg}.`}
-            </div>
-          </div>,
-          {
-            dismissible: true,
-            className: css`
-              background: #ffecec;
-              border: 2px solid red;
-            `,
-          }
-        );
+        setTimeout(() => {
+          toast.dismiss();
+          setTimeout(() => {
+            toast.error(
+              <div className="flex flex-col w-full">
+                <div className="flex text-red-600 items-center">
+                  <AlertTriangle className="h-4 w-4 mr-1" />
+                  {toastMessage
+                    ? `${toastMessage} failed ${msg}.`
+                    : `Submit Failed ${msg}.`}
+                </div>
+              </div>,
+              {
+                dismissible: true,
+                className: css`
+                  background: #ffecec;
+                  border: 2px solid red;
+                `,
+              }
+            );
+          }, 100);
+        }, 100);
       }
       local.btn_ready = true;
       local.render();
@@ -229,13 +240,18 @@ export const Form: React.FC<any> = ({
             )}
           />
           {"Loading..."}
-        </>
+        </>,
+        {
+          duration: Infinity,
+        }
       );
       local.data = null;
       local.render();
-      const res = await onLoad();
+      try {
+        const res = await onLoad();
+        local.data = res;
+      } catch (ex) {}
       local.ready = true;
-      local.data = res;
       local.render();
       if (typeof afterLoad === "function") {
         afterLoad(local);
@@ -243,22 +259,6 @@ export const Form: React.FC<any> = ({
       setTimeout(() => {
         toast.dismiss();
       }, 100);
-
-      // if (res instanceof Promise) {
-      //   res.then((data) => {
-      //     local.ready = true;
-      //     local.data = data;
-      //     local.render(); // Panggil render setelah data diperbarui
-      //     // toast.dismiss();
-      //     // toast.success("Data Loaded Successfully!");
-      //   });
-      // } else {
-      //   local.ready = true;
-      //   local.data = res;
-      //   local.render(); // Panggil render untuk memicu re-render
-      //   toast.dismiss();
-      //   toast.success("Data Loaded Successfully!");
-      // }
     },
     fields: {} as any,
     render: () => {},
@@ -295,19 +295,46 @@ export const Form: React.FC<any> = ({
             )}
           />
           {"Loading..."}
-        </>
+        </>,
+        {
+          duration: Infinity,
+        }
       );
-      const res = await onLoad();
-
+      let res = null as any;
+      try {
+        res = await onLoad();
+        local.data = res;
+        setTimeout(() => {
+          toast.dismiss();
+        }, 100);
+      } catch (ex: any) {
+        const msg = get(ex, "response.data.meta.message") || ex.message;
+        setTimeout(() => {
+          toast.dismiss();
+          setTimeout(() => {
+            toast.error(
+              <div className="flex flex-col w-full">
+                <div className="flex text-red-600 items-center">
+                  <AlertTriangle className="h-4 w-4 mr-1" />
+                  {`Failed ${msg}.`}
+                </div>
+              </div>,
+              {
+                dismissible: true,
+                className: css`
+                  background: #ffecec;
+                  border: 2px solid red;
+                `,
+              }
+            );
+          }, 100);
+        }, 100);
+      }
       local.ready = true;
-      local.data = res;
       local.render();
       if (typeof afterLoad === "function") {
         await afterLoad(local);
       }
-      setTimeout(() => {
-        toast.dismiss();
-      }, 100);
     };
     run();
   }, []);

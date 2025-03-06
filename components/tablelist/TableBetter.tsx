@@ -10,6 +10,7 @@ import { getNumber } from "@/lib/utils/getNumber";
 import { formatMoney } from "@/lib/components/form/field/TypeInput";
 import "react-resizable/css/styles.css";
 import { Resizable } from "react-resizable";
+import get from "lodash.get";
 export const TableEditBetter: React.FC<any> = ({
   name,
   column,
@@ -101,37 +102,44 @@ export const TableEditBetter: React.FC<any> = ({
             )}
           />
           {"Loading..."}
-        </>
-      );
-      if (Array.isArray(onLoad)) {
-        local.data = onLoad;
-        local.render();
-        setData(onLoad);
-      } else {
-        const res: any = onLoad({
-          search: local.search,
-          sort: local.sort,
-          take,
-          paging: 1,
-        });
-        if (res instanceof Promise) {
-          res.then((e) => {
-            local.data = e;
-            local.render();
-            setData(e);
-            setTimeout(() => {
-              toast.dismiss();
-            }, 100);
-          });
-        } else {
-          local.data = res;
-          local.render();
-          setData(res);
-          setTimeout(() => {
-            toast.dismiss();
-          }, 100);
+        </>,
+        {
+          duration: Infinity,
         }
+      );
+      try {
+        if (Array.isArray(onLoad)) {
+          local.data = onLoad;
+          local.render();
+          setData(onLoad);
+        } else {
+          const res: any = onLoad({
+            search: local.search,
+            sort: local.sort,
+            take,
+            paging: 1,
+          });
+          if (res instanceof Promise) {
+            res.then((e) => {
+              local.data = e;
+              local.render();
+              setData(e);
+              setTimeout(() => {
+                toast.dismiss();
+              }, 100);
+            });
+          } else {
+            local.data = res;
+            local.render();
+            setData(res);
+          }
+        }
+      } catch (ex: any) {
+        console.error(get(ex, "response.data.meta.message") || ex.message);
       }
+      setTimeout(() => {
+        toast.dismiss();
+      }, 100);
     },
   });
   // const cloneListFM = (data: any[]) => {

@@ -46,27 +46,31 @@ export const actionToast = async (data: {
           )}
         />
         {msg_load ? msg_load : " Load..."}
-      </>
+      </>,
+      {
+        duration: Infinity,
+      }
     );
     if (typeof task === "function") await task();
     setTimeout(() => {
       toast.dismiss();
-      toast.success(
-        <div
-          className={cx(
-            "cursor-pointer flex flex-col select-none items-stretch flex-1 w-full"
-          )}
-          onClick={() => {
-            toast.dismiss();
-          }}
-        >
-          <div className="flex text-green-700 items-center success-title font-semibold">
-            <Check className="h-6 w-6 mr-1 " />
-            {msg_succes ? msg_succes : " Success"}
+      setTimeout(() => {
+        toast.success(
+          <div
+            className={cx(
+              "cursor-pointer flex flex-col select-none items-stretch flex-1 w-full"
+            )}
+            onClick={() => {
+              toast.dismiss();
+            }}
+          >
+            <div className="flex text-green-700 items-center success-title font-semibold">
+              <Check className="h-6 w-6 mr-1 " />
+              {msg_succes ? msg_succes : " Success"}
+            </div>
           </div>
-        </div>
-      );
-
+        );
+      }, 100);
       if (typeof after === "function") after();
       if (typeof success === "function") success();
     }, 100);
@@ -74,26 +78,28 @@ export const actionToast = async (data: {
     setTimeout(() => {
       if (typeof failed === "function") failed();
       toast.dismiss();
-      toast.error(
-        <div className="flex flex-col w-full">
-          <div className="flex text-red-600 items-center">
-            {hidden_icon !== true ? (
-              <AlertTriangle className="h-4 w-4 mr-1" />
-            ) : (
-              <></>
-            )}
-            {msg_error ? msg_error : " Failed"}{" "}
-            {get(ex, "response.data.meta.message") || ex.message}.
-          </div>
-        </div>,
-        {
-          dismissible: true,
-          className: css`
-            background: #ffecec;
-            border: 2px solid red;
-          `,
-        }
-      );
+      setTimeout(() => {
+        toast.error(
+          <div className="flex flex-col w-full">
+            <div className="flex text-red-600 items-center">
+              {hidden_icon !== true ? (
+                <AlertTriangle className="h-4 w-4 mr-1" />
+              ) : (
+                <></>
+              )}
+              {msg_error ? msg_error : " Failed"}{" "}
+              {get(ex, "response.data.meta.message") || ex.message}.
+            </div>
+          </div>,
+          {
+            dismissible: true,
+            className: css`
+              background: #ffecec;
+              border: 2px solid red;
+            `,
+          }
+        );
+      }, 100);
     }, 100);
   }
 };
