@@ -68,6 +68,7 @@ export interface FieldProps {
   search?: "api" | "local";
   visibleLabel?: boolean;
   autoRefresh?: boolean;
+  forceDisabled?: boolean;
 }
 export const Field: React.FC<FieldProps> = ({
   fm,
@@ -99,6 +100,7 @@ export const Field: React.FC<FieldProps> = ({
   pagination = true,
   search = "api",
   autoRefresh = false,
+  forceDisabled,
 }) => {
   let result = null;
   const field = useLocal({
@@ -135,7 +137,11 @@ export const Field: React.FC<FieldProps> = ({
     search,
   };
   const is_disable =
-    disabled === false ? false : fm.mode === "view" ? true : disabled;
+    typeof forceDisabled === "boolean"
+      ? forceDisabled
+      : fm.mode === "view"
+      ? true
+      : disabled;
   const error = fm.error?.[name];
   useEffect(() => {
     setTimeout(() => {
