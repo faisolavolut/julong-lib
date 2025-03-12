@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import { empty } from "./isStringEmpty";
 dotenv.config();
 export const siteurl = (
   param: string,
@@ -13,6 +14,7 @@ export const siteurl = (
       : port === "mpp"
       ? process.env.NEXT_PUBLIC_API_MPP
       : process.env.NEXT_PUBLIC_BASE_URL
-  }${param}`;
+  }/${param}`;
+  if (empty(param)) return null;
   return `${root_url}`;
 };
