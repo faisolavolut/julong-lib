@@ -69,6 +69,7 @@ export interface FieldProps {
   visibleLabel?: boolean;
   autoRefresh?: boolean;
   forceDisabled?: boolean;
+  description?: string;
 }
 export const Field: React.FC<FieldProps> = ({
   fm,
@@ -101,6 +102,7 @@ export const Field: React.FC<FieldProps> = ({
   search = "api",
   autoRefresh = false,
   forceDisabled,
+  description,
 }) => {
   let result = null;
   const field = useLocal({
@@ -513,7 +515,11 @@ export const Field: React.FC<FieldProps> = ({
             )}
           </div>
         </TooltipBetter>
-
+        {description ? (
+          <div className="text-xs text-gray-500 py-1">{description}</div>
+        ) : (
+          <></>
+        )}
         {error ? (
           <div className="text-sm text-red-500 py-1">{error}</div>
         ) : (

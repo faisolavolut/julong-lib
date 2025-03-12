@@ -41,6 +41,7 @@ export const TableUI = <T extends object>({
   breadcrumb,
   title,
   ready = true,
+  filter = true,
 }: TableUIProps<T>) => {
   const local = useLocal({
     tab: get(tab, "[0].id"),
@@ -142,6 +143,7 @@ export const TableUI = <T extends object>({
             <div className="w-full flex flex-row flex-grow  overflow-hidden ">
               {local.show ? (
                 <TableList
+                  filter={filter}
                   name={name}
                   header={header}
                   column={column}
