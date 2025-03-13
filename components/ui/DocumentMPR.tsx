@@ -13,29 +13,30 @@ import get from "lodash.get";
 import { dayDate } from "@/lib/utils/date";
 import { getNumber } from "@/lib/utils/getNumber";
 Font.register({
-  family: "Noto Sans SC",
-  src: `${process.env.NEXT_PUBLIC_BASE_URL}/NotoSerifSC-Regular.ttf`,
-});
-Font.register({
-  family: "roboto",
-  src: `${process.env.NEXT_PUBLIC_BASE_URL}/Roboto-Medium.ttf`,
-});
-Font.register({
-  family: "roboto-light",
-  src: `${process.env.NEXT_PUBLIC_BASE_URL}/Roboto-Light.ttf`,
+  family: "NotoSansCJK",
+  fonts: [
+    {
+      src: `${process.env.NEXT_PUBLIC_BASE_URL}/NotoSansSC-Regular.otf`,
+      fontWeight: "normal",
+    },
+    {
+      src: `${process.env.NEXT_PUBLIC_BASE_URL}/NotoSansSC-Bold.otf`,
+      fontWeight: "bold",
+    },
+  ],
 });
 // Create styles
 const styles = StyleSheet.create({
   chinese: {
-    fontFamily: "Noto Sans SC", // Font Chinese
+    fontFamily: "NotoSansCJK", // Font Chinese
     fontSize: 10,
   },
   chineseFont: {
-    fontFamily: "Noto Sans SC",
+    fontFamily: "NotoSansCJK",
   },
   page: {
     padding: 20,
-    fontFamily: "roboto",
+    fontFamily: "NotoSansCJK",
     fontSize: 10,
     display: "flex",
     flexDirection: "column",
@@ -429,7 +430,6 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            fontFamily: "roboto-light",
           }}
         >
           <View
@@ -450,45 +450,10 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
               需求人数
             </Text>
           </View>
-
           <Text>
-            : {getNumber(get(data, "male_needs"))} ( Pria{" "}
-            <Text
-              style={{
-                ...styles.chineseFont,
-                width: 100,
-              }}
-            >
-              男{" "}
-            </Text>{" "}
-            ) dan{" "}
-            <Text
-              style={{
-                ...styles.chineseFont,
-                width: 100,
-              }}
-            >
-              和
-            </Text>
-            /atau{" "}
-            <Text
-              style={{
-                ...styles.chineseFont,
-                width: 100,
-              }}
-            >
-              或
-            </Text>{" "}
-            {getNumber(get(data, "female_needs"))} ( Wanita{" "}
-            <Text
-              style={{
-                ...styles.chineseFont,
-                width: 100,
-              }}
-            >
-              女{" "}
-            </Text>{" "}
-            )
+            : {getNumber(get(data, "male_needs"))} ( Pria ) dan 和/atau 或{" "}
+            {getNumber(get(data, "female_needs"))} ( Wanita 女 ), atau 或{" "}
+            {getNumber(get(data, "any_gender"))} (Tidak Terbatas 不限)
           </Text>
         </View>
         <View
@@ -496,7 +461,6 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            fontFamily: "roboto-light",
           }}
         >
           <View
@@ -537,7 +501,6 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            fontFamily: "roboto-light",
           }}
         >
           <View
@@ -596,7 +559,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            fontFamily: "roboto-light",
+
             flexWrap: "wrap",
           }}
         >
@@ -651,7 +614,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            fontFamily: "roboto-light",
+
             flexWrap: "wrap",
           }}
         >
@@ -684,7 +647,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            fontFamily: "roboto-light",
+
             flexWrap: "wrap",
           }}
         >
@@ -717,7 +680,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            fontFamily: "roboto-light",
+
             flexWrap: "wrap",
           }}
         >
@@ -750,7 +713,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            fontFamily: "roboto-light",
+
             flexWrap: "wrap",
           }}
         >
@@ -781,7 +744,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            fontFamily: "roboto",
+
             flexWrap: "wrap",
           }}
         >
@@ -810,7 +773,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            fontFamily: "roboto-light",
+
             flexWrap: "wrap",
           }}
         >
@@ -842,7 +805,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            fontFamily: "roboto-light",
+
             flexWrap: "wrap",
           }}
         >
@@ -875,7 +838,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            fontFamily: "roboto-light",
+
             flexWrap: "wrap",
           }}
         >
@@ -908,7 +871,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            fontFamily: "roboto-light",
+
             flexWrap: "wrap",
           }}
         >
@@ -938,7 +901,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
           style={{
             display: "flex",
             flexDirection: "row",
-            fontFamily: "roboto-light",
+
             flexWrap: "wrap",
           }}
         >
@@ -966,7 +929,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
             style={{
               display: "flex",
               flexDirection: "column",
-              fontFamily: "roboto-light",
+
               flexWrap: "wrap",
             }}
           >
@@ -976,7 +939,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
-                fontFamily: "roboto-light",
+
                 flexWrap: "wrap",
               }}
             >
@@ -1008,7 +971,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
-                fontFamily: "roboto-light",
+
                 flexWrap: "wrap",
               }}
             >
@@ -1040,7 +1003,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
-                fontFamily: "roboto-light",
+
                 flexWrap: "wrap",
               }}
             >
@@ -1072,7 +1035,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
-                fontFamily: "roboto-light",
+
                 flexWrap: "wrap",
               }}
             >
@@ -1106,7 +1069,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            fontFamily: "roboto-light",
+
             flexWrap: "wrap",
           }}
         >
@@ -1139,7 +1102,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            fontFamily: "roboto-light",
+
             flexWrap: "wrap",
           }}
         >
