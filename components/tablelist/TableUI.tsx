@@ -57,7 +57,7 @@ export const TableUI = <T extends object>({
   }
   return (
     <div className="flex flex-col flex-grow">
-      <div className="w-full p-4 py-6 pr-6 pl-3 ">
+      <div className="w-full p-4 md:py-6 pr-6 pl-3 ">
         <div className="flex flex-row  text-2xl font-bold">{title}</div>
         {breadcrumb?.length ? (
           <BreadcrumbBetterLink data={breadcrumb} />

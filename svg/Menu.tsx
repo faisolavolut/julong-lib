@@ -1,6 +1,16 @@
-import { SVGProps } from "react";
-const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
+import { SVGProps, Ref, forwardRef, memo } from "react";
+import { cn } from "../utils";
+const SvgComponent = (
+  props: SVGProps<SVGSVGElement>,
+  ref: Ref<SVGSVGElement>
+) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    ref={ref}
+    className={cn(`text-current`, props.className)}
+    {...props}
+  >
     <path
       fill="none"
       stroke="currentColor"
@@ -12,4 +22,6 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
     />
   </svg>
 );
-export { SvgComponent as Menu };
+const ForwardRef = forwardRef(SvgComponent);
+const Memo = memo(ForwardRef);
+export { Memo as Menu };
