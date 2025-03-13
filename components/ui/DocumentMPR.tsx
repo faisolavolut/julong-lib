@@ -453,7 +453,7 @@ const DocumentMPR: FC<any> = ({ data, onRender }) => {
           <Text>
             : {getNumber(get(data, "male_needs"))} ( Pria ) dan 和/atau 或{" "}
             {getNumber(get(data, "female_needs"))} ( Wanita 女 ), atau 或{" "}
-            {getNumber(get(data, "any_gender"))} (Tidak Terbatas 不限)
+            {getNumber(get(data, "any_gender"))} (tanpa batasan gender 不限)
           </Text>
         </View>
         <View
