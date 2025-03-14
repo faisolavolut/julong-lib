@@ -61,6 +61,12 @@ export const formatTime = (date: string | Date) => {
 };
 
 export const time = (date: string | Date) => {
+  if (date === "string") {
+    const timeFormatRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    if (timeFormatRegex.test(date)) {
+      return date; // Jika sudah format HH:mm, langsung return
+    }
+  }
   if (date instanceof Date || typeof date === "string") {
     return day(date).format("HH:mm");
   }
