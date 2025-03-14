@@ -13,6 +13,7 @@ import {
 import get from "lodash.get";
 import { dayDate } from "@/lib/utils/date";
 import { getNumber } from "@/lib/utils/getNumber";
+import { findLastEducation } from "@/lib/utils/findLastEducation";
 Font.register({
   family: "zen",
   src: `${process.env.NEXT_PUBLIC_BASE_URL}/zen.ttf`,
@@ -739,7 +740,7 @@ export const DocumentBiodata: FC<any> = ({ data, onRender }) => {
                     borderColor: "black",
                   }}
                 >
-                  {}
+                  {findLastEducation(level, data?.educations, "graduate_year")}
                 </Text>
                 <Text
                   style={{
@@ -749,7 +750,8 @@ export const DocumentBiodata: FC<any> = ({ data, onRender }) => {
                     borderColor: "black",
                   }}
                 >
-                  {level}
+                  {findLastEducation(level, data?.educations, "school_name") ||
+                    level}
                 </Text>
                 <Text
                   style={{
@@ -758,7 +760,9 @@ export const DocumentBiodata: FC<any> = ({ data, onRender }) => {
                     borderRight: 1,
                     borderColor: "black",
                   }}
-                ></Text>
+                >
+                  {findLastEducation(level, data?.educations, "major")}
+                </Text>
                 <Text
                   style={{
                     width: 100,
