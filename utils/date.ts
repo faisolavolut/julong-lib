@@ -61,6 +61,7 @@ export const formatTime = (date: string | Date) => {
 };
 
 export const time = (date: string | Date) => {
+  if (!date) return null;
   if (date === "string") {
     const timeFormatRegex = /^(\d{2}):(\d{2})$/;
     if (timeFormatRegex.test(date)) {
