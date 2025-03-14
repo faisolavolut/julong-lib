@@ -69,7 +69,7 @@ export interface FieldProps {
   visibleLabel?: boolean;
   autoRefresh?: boolean;
   forceDisabled?: boolean;
-  description?: string;
+  description?: string | (() => any);
 }
 export const Field: React.FC<FieldProps> = ({
   fm,
@@ -516,7 +516,9 @@ export const Field: React.FC<FieldProps> = ({
           </div>
         </TooltipBetter>
         {description ? (
-          <div className="text-xs text-gray-500 py-1">{description}</div>
+          <div className="text-xs text-gray-500 py-1">
+            {typeof description === "function" ? description() : description}
+          </div>
         ) : (
           <></>
         )}
