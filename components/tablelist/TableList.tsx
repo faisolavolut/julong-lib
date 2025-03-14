@@ -122,7 +122,6 @@ export const TableList = <T extends object>({
   onChange,
   filter = true,
 }: TableListProps<T>) => {
-  console.log({ filter });
   const [show, setShow] = useState(false as boolean);
   const [data, setData] = useState<any[]>([]);
   const sideLeft =

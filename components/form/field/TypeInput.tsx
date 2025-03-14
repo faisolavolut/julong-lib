@@ -30,9 +30,6 @@ export const TypeInput: React.FC<any> = ({
 
   let value: any = fm.data?.[name] || "";
 
-  if (type === "time") {
-    value = time(value) || "";
-  }
   const [rating, setRating] = useState(value); // State untuk menyimpan nilai rating
   const handleClick = (index: number) => {
     setRating(index); // Update nilai rating
@@ -70,9 +67,6 @@ export const TypeInput: React.FC<any> = ({
       const convertColor = tinycolor(meta.inputValue);
       meta.rgbValue = convertColor.toRgbString();
       meta.render();
-    } else if (type === "time") {
-      if (fm.data?.[name]) fm.data[name] = time(fm.data[name]);
-      fm.render();
     } else {
       setRating(value ? value - 1 : value);
     }
@@ -126,7 +120,7 @@ export const TypeInput: React.FC<any> = ({
       return (
         <>
           <MaskedInput
-            value={value}
+            value={time(value) || ""}
             disabled={disabled}
             className={cx(
               css`
