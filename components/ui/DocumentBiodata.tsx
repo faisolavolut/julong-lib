@@ -80,6 +80,7 @@ const styles = StyleSheet.create({
 });
 // Create Document Component
 export const DocumentBiodata: FC<any> = ({ data, onRender }) => {
+  console.log({ data });
   return (
     <PDFViewer className="flex-grow w-full">
       <Document
@@ -134,8 +135,14 @@ export const DocumentBiodata: FC<any> = ({ data, onRender }) => {
                 <Text>DATA DIRI 个人资料</Text>
               </View>
               {[
-                { label: "Nama Lengkap 姓名", value: "" },
-                { label: "Tempat & Tanggal Lahir 出生地点，日期", value: "" },
+                { label: "Nama Lengkap 姓名", value: data?.name },
+                {
+                  label: "Tempat & Tanggal Lahir 出生地点，日期",
+                  value:
+                    data?.birth_place && data?.birth_date
+                      ? `${data?.birth_place}, ${dayDate(data?.birth_date)}`
+                      : "",
+                },
               ].map((row: any, rowIndex) => {
                 return <RowPDF row={row} rowIndex={rowIndex} key={rowIndex} />;
               })}
@@ -159,7 +166,12 @@ export const DocumentBiodata: FC<any> = ({ data, onRender }) => {
             [
               {
                 label: "Jenis Kelamin 性别",
-                value: "L 男 / P 女",
+                value:
+                  data?.gender === "FEMALE"
+                    ? "P 女"
+                    : data?.gender === "MALE"
+                    ? "L 男"
+                    : "L 男 / P 女",
                 mode: "noline",
               },
               {
@@ -180,7 +192,7 @@ export const DocumentBiodata: FC<any> = ({ data, onRender }) => {
             ],
             [
               { label: "No. KTP 身份证号码", value: "" },
-              { label: "Agama 宗教", value: "" },
+              { label: "Agama 宗教", value: data?.religion },
             ],
             [
               { label: "Masa Berlaku KTP 身份证有效期", value: "" },
@@ -202,9 +214,9 @@ export const DocumentBiodata: FC<any> = ({ data, onRender }) => {
               value: "",
               // mode: "placeholder",
             },
-            { label: "Alamat Lengkap 地址", value: "" },
+            { label: "Alamat Lengkap 地址", value: data?.address },
             { label: "Alamat Lengkap Asal 故乡地址", value: "" },
-            { label: "Alamat Email 电子邮件地址", value: "" },
+            { label: "Alamat Email 电子邮件地址", value: data?.user?.email },
           ].map((row: any, rowIndex) => {
             return <RowPDF row={row} rowIndex={rowIndex} key={rowIndex} />;
           })}
@@ -726,7 +738,9 @@ export const DocumentBiodata: FC<any> = ({ data, onRender }) => {
                     borderRight: 1,
                     borderColor: "black",
                   }}
-                ></Text>
+                >
+                  {}
+                </Text>
                 <Text
                   style={{
                     width: 200,

@@ -11,6 +11,7 @@ import { getNumber } from "@/lib/utils/getNumber";
 import MaskedInput from "../../ui/MaskedInput";
 import { cn } from "@/lib/utils";
 import { getLabel } from "@/lib/utils/getLabel";
+import { time } from "@/lib/utils/date";
 
 export const TypeInput: React.FC<any> = ({
   name,
@@ -30,7 +31,7 @@ export const TypeInput: React.FC<any> = ({
   let value: any = fm.data?.[name] || "";
 
   if (type === "time") {
-    value = convertToTimeOnly(value) || "";
+    value = time(value) || "";
   }
   const [rating, setRating] = useState(value); // State untuk menyimpan nilai rating
   const handleClick = (index: number) => {
@@ -70,7 +71,7 @@ export const TypeInput: React.FC<any> = ({
       meta.rgbValue = convertColor.toRgbString();
       meta.render();
     } else if (type === "time") {
-      if (fm.data?.[name]) fm.data[name] = convertToTimeOnly(fm.data[name]);
+      if (fm.data?.[name]) fm.data[name] = time(fm.data[name]);
       fm.render();
     } else {
       setRating(value ? value - 1 : value);
@@ -246,61 +247,63 @@ export const TypeInput: React.FC<any> = ({
       );
       break;
     case "money":
-      return <>
-        <Input
-          id={name}
-          name={name}
-          disabled={disabled}
-          className={cn(
-            "text-sm text-right	",
-            error
-              ? css`
-                  border-color: red !important;
-                `
-              : ``,
-            css`
-              background-color: ${disabled
-                  ? "rgb(243 244 246)"
-                  : "transparant"}
-                ? "";
-            `,
-            className
-          )}
-          required={required}
-          placeholder={placeholder || ""}
-          value={formatCurrency(input.value)}
-          type={"text"}
-          onKeyDown={handleKeyDown}
-          onChange={(ev) => {
-            const rawValue = ev.currentTarget.value
-              .replace(/[^0-9,-]/g, "")
-              .toString();
-            if (rawValue === "0") {
-              input.value = "0";
-              input.render();
-            }
-            if (
-              (!rawValue.startsWith(",") || !rawValue.endsWith(",")) &&
-              !rawValue.endsWith("-") &&
-              convertionCurrencyNumber(rawValue) !==
-                convertionCurrencyNumber(input.value)
-            ) {
-              fm.data[name] = convertionCurrencyNumber(
-                formatCurrency(rawValue)
-              );
-              fm.render();
-              if (typeof onChange === "function") {
-                onChange(fm.data[name]);
+      return (
+        <>
+          <Input
+            id={name}
+            name={name}
+            disabled={disabled}
+            className={cn(
+              "text-sm text-right	",
+              error
+                ? css`
+                    border-color: red !important;
+                  `
+                : ``,
+              css`
+                background-color: ${disabled
+                    ? "rgb(243 244 246)"
+                    : "transparant"}
+                  ? "";
+              `,
+              className
+            )}
+            required={required}
+            placeholder={placeholder || ""}
+            value={formatCurrency(input.value)}
+            type={"text"}
+            onKeyDown={handleKeyDown}
+            onChange={(ev) => {
+              const rawValue = ev.currentTarget.value
+                .replace(/[^0-9,-]/g, "")
+                .toString();
+              if (rawValue === "0") {
+                input.value = "0";
+                input.render();
               }
-              input.value = formatCurrency(fm.data[name]);
-              input.render();
-            } else {
-              input.value = rawValue;
-              input.render();
-            }
-          }}
-        />
-      </>;
+              if (
+                (!rawValue.startsWith(",") || !rawValue.endsWith(",")) &&
+                !rawValue.endsWith("-") &&
+                convertionCurrencyNumber(rawValue) !==
+                  convertionCurrencyNumber(input.value)
+              ) {
+                fm.data[name] = convertionCurrencyNumber(
+                  formatCurrency(rawValue)
+                );
+                fm.render();
+                if (typeof onChange === "function") {
+                  onChange(fm.data[name]);
+                }
+                input.value = formatCurrency(fm.data[name]);
+                input.render();
+              } else {
+                input.value = rawValue;
+                input.render();
+              }
+            }}
+          />
+        </>
+      );
       break;
   }
   let type_field = type;

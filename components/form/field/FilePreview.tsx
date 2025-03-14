@@ -242,7 +242,11 @@ export const FilePreview = ({
         >
           <div className="flex flex-row gap-x-1 items-center">
             <div className="h-[30px] flex flex-row items-center">{content}</div>
-            <div className="text-xs filename">{file?.name}</div>
+            <div className="text-xs filename">
+              {limit_name && file?.name
+                ? file?.name.substring(0, limit_name)
+                : file?.name}
+            </div>
           </div>
 
           <div className="ml-2">

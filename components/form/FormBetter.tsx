@@ -17,6 +17,7 @@ export const FormBetter: React.FC<any> = ({
   className,
   onInit,
   afterLoad,
+  disabledScroll,
 }) => {
   const [fm, setFM] = useState<any>({
     data: null as any,
@@ -37,55 +38,110 @@ export const FormBetter: React.FC<any> = ({
       )}
       <div className="w-full flex-grow flex flex-row rounded-lg">
         <div className="w-full flex flex-row flex-grow bg-white rounded-lg border border-gray-300 relative ">
-          <ScrollArea className="flex-grow">
-            <Form
-              {...{
-                children,
-                header,
-                onTitle,
-                onLoad: async () => {
-                  try {
-                    const res = await onLoad();
-                    return res;
-                  } catch (ex: any) {
-                    setShow(false);
-                    throw new Error(
-                      get(ex, "response.data.meta.message") || ex.message
-                    );
-                  }
-                },
-                onSubmit,
-                onFooter,
-                showResize,
-                mode,
-                className: cx(className, "top-0 left-0 w-full"),
-                afterLoad,
-                onInit: (form: any) => {
-                  setFM(form);
+          {disabledScroll ? (
+            <>
+              {" "}
+              <Form
+                {...{
+                  children,
+                  header,
+                  onTitle,
+                  onLoad: async () => {
+                    try {
+                      const res = await onLoad();
+                      return res;
+                    } catch (ex: any) {
+                      setShow(false);
+                      throw new Error(
+                        get(ex, "response.data.meta.message") || ex.message
+                      );
+                    }
+                  },
+                  onSubmit,
+                  onFooter,
+                  showResize,
+                  mode,
+                  className: cx(className, "top-0 left-0 w-full"),
+                  afterLoad,
+                  onInit: (form: any) => {
+                    setFM(form);
 
-                  const originalRender = form.render;
+                    const originalRender = form.render;
 
-                  // Buat versi baru dari `local.render`
-                  form.render = () => {
-                    // Panggil fungsi asli
-                    originalRender();
+                    // Buat versi baru dari `local.render`
+                    form.render = () => {
+                      // Panggil fungsi asli
+                      originalRender();
 
-                    // Tambahkan logika tambahan untuk sinkronisasi
-                    setFM({
-                      ...form,
-                      submit: form.submit,
-                      render: form.render,
-                      data: form.data,
-                    });
-                  };
-                  form.render();
-                  if (typeof onInit === "function") {
-                    onInit(form);
-                  }
-                },
-              }}
-            />
-          </ScrollArea>
+                      // Tambahkan logika tambahan untuk sinkronisasi
+                      setFM({
+                        ...form,
+                        submit: form.submit,
+                        render: form.render,
+                        data: form.data,
+                      });
+                    };
+                    form.render();
+                    if (typeof onInit === "function") {
+                      onInit(form);
+                    }
+                  },
+                }}
+              />
+            </>
+          ) : (
+            <>
+              <ScrollArea className="flex-grow">
+                <Form
+                  {...{
+                    children,
+                    header,
+                    onTitle,
+                    onLoad: async () => {
+                      try {
+                        const res = await onLoad();
+                        return res;
+                      } catch (ex: any) {
+                        setShow(false);
+                        throw new Error(
+                          get(ex, "response.data.meta.message") || ex.message
+                        );
+                      }
+                    },
+                    onSubmit,
+                    onFooter,
+                    showResize,
+                    mode,
+                    className: cx(className, "top-0 left-0 w-full"),
+                    afterLoad,
+                    onInit: (form: any) => {
+                      setFM(form);
+
+                      const originalRender = form.render;
+
+                      // Buat versi baru dari `local.render`
+                      form.render = () => {
+                        // Panggil fungsi asli
+                        originalRender();
+
+                        // Tambahkan logika tambahan untuk sinkronisasi
+                        setFM({
+                          ...form,
+                          submit: form.submit,
+                          render: form.render,
+                          data: form.data,
+                        });
+                      };
+                      form.render();
+                      if (typeof onInit === "function") {
+                        onInit(form);
+                      }
+                    },
+                  }}
+                />
+              </ScrollArea>
+            </>
+          )}
         </div>
       </div>
     </div>
