@@ -70,6 +70,7 @@ export interface FieldProps {
   autoRefresh?: boolean;
   forceDisabled?: boolean;
   description?: string | (() => any);
+  styleField?: string | null;
 }
 export const Field: React.FC<FieldProps> = ({
   fm,
@@ -103,6 +104,7 @@ export const Field: React.FC<FieldProps> = ({
   autoRefresh = false,
   forceDisabled,
   description,
+  styleField,
 }) => {
   let result = null;
   const field = useLocal({
@@ -458,6 +460,7 @@ export const Field: React.FC<FieldProps> = ({
             ) : ["tag"].includes(type) ? (
               <>
                 <TypeTag
+                  styleField={styleField}
                   fm={fm}
                   fields={initField}
                   name={name}

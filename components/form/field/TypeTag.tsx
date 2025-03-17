@@ -1,4 +1,8 @@
-import { useRef, useState } from "react";
+import { cva } from "class-variance-authority";
+import { useRef, useState, useEffect } from "react";
+import { Checkbox } from "../../ui/checkbox";
+import { X } from "lucide-react";
+import { IoIosRadioButtonOff } from "react-icons/io";
 
 export const TypeTag: React.FC<any> = ({
   name,
@@ -9,6 +13,7 @@ export const TypeTag: React.FC<any> = ({
   type,
   field,
   onChange,
+  styleField,
 }) => {
   const [tags, setTags] = useState<string[]>(fm.data?.[name] || []);
   const [inputValue, setInputValue] = useState("");
@@ -16,8 +21,15 @@ export const TypeTag: React.FC<any> = ({
   const [tempValue, setTempValue] = useState<string>(""); // Nilai sementara untuk pengeditan
   const tagRefs = useRef<(HTMLDivElement | null)[]>([]);
   const val = fm?.data?.[name];
+
+  useEffect(() => {
+    if (editingIndex !== null && tagRefs.current[editingIndex]) {
+      tagRefs.current[editingIndex]?.focus();
+    }
+  }, [editingIndex]);
+
   const handleSaveEdit = (index: number) => {
-    if (!disabled) return;
+    if (disabled) return;
     const updatedTags = [...tags];
     updatedTags[index] = tempValue.trim(); // Update nilai tag
     setTags(updatedTags);
@@ -30,6 +42,7 @@ export const TypeTag: React.FC<any> = ({
       onChange(tags);
     }
   };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -50,44 +63,88 @@ export const TypeTag: React.FC<any> = ({
       setTags(tags.slice(0, -1));
     }
   };
+
   const handleFocusTag = (index: number) => {
     if (disabled) return;
     setEditingIndex(index); // Masuk ke mode edit
     setTempValue(tags[index]); // Isi nilai sementara dengan nilai tag
-    setTimeout(() => {
-      tagRefs.current[index]?.focus(); // Fokus pada elemen yang diedit
-    }, 0);
   };
+
   const removeTag = (index: number) => {
     if (disabled) return;
     setTags(tags.filter((_, i) => i !== index));
   };
 
+  const buttonVariants = cva(
+    "flex flex-row items-center  rounded-full  text-sm p-1",
+    {
+      variants: {
+        variant: {
+          default: "bg-blue-100 text-blue-800 m-1",
+          moe: "",
+        },
+      },
+    }
+  );
+  const stylingGroup = ["checkbox", "radio", "order"];
   return (
     <div
       className={cx(
-        "flex flex-wrap items-center  rounded-md flex-grow ",
+        "flex    rounded-md flex-grow ",
+        stylingGroup.includes(styleField)
+          ? "flex-wrap flex-col"
+          : "items-center flex-wrap",
         disabled && !tags?.length ? "h-9" : ""
       )}
     >
       {tags.map((tag, index) => (
         <div
           key={index}
-          className="flex flex-row items-center bg-blue-100 text-blue-800 rounded-full m-1 text-sm"
+          className={cx(
+            buttonVariants({ variant: styleField ? styleField : "default" }),
+            editingIndex === index
+              ? styleField
+                ? "border-b border-gray-500 rounded-none"
+                : "bg-transparent border border-gray-500 rounded-full text-gray-900"
+              : ""
+          )}
         >
+          {styleField === "checkbox" ? (
+            <>
+              <Checkbox
+                className="border border-primary"
+                checked={false}
+                onClick={(e) => {}}
+              />{" "}
+            </>
+          ) : styleField === "radio" ? (
+            <>
+              <IoIosRadioButtonOff />{" "}
+            </>
+          ) : styleField === "order" ? (
+            <>
+              {index + 1}
+              {". "}
+            </>
+          ) : (
+            <></>
+          )}
           {disabled ? (
             <div className="px-2">{tag}</div>
           ) : (
             <div
+              ref={(el) => {
+                if (el) tagRefs.current[index] = el;
+              }}
               className={cx(
                 "px-3 py-1 pr-0 flex-grow  focus:shadow-none focus:ring-0	 focus:border-none focus:outline-none",
-                editingIndex! !== index && "cursor-pointer"
+                editingIndex !== index && "cursor-pointer"
               )}
               contentEditable={editingIndex === index}
               suppressContentEditableWarning
               onBlur={() => handleSaveEdit(index)}
               onKeyDown={(e) => {
-                if (!disabled) return;
+                if (disabled) return;
                 if (e.key === "Enter") {
                   e.preventDefault();
                   e.stopPropagation();
@@ -97,9 +154,7 @@ export const TypeTag: React.FC<any> = ({
                   setEditingIndex(null);
                 }
               }}
-              onClick={() => {
-                handleFocusTag(index);
-              }}
+              onClick={() => handleFocusTag(index)}
               onInput={(e) =>
                 setTempValue((e.target as HTMLDivElement).innerText)
               }
@@ -112,9 +167,9 @@ export const TypeTag: React.FC<any> = ({
             <button
               type="button"
               onClick={() => removeTag(index)}
-              className="ml-2 text-blue-500 hover:text-blue-700 pr-2"
+              className="ml-2  text-red-500  pr-2"
             >
-              &times;
+              <X size={16} />
             </button>
           )}
         </div>
