@@ -460,7 +460,7 @@ const SidebarBetterTree: React.FC<TreeMenuProps> = ({
     <div className="flex flex-col  flex-grow bg-white  relative rounded-b-2xl">
       <div
         className={cx(
-          "bg-linear-sidebar-active text-white p-1 absolute top-0 right-[-13px] cursor-pointer rounded-lg shadow-md",
+          "bg-linear-sidebar-active text-white p-1 hidden md:absolute top-0 right-[-13px] cursor-pointer rounded-lg shadow-md",
           css`
             z-index: 1;
           `
@@ -476,7 +476,7 @@ const SidebarBetterTree: React.FC<TreeMenuProps> = ({
         <Sidebar
           aria-label="Sidebar with multi-level dropdown example"
           className={classNames(
-            "relative pt-0 rounded-none",
+            "relative pt-0 rounded-none md:w-64 w-full",
             mini ? "w-20" : "",
             css`
               > div {
@@ -496,7 +496,7 @@ const SidebarBetterTree: React.FC<TreeMenuProps> = ({
                 <Sidebar.Items>
                   <Sidebar.ItemGroup
                     className={cx(
-                      "border-none mt-0 pt-4",
+                      "border-none mt-0 pt-0 md:pt-4",
                       mini ? "flex flex-col gap-y-2" : ""
                     )}
                   >
@@ -515,7 +515,7 @@ const SidebarBetterTree: React.FC<TreeMenuProps> = ({
             mini ? "justify-center" : "px-4"
           )}
         >
-          <div className="flex flex-row justify-center flex-grow hidden">
+          <div className="hidden md:flex flex-row justify-center flex-grow">
             <Popover
               classNameTrigger={cx("flex flex-row justify-center flex-grow")}
               popoverClassName={cx(
