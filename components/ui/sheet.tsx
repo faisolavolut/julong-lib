@@ -51,27 +51,36 @@ const sheetVariants = cva(
 
 interface SheetContentProps
   extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
-    VariantProps<typeof sheetVariants> {}
+    VariantProps<typeof sheetVariants> {
+  showClose?: boolean;
+}
 
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   SheetContentProps
->(({ side = "right", className, children, ...props }, ref) => (
-  <SheetPortal>
-    <SheetOverlay />
-    <SheetPrimitive.Content
-      ref={ref}
-      className={cn(sheetVariants({ side }), className)}
-      {...props}
-    >
-      <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
-        <X className="h-4 w-4" />
-        <span className="sr-only">Close</span>
-      </SheetPrimitive.Close>
-      {children}
-    </SheetPrimitive.Content>
-  </SheetPortal>
-));
+>(
+  (
+    { side = "right", showClose = true, className, children, ...props },
+    ref
+  ) => (
+    <SheetPortal>
+      <SheetOverlay />
+      <SheetPrimitive.Content
+        ref={ref}
+        className={cn(sheetVariants({ side }), className)}
+        {...props}
+      >
+        {showClose && ( // Hanya render tombol close jika showClose true
+          <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </SheetPrimitive.Close>
+        )}
+        {children}
+      </SheetPrimitive.Content>
+    </SheetPortal>
+  )
+);
 SheetContent.displayName = SheetPrimitive.Content.displayName;
 
 const SheetHeader = ({
@@ -126,23 +135,47 @@ const SheetDescription = React.forwardRef<
 ));
 export interface SheetBetterProps {
   open?: boolean;
+  contentOpen?: any;
+  onOpenChange?: (open: boolean) => void;
+  showClose?: boolean;
+  side?: "top" | "bottom" | "left" | "right";
 }
 
 const SheetBetter = ({
   className,
+  open,
+  contentOpen,
+  showClose = true,
+  side = "right",
+  onOpenChange,
+  children,
   ...props
 }: SheetBetterProps & React.HTMLAttributes<HTMLDivElement>) => {
+  const [isOpen, setOpen] = React.useState(false as boolean);
   return (
-    <Sheet>
-      <SheetTrigger>Open</SheetTrigger>
-      <SheetContent className="w-screen md:w-auto">
-        <SheetHeader>
+    <Sheet
+      open={typeof open === "boolean" ? open : isOpen}
+      onOpenChange={(event) => {
+        setOpen(event);
+        if (typeof onOpenChange === "function") {
+          onOpenChange(event);
+        }
+      }}
+    >
+      <SheetTrigger onClick={() => setOpen(true)}>{contentOpen}</SheetTrigger>
+      <SheetContent
+        className={cn("w-screen md:w-auto", className)}
+        showClose={showClose}
+        side={side}
+      >
+        <SheetHeader className="hidden">
           <SheetTitle>Are you absolutely sure?</SheetTitle>
           <SheetDescription>
             This action cannot be undone. This will permanently delete your
             account and remove your data from our servers.
           </SheetDescription>
         </SheetHeader>
+        {children}
       </SheetContent>
     </Sheet>
   );

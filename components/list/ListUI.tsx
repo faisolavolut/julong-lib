@@ -51,11 +51,15 @@ export const ListUI: React.FC<any> = ({
     <div className="flex flex-col flex-grow  rounded-lg border border-gray-200 py-2 overflow-hidden">
       <div className="flex flex-col flex-grow">
         <div className="flex flex-col  flex-grow">
-          <div className="flex flex-col w-full px-4 pt-2">
-            {typeof title === "function"
-              ? title({ ui: local, count: local.count })
-              : title}
-          </div>
+          {title ? (
+            <div className="flex flex-col w-full px-4 pt-2">
+              {typeof title === "function"
+                ? title({ ui: local, count: local.count })
+                : title}
+            </div>
+          ) : (
+            <></>
+          )}
 
           <div className="w-full flex flex-row flex-grow  overflow-hidden ">
             <ListBetter
