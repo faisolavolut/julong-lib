@@ -5,6 +5,7 @@ import get from "lodash.get";
 import { ListBetter } from "../tablelist/List";
 export const ListUI: React.FC<any> = ({
   tabHeader,
+  className,
   name,
   modeTab,
   column,
@@ -48,7 +49,12 @@ export const ListUI: React.FC<any> = ({
     );
   }
   return (
-    <div className="flex flex-col flex-grow  rounded-lg border border-gray-200 py-2 overflow-hidden">
+    <div
+      className={cx(
+        "flex flex-col flex-grow  rounded-lg border border-gray-200 py-2 overflow-hidden",
+        className
+      )}
+    >
       <div className="flex flex-col flex-grow">
         <div className="flex flex-col  flex-grow">
           {title ? (
