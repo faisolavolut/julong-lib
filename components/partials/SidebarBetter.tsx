@@ -36,6 +36,7 @@ interface TreeMenuItem {
 interface TreeMenuProps {
   data: TreeMenuItem[];
   minimaze: () => void;
+  onClick?: () => void;
   mini: boolean;
 }
 
@@ -43,6 +44,7 @@ const SidebarBetterTree: React.FC<TreeMenuProps> = ({
   data,
   minimaze,
   mini,
+  onClick,
 }) => {
   const [currentPage, setCurrentPage] = useState("");
   const [notification, setNotification] = useState(false as boolean);
@@ -325,6 +327,9 @@ const SidebarBetterTree: React.FC<TreeMenuProps> = ({
                               href={item.href}
                               onClick={() => {
                                 if (item?.href) setCurrentPage(item.href);
+                                if (typeof onClick === "function") {
+                                  onClick();
+                                }
                               }}
                               className={classNames(
                                 "transition-all  font-bold relative flex-row flex items-center cursor-pointer items-center   text-base flex flex-row  ",
@@ -393,6 +398,9 @@ const SidebarBetterTree: React.FC<TreeMenuProps> = ({
                       href={item.href}
                       onClick={() => {
                         if (item?.href) setCurrentPage(item.href);
+                        if (typeof onClick === "function") {
+                          onClick();
+                        }
                       }}
                       className={classNames(
                         "transition-all  font-bold relative flex-row flex items-center cursor-pointer items-center   text-base flex flex-row  ",
@@ -460,7 +468,7 @@ const SidebarBetterTree: React.FC<TreeMenuProps> = ({
     <div className="flex flex-col  flex-grow bg-white  relative rounded-b-2xl">
       <div
         className={cx(
-          "bg-linear-sidebar-active text-white p-1 hidden md:absolute top-0 right-[-13px] cursor-pointer rounded-lg shadow-md",
+          "hidden md:flex bg-linear-sidebar-active text-white p-1  md:absolute top-0 right-[-13px] cursor-pointer rounded-lg shadow-md",
           css`
             z-index: 1;
           `
@@ -476,8 +484,8 @@ const SidebarBetterTree: React.FC<TreeMenuProps> = ({
         <Sidebar
           aria-label="Sidebar with multi-level dropdown example"
           className={classNames(
-            "relative pt-0 rounded-none md:w-64 w-full",
-            mini ? "w-20" : "",
+            "relative pt-0 rounded-none  w-full",
+            mini ? "w-20" : "md:w-64",
             css`
               > div {
                 border-radius: 0px;

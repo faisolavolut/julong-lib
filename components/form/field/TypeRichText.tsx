@@ -459,7 +459,7 @@ export const TypeRichText: React.FC<any> = ({
                     <Input
                       id="maxWidth"
                       value={url || ""}
-                      className="col-span-2 h-9"
+                      className="md:col-span-2 h-9"
                       onChange={(e) => {
                         setUrl(get(e, "currentTarget.value"));
                       }}

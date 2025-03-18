@@ -11,7 +11,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import React, { useEffect, useState } from "react";
-import { Button, Label, Table } from "flowbite-react";
+import { Button, Table } from "flowbite-react";
 import { HiChevronLeft, HiChevronRight, HiPlus } from "react-icons/hi";
 import { useLocal } from "@/lib/utils/use-local";
 import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa6";
@@ -573,7 +573,7 @@ export const TableList = <T extends object>({
     <>
       <div className="tbl-wrapper flex flex-grow flex-col">
         {!disabledHeader ? (
-          <div className="head-tbl-list block items-start justify-between   px-4 py-4 sm:flex">
+          <div className="head-tbl-list block items-start justify-between  flex-col gap-y-2 md:flex-row px-4 py-4 sm:flex">
             <div className="flex flex-row items-end">
               <div className="sm:flex flex flex-col space-y-2">
                 <div className="flex">
@@ -595,17 +595,14 @@ export const TableList = <T extends object>({
               </div>
             </div>
 
-            <div className="ml-auto flex items-center flex-row gap-x-1">
-              <div className="tbl-search hidden items-center sm:mb-0 sm:flex sm:divide-x sm:divide-gray-100">
+            <div className="pt-2 md:pt-0 ml-auto flex items-center flex-row gap-x-1">
+              <div className="tbl-search  items-center sm:mb-0 sm:flex sm:divide-x sm:divide-gray-100 flex-grow md:flex-grow-0">
                 <div
                   onSubmit={async (e) => {
                     e.preventDefault();
                     await local.reload();
                   }}
                 >
-                  <Label htmlFor="users-search" className="sr-only">
-                    Search
-                  </Label>
                   <div className="relative  lg:w-56">
                     <InputSearch
                       id="users-search"
