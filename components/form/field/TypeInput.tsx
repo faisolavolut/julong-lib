@@ -374,7 +374,7 @@ export const TypeInput: React.FC<any> = ({
         if (typeof onChange === "function") {
           onChange(fm.data[name]);
         }
-      }, 2000),
+      }, 1500),
     []
   );
   return (
