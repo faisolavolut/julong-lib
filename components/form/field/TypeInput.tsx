@@ -12,6 +12,8 @@ import MaskedInput from "../../ui/MaskedInput";
 import { cn } from "@/lib/utils";
 import { getLabel } from "@/lib/utils/getLabel";
 import { time } from "@/lib/utils/date";
+import React from "react";
+import debounce from "lodash.debounce";
 
 export const TypeInput: React.FC<any> = ({
   name,
@@ -24,7 +26,10 @@ export const TypeInput: React.FC<any> = ({
   onChange,
   className,
   placeholderDate,
+  isDebounce = false,
 }) => {
+  const [inputValue, setInputValue] = useState(null as any);
+
   const [hover, setHover] = useState(0); // State untuk menyimpan nilai hover
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -227,7 +232,6 @@ export const TypeInput: React.FC<any> = ({
             asSingle={true}
             useRange={false}
             onChange={(value) => {
-              console.log(value);
               fm.data[name] = value?.startDate
                 ? new Date(value?.startDate)
                 : null;
@@ -364,6 +368,15 @@ export const TypeInput: React.FC<any> = ({
       type = "text";
     }
   }
+  const debouncedOnChange = React.useMemo(
+    () =>
+      debounce((event: React.ChangeEvent<HTMLInputElement>) => {
+        if (typeof onChange === "function") {
+          onChange(fm.data[name]);
+        }
+      }, 2000),
+    []
+  );
   return (
     <>
       <Input
@@ -391,8 +404,14 @@ export const TypeInput: React.FC<any> = ({
         onChange={(ev) => {
           fm.data[name] = ev.currentTarget.value;
           fm.render();
-          if (typeof onChange === "function") {
-            onChange(fm.data[name]);
+          if (!isDebounce) {
+            if (typeof onChange === "function") {
+              onChange(fm.data[name]);
+            }
+          } else {
+            setInputValue(ev.currentTarget.value);
+            debouncedOnChange(inputValue);
+            return () => debouncedOnChange.cancel();
           }
         }}
       />
