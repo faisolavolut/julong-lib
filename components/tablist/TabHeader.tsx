@@ -64,7 +64,7 @@ export const TabHeader: React.FC<any> = ({
   }, []);
   if (!local.data?.length) return <></>;
   return (
-    <div className="flex flex-row w-full">
+    <div className="flex flex-row w-full flex-wrap">
       <Tabs
         className="flex flex-col w-full"
         defaultValue={onValue(local.data?.[0])}

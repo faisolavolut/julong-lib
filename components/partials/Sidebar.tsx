@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import classNames from "classnames";
 import { HiAdjustments, HiCog } from "react-icons/hi";
 import { css } from "@emotion/css";
-import { FaAngleUp, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { SidebarLinkBetter } from "../ui/link-better";
 import { detectCase } from "@/lib/utils/detectCase";
 import { useLocal } from "@/lib/utils/use-local";
@@ -403,7 +403,7 @@ const SidebarTree: React.FC<TreeMenuProps> = ({ data, minimaze, mini }) => {
           </div>
         </div>
 
-        <div className="flex flex-row w-full">
+        <div className="flex flex-row w-full flex-wrap">
           <div
             className={cx(
               "flex flex-row justify-center flex-grow  rounded-lg",

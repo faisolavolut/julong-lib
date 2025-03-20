@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { useLocal } from "@/lib/utils/use-local";
 import { FC, useEffect } from "react";
 import { IoRadioButtonOff, IoRadioButtonOn } from "react-icons/io5";
@@ -73,8 +74,8 @@ export const FieldRadio: FC<any> = ({
     <>
       <div className={cx("flex items-center w-full flex-row")}>
         <div
-          className={cx(
-            `flex flex-col p-0.5 flex-1`,
+          className={cn(
+            `flex flex-col p-0.5 flex-1 text-sm `,
             !is_tree && "space-y-1 ",
             className
           )}
@@ -111,7 +112,7 @@ export const FieldRadio: FC<any> = ({
                   }
                 }}
                 className={cx(
-                  "text-sm opt-item flex flex-row gap-x-1 cursor-pointer items-center rounded-full p-0.5 ",
+                  "opt-item flex flex-row gap-x-1 cursor-pointer items-center rounded-full p-0.5 ",
                   isChecked && "active"
                 )}
               >
