@@ -14,7 +14,7 @@ export const siteurl = (
       : port === "mpp"
       ? process.env.NEXT_PUBLIC_API_MPP
       : process.env.NEXT_PUBLIC_BASE_URL
-  }/${param}`;
+  }${param}`;
   if (port && empty(param)) return "";
   return `${root_url}`;
 };
