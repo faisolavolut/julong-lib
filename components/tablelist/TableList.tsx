@@ -37,8 +37,10 @@ export interface Column<T = any> {
   resize?: boolean;
   width?: number;
   type?: "text" | "date" | "time" | "money" | "file";
-  nameFilter?: string;
+  nameFilter?: string | string[];
+  placeholderFilter?: string | string[];
   onLoadFilter?: (params?: any) => Promise<any> | any;
+  labelFilter?: string;
   onLabel?: string | ((item: any) => any);
   onValue?: string | ((item: any) => any);
   pagination?: boolean;
@@ -96,7 +98,14 @@ export interface TableListProps<T extends object> {
   filter?: boolean;
 }
 
-export interface FieldFilterProps extends Omit<FieldProps, "fm"> {
+export interface FilterProps<T extends object> {
+  nameFilter?: string | string[];
+  placeholderFilter?: string | string[];
+}
+export interface FieldFilterProps
+  extends Omit<FieldProps, "fm">,
+    FilterProps<object>,
+    FilterProps<object> {
   fm?: any; // Membuat `fm` nullable
 }
 
@@ -322,8 +331,20 @@ export const TableList = <T extends object>({
               e.filter !== false && (e.type !== "date" || index === dateIndex)
           ) // Hapus jika `false`
           .map((e) => ({
-            name: e?.nameFilter || e.name,
-            label: e?.header && typeof e?.header === "string" ? e.header : "", // Default null jika tidak ada label
+            nameFilter: e?.nameFilter,
+            placeholderFilter: e?.placeholderFilter,
+            name:
+              Array.isArray(e?.nameFilter) && e?.nameFilter?.length
+                ? e.nameFilter[0]
+                : typeof e?.nameFilter === "string"
+                ? e.nameFilter
+                : e?.name,
+            label:
+              e?.labelFilter && typeof e?.labelFilter === "string"
+                ? e.labelFilter // Default null jika tidak ada label
+                : e?.header && typeof e?.header === "string"
+                ? e.header
+                : "", // Default null jika tidak ada label
             type:
               typeof e.onLoadFilter === "function"
                 ? "dropdown-async"
@@ -630,7 +651,7 @@ export const TableList = <T extends object>({
                     }}
                     open={show}
                     content={
-                      <div className="flex flex-col p-4 w-80 gap-y-1">
+                      <div className="flex flex-col p-4 w-80 gap-y-1 overflow-y-scroll max-h-96">
                         {/* <div className="text-md font-semibold">Filter</div> */}
 
                         <Form
@@ -675,17 +696,28 @@ export const TableList = <T extends object>({
                                           >
                                             <Field
                                               fm={fm}
-                                              name={"start_date"}
+                                              name={
+                                                e?.nameFilter?.[0] ||
+                                                "start_date"
+                                              }
                                               label={e?.label}
                                               type={"date"}
-                                              placeholder={`From`}
+                                              placeholder={
+                                                e?.placeholderFilter?.[0] ||
+                                                "Form"
+                                              }
                                             />
                                             <Field
                                               fm={fm}
-                                              name={"end_date"}
+                                              name={
+                                                e?.nameFilter?.[1] || "end_date"
+                                              }
                                               label={e?.label}
                                               type={"date"}
-                                              placeholder={`To`}
+                                              placeholder={
+                                                e?.placeholderFilter?.[1] ||
+                                                "To"
+                                              }
                                               visibleLabel={true}
                                             />
                                           </div>

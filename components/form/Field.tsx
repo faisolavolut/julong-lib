@@ -72,6 +72,7 @@ export interface FieldProps {
   description?: string | (() => any);
   styleField?: string | null;
   isDebounce?: boolean;
+  data?: any;
 }
 export const Field: React.FC<FieldProps> = ({
   fm,
