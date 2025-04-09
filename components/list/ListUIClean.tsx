@@ -80,7 +80,7 @@ export const ListUIClean: React.FC<any> = ({
               content={content}
               onLoad={onLoad}
               onCount={async (params: any) => {
-                const result = await onCount();
+                const result = await onCount(params);
                 local.count = result;
                 local.render();
                 return result;

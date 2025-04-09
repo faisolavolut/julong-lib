@@ -73,6 +73,7 @@ export interface FieldProps {
   styleField?: string | null;
   isDebounce?: boolean;
   data?: any;
+  mode?: string;
 }
 export const Field: React.FC<FieldProps> = ({
   fm,
@@ -108,6 +109,7 @@ export const Field: React.FC<FieldProps> = ({
   description,
   styleField,
   isDebounce = false,
+  mode,
 }) => {
   let result = null;
   const field = useLocal({
@@ -470,6 +472,7 @@ export const Field: React.FC<FieldProps> = ({
                   disabled={is_disable}
                   className={className}
                   onChange={onChange}
+                  mode={mode}
                 />
               </>
             ) : (

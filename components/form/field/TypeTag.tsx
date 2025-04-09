@@ -14,6 +14,7 @@ export const TypeTag: React.FC<any> = ({
   field,
   onChange,
   styleField,
+  mode,
 }) => {
   const [tags, setTags] = useState<string[]>(fm.data?.[name] || []);
   const [inputValue, setInputValue] = useState("");

@@ -659,7 +659,14 @@ const SidebarBetterTree: React.FC<TreeMenuProps> = ({
                     </g>
                   </svg>
                 </div>
-                {!mini && "Notifications"}
+                {!mini && (
+                  <div className="flex flex-row gap-x-2 items-center">
+                    Notifications{" "}
+                    <div className="p-0.5 text-2xs rounded-full bg-red-500 text-white min-w-6 h-6 flex flex-row items-center justify-center">
+                      912
+                    </div>
+                  </div>
+                )}
               </div>
             </Popover>
           </div>
