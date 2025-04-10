@@ -2,7 +2,7 @@ import { cva } from "class-variance-authority";
 import { useRef, useState, useEffect } from "react";
 import { Checkbox } from "../../ui/checkbox";
 import { X } from "lucide-react";
-import { IoIosRadioButtonOff } from "react-icons/io";
+import { IoIosRadioButtonOff, IoIosRadioButtonOn } from "react-icons/io";
 
 export const TypeTag: React.FC<any> = ({
   name,
@@ -15,6 +15,7 @@ export const TypeTag: React.FC<any> = ({
   onChange,
   styleField,
   mode,
+  valueChecked,
 }) => {
   const [tags, setTags] = useState<string[]>(fm.data?.[name] || []);
   const [inputValue, setInputValue] = useState("");
@@ -98,83 +99,86 @@ export const TypeTag: React.FC<any> = ({
         disabled && !tags?.length ? "h-9" : ""
       )}
     >
-      {tags.map((tag, index) => (
-        <div
-          key={index}
-          className={cx(
-            buttonVariants({ variant: styleField ? styleField : "default" }),
-            editingIndex === index
-              ? styleField
-                ? "border-b border-gray-500 rounded-none"
-                : "bg-transparent border border-gray-500 rounded-full text-gray-900"
-              : ""
-          )}
-        >
-          {styleField === "checkbox" ? (
-            <>
-              <Checkbox
-                className="border border-primary"
-                checked={false}
-                onClick={(e) => {}}
-              />{" "}
-            </>
-          ) : styleField === "radio" ? (
-            <>
-              <IoIosRadioButtonOff />{" "}
-            </>
-          ) : styleField === "order" ? (
-            <>
-              {index + 1}
-              {". "}
-            </>
-          ) : (
-            <></>
-          )}
-          {disabled ? (
-            <div className="px-2">{tag}</div>
-          ) : (
-            <div
-              ref={(el) => {
-                if (el) tagRefs.current[index] = el;
-              }}
-              className={cx(
-                "px-3 py-1 pr-0 flex-grow  focus:shadow-none focus:ring-0	 focus:border-none focus:outline-none",
-                editingIndex !== index && "cursor-pointer"
-              )}
-              contentEditable={editingIndex === index}
-              suppressContentEditableWarning
-              onBlur={() => handleSaveEdit(index)}
-              onKeyDown={(e) => {
-                if (disabled) return;
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleSaveEdit(index);
+      {tags.map((tag, index) => {
+        const checked = valueChecked?.length
+          ? isChecked(tag, valueChecked)
+          : false;
+        return (
+          <div
+            key={index}
+            className={cx(
+              buttonVariants({ variant: styleField ? styleField : "default" }),
+              editingIndex === index
+                ? styleField
+                  ? "border-b border-gray-500 rounded-none"
+                  : "bg-transparent border border-gray-500 rounded-full text-gray-900"
+                : ""
+            )}
+          >
+            {styleField === "checkbox" ? (
+              <>
+                <Checkbox
+                  className="border border-primary"
+                  checked={checked}
+                  onClick={(e) => {}}
+                />{" "}
+              </>
+            ) : styleField === "radio" ? (
+              <>{checked ? <IoIosRadioButtonOn /> : <IoIosRadioButtonOff />}</>
+            ) : styleField === "order" ? (
+              <>
+                {index + 1}
+                {". "}
+              </>
+            ) : (
+              <></>
+            )}
+            {disabled ? (
+              <div className="px-2">{tag}</div>
+            ) : (
+              <div
+                ref={(el) => {
+                  if (el) tagRefs.current[index] = el;
+                }}
+                className={cx(
+                  "px-3 py-1 pr-0 flex-grow  focus:shadow-none focus:ring-0	 focus:border-none focus:outline-none",
+                  editingIndex !== index && "cursor-pointer"
+                )}
+                contentEditable={editingIndex === index}
+                suppressContentEditableWarning
+                onBlur={() => handleSaveEdit(index)}
+                onKeyDown={(e) => {
+                  if (disabled) return;
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleSaveEdit(index);
+                  }
+                  if (e.key === "Escape") {
+                    setEditingIndex(null);
+                  }
+                }}
+                onClick={() => handleFocusTag(index)}
+                onInput={(e) =>
+                  setTempValue((e.target as HTMLDivElement).innerText)
                 }
-                if (e.key === "Escape") {
-                  setEditingIndex(null);
-                }
-              }}
-              onClick={() => handleFocusTag(index)}
-              onInput={(e) =>
-                setTempValue((e.target as HTMLDivElement).innerText)
-              }
-            >
-              {tag}
-            </div>
-          )}
+              >
+                {tag}
+              </div>
+            )}
 
-          {!disabled && (
-            <button
-              type="button"
-              onClick={() => removeTag(index)}
-              className="ml-2  text-red-500  pr-2"
-            >
-              <X size={16} />
-            </button>
-          )}
-        </div>
-      ))}
+            {!disabled && (
+              <button
+                type="button"
+                onClick={() => removeTag(index)}
+                className="ml-2  text-red-500  pr-2"
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+        );
+      })}
       {!disabled && (
         <input
           type="text"
@@ -187,4 +191,9 @@ export const TypeTag: React.FC<any> = ({
       )}
     </div>
   );
+};
+
+const isChecked = (value: string, valueChecked: string[]) => {
+  const findCheck = valueChecked?.find((item) => item === value);
+  return findCheck ? true : false;
 };

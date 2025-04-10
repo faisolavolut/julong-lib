@@ -74,6 +74,7 @@ export interface FieldProps {
   isDebounce?: boolean;
   data?: any;
   mode?: string;
+  valueChecked?: string[];
 }
 export const Field: React.FC<FieldProps> = ({
   fm,
@@ -109,6 +110,7 @@ export const Field: React.FC<FieldProps> = ({
   description,
   styleField,
   isDebounce = false,
+  valueChecked,
   mode,
 }) => {
   let result = null;
@@ -469,6 +471,7 @@ export const Field: React.FC<FieldProps> = ({
                   fm={fm}
                   fields={initField}
                   name={name}
+                  valueChecked={valueChecked}
                   disabled={is_disable}
                   className={className}
                   onChange={onChange}
