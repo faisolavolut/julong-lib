@@ -289,6 +289,7 @@ export const FilePreviewBetter = ({
     </div>
   );
   if (
+    file?.fullname &&
     [".png", ".jpeg", ".jpg", ".webp"].find((e) => file?.fullname.endsWith(e))
   ) {
     content = (
