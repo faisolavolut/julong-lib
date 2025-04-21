@@ -7,22 +7,28 @@ export const findLastEducation = (
   if (!Array.isArray(userEducation) || userEducation.length === 0) {
     return null; // Jika array kosong, kembalikan null
   }
-
-  const educationMapping: Record<string, string | string[]> = {
-    SD: "8 - Elementary School",
-    "SD 小学": "8 - Elementary School",
-    SLTP: "10 - Junior High School",
-    "SLTP 中学": "10 - Junior High School",
-    SLTA: "9 - Senior High School",
-    "SLTA 高学": "9 - Senior High School",
-    "D 1": "4 - Diploma 1",
-    "D 2": "5 - Diploma 2",
-    "D 3": "6 - Diploma 3",
-    "D 1/2/3": ["4 - Diploma 1", "5 - Diploma 2", "6 - Diploma 3"], // Cari D1/D2/D3 tertinggi & terbaru
-    S1: ["3 - Bachelor", "7 - Diploma 4"], // S1 setara dengan D4
-    S2: "2 - Master Degree",
-    "S2 研究": "2 - Master Degree",
-    S3: "1 - Doctoral / Professor",
+  const educationMapping: Record<string, string[]> = {
+    SD: ["8 - Elementary School", "SD"],
+    "SD 小学": ["8 - Elementary School", "SD"],
+    SLTP: ["10 - Junior High School", "SMP"],
+    "SLTP 中学": ["10 - Junior High School", "SMP"],
+    SLTA: ["9 - Senior High School", "SMA"],
+    "SLTA 高学": ["9 - Senior High School", "SMA"],
+    "D 1": ["4 - Diploma 1", "D1"],
+    "D 2": ["5 - Diploma 2", "D2"],
+    "D 3": ["6 - Diploma 3", "D3"],
+    "D 1/2/3": [
+      "4 - Diploma 1",
+      "5 - Diploma 2",
+      "6 - Diploma 3",
+      "D1",
+      "D2",
+      "D3",
+    ],
+    S1: ["3 - Bachelor", "7 - Diploma 4", "S1", "D4"],
+    S2: ["2 - Master Degree", "S2"],
+    "S2 研究": ["2 - Master Degree", "S2"],
+    S3: ["1 - Doctoral / Professor", "S3"],
   };
 
   const mappedValue = educationMapping[searchTerm];
