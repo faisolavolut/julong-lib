@@ -368,15 +368,30 @@ export const TypeInput: React.FC<any> = ({
       type = "text";
     }
   }
+
+  const latestValueRef = React.useRef<string | null>(null);
+
   const debouncedOnChange = React.useMemo(
     () =>
-      debounce((event: React.ChangeEvent<HTMLInputElement>) => {
-        if (typeof onChange === "function") {
-          onChange(fm.data[name]);
+      debounce(() => {
+        if (typeof onChange === "function" && latestValueRef.current !== null) {
+          console.log("onChange", latestValueRef.current);
+          onChange(latestValueRef.current);
         }
-      }, 1500),
+      }, 1000),
     []
   );
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    latestValueRef.current = event.currentTarget.value; // Simpan nilai terbaru
+    debouncedOnChange(); // Panggil fungsi debounce
+  };
+
+  useEffect(() => {
+    return () => {
+      debouncedOnChange.cancel(); // Bersihkan debounce saat komponen unmount
+    };
+  }, [debouncedOnChange]);
   return (
     <>
       <Input
@@ -402,16 +417,15 @@ export const TypeInput: React.FC<any> = ({
         value={value}
         type={!type ? "text" : type_field}
         onChange={(ev) => {
+          setInputValue(ev.currentTarget.value);
           fm.data[name] = ev.currentTarget.value;
           fm.render();
           if (!isDebounce) {
             if (typeof onChange === "function") {
-              onChange(fm.data[name]);
+              onChange(ev.currentTarget.value);
             }
           } else {
-            setInputValue(ev.currentTarget.value);
-            debouncedOnChange(inputValue);
-            return () => debouncedOnChange.cancel();
+            handleInputChange(ev);
           }
         }}
       />
