@@ -376,6 +376,8 @@ export const TypeInput: React.FC<any> = ({
       debounce(() => {
         if (typeof onChange === "function" && latestValueRef.current !== null) {
           console.log("onChange", latestValueRef.current);
+          fm.data[name] = latestValueRef.current;
+          fm.render();
           onChange(latestValueRef.current);
         }
       }, 1000),
