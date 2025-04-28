@@ -323,13 +323,14 @@ export const TableList = <T extends object>({
   };
   useEffect(() => {
     try {
-      if (Array.isArray(column) && column?.length) {
-        const dateIndices = Array.isArray(column)
-          ? column
+      const col = typeof column === "function" ? column() : column;
+      if (Array.isArray(col) && col?.length) {
+        const dateIndices = Array.isArray(col)
+          ? col
               .map((e, index) => (e.type === "date" ? index : -1))
               .filter((index) => index !== -1)
           : [];
-        const result: FieldFilterProps[] = column
+        const result: FieldFilterProps[] = col
           .filter(
             (e, index) =>
               e.filter !== false &&
@@ -362,6 +363,7 @@ export const TableList = <T extends object>({
             pagination: e?.pagination,
             search: e?.search,
           }));
+        console.log({ result });
         local.fieldFilter = result;
         local.render();
       }
