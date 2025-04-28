@@ -324,11 +324,16 @@ export const TableList = <T extends object>({
   useEffect(() => {
     try {
       if (Array.isArray(column) && column?.length) {
-        const dateIndex = column.findIndex((e) => e.type === "date");
+        const dateIndices = Array.isArray(column)
+          ? column
+              .map((e, index) => (e.type === "date" ? index : -1))
+              .filter((index) => index !== -1)
+          : [];
         const result: FieldFilterProps[] = column
           .filter(
             (e, index) =>
-              e.filter !== false && (e.type !== "date" || index === dateIndex)
+              e.filter !== false &&
+              (e.type !== "date" || dateIndices.includes(index))
           ) // Hapus jika `false`
           .map((e) => ({
             nameFilter: e?.nameFilter,
