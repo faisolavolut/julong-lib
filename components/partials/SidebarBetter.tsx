@@ -25,6 +25,9 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 import ImageBetter from "../ui/Image";
+import { ListUI } from "../list/ListUI";
+import { apix } from "@/lib/utils/apix";
+import { getNumber } from "@/lib/utils/getNumber";
 
 interface TreeMenuItem {
   title: string;
@@ -527,7 +530,7 @@ const SidebarBetterTree: React.FC<TreeMenuProps> = ({
             <Popover
               classNameTrigger={cx("flex flex-row justify-center flex-grow")}
               popoverClassName={cx(
-                "max-w-[24rem]  bg-white shadow-lg rounded-lg"
+                "w-[24rem] h-[32rem] bg-white shadow-lg rounded-lg"
               )}
               placement={"right-start"}
               arrow={false}
@@ -537,79 +540,62 @@ const SidebarBetterTree: React.FC<TreeMenuProps> = ({
               }}
               open={notification}
               content={
-                <div className="max-w-[24rem]">
+                <div className="flex-grow w-full h-full flex flex-col">
                   <div className="block rounded-t-xl bg-gray-50 py-2 px-4 text-center text-base font-medium text-gray-700">
                     Notifications
                   </div>
-                  <div className="flex flex-col">
-                    <a
-                      href="#"
-                      className="flex border-y py-3 px-4 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-600"
-                    >
-                      <div className="w-full pl-3">
-                        <div className="mb-1.5 text-md font-normal text-gray-500 ">
-                          New message from&nbsp;
-                          <span className="font-semibold text-gray-900 ">
-                            Bonnie Green
-                          </span>
-                          : "Hey, what's up? All set for the presentation?"
-                        </div>
-                        <div className="text-md font-medium text-primary-700 ">
-                          a few moments ago
-                        </div>
-                      </div>
-                    </a>
-                    <a
-                      href="#"
-                      className="flex border-y py-3 px-4 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-600"
-                    >
-                      <div className="w-full pl-3">
-                        <div className="mb-1.5 text-md font-normal text-gray-500 ">
-                          New message from&nbsp;
-                          <span className="font-semibold text-gray-900 ">
-                            Bonnie Green
-                          </span>
-                          : "Hey, what's up? All set for the presentation?"
-                        </div>
-                        <div className="text-md font-medium text-primary-700 ">
-                          a few moments ago
-                        </div>
-                      </div>
-                    </a>
-                    <a
-                      href="#"
-                      className="flex border-y py-3 px-4 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-600"
-                    >
-                      <div className="w-full pl-3">
-                        <div className="mb-1.5 text-md font-normal text-gray-500 ">
-                          New message from&nbsp;
-                          <span className="font-semibold text-gray-900 ">
-                            Bonnie Green
-                          </span>
-                          : "Hey, what's up? All set for the presentation?"
-                        </div>
-                        <div className="text-md font-medium text-primary-700 ">
-                          a few moments ago
-                        </div>
-                      </div>
-                    </a>
-                    <a
-                      href="#"
-                      className="flex border-y py-3 px-4 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-600"
-                    >
-                      <div className="w-full pl-3">
-                        <div className="mb-1.5 text-md font-normal text-gray-500 ">
-                          New message from&nbsp;
-                          <span className="font-semibold text-gray-900 ">
-                            Bonnie Green
-                          </span>
-                          : "Hey, what's up? All set for the presentation?"
-                        </div>
-                        <div className="text-md font-medium text-primary-700 ">
-                          a few moments ago
-                        </div>
-                      </div>
-                    </a>
+                  <div className="flex flex-col flex-grow">
+                    <ListUI
+                      className={"border-none py-0"}
+                      classNameContainer={"gap-y-0"}
+                      classNameScrollArea={"p-0"}
+                      name="todo"
+                      content={({ item }: any) => {
+                        return (
+                          <>
+                            <a
+                              href="#"
+                              className="flex border-y py-3 px-4 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-600"
+                            >
+                              <div className="w-full pl-3">
+                                <div className="mb-1.5 text-md font-normal text-gray-500 ">
+                                  New message from&nbsp;
+                                  <span className="font-semibold text-gray-900 ">
+                                    Bonnie Green
+                                  </span>
+                                  : "Hey, what's up? All set for the
+                                  presentation?"
+                                </div>
+                                <div className="text-md font-medium text-primary-700 ">
+                                  a few moments ago
+                                </div>
+                              </div>
+                            </a>
+                          </>
+                        );
+                      }}
+                      onLoad={async (param: any) => {
+                        const params = await events("onload-param", {
+                          ...param,
+                        });
+                        const result: any = await apix({
+                          port: "recruitment",
+                          value: "data.data.job_postings",
+                          path: `/api/job-postings${params}`,
+                          validate: "array",
+                        });
+                        return result;
+                      }}
+                      onCount={async () => {
+                        const result: any = await apix({
+                          port: "recruitment",
+                          value: "data.data.total",
+                          path: `/api/job-postings?page=1&page_size=1`,
+                          validate: "object",
+                        });
+                        return getNumber(result);
+                      }}
+                    />
                   </div>
                   <a
                     href="#"

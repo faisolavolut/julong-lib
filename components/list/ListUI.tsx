@@ -3,9 +3,11 @@ import React from "react";
 import { useLocal } from "@/lib/utils/use-local";
 import get from "lodash.get";
 import { ListBetter } from "../tablelist/List";
+import { cn } from "@/lib/utils";
 export const ListUI: React.FC<any> = ({
   tabHeader,
   className,
+  classNameScrollArea,
   name,
   modeTab,
   column,
@@ -29,6 +31,7 @@ export const ListUI: React.FC<any> = ({
   tab,
   onTab,
   breadcrumb,
+  classNameContainer,
   content,
   ready = true,
 }) => {
@@ -50,7 +53,7 @@ export const ListUI: React.FC<any> = ({
   }
   return (
     <div
-      className={cx(
+      className={cn(
         "flex flex-col flex-grow  rounded-lg border border-gray-200 py-2 overflow-hidden",
         className
       )}
@@ -70,6 +73,8 @@ export const ListUI: React.FC<any> = ({
           <div className="w-full flex flex-row flex-grow  overflow-hidden ">
             <ListBetter
               name={name}
+              classNameScrollArea={classNameScrollArea}
+              classNameContainer={classNameContainer}
               content={content}
               onLoad={onLoad}
               onCount={async (params: any) => {

@@ -5,8 +5,11 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
 import get from "lodash.get";
+import { cn } from "@/lib/utils";
 
 export const ListBetter: React.FC<any> = ({
+  classNameContainer,
+  classNameScrollArea,
   autoPagination = true,
   name,
   column,
@@ -279,7 +282,10 @@ export const ListBetter: React.FC<any> = ({
     <>
       <div className="tbl-wrapper flex flex-grow flex-col">
         <ScrollArea
-          className="w-full h-full flex flex-col gap-y-4 p-4"
+          className={cn(
+            "w-full h-full flex flex-col gap-y-4 p-4",
+            classNameScrollArea
+          )}
           reload={reload}
         >
           {!local.ready ? (
@@ -289,7 +295,12 @@ export const ListBetter: React.FC<any> = ({
               </div>
             </>
           ) : (
-            <div className="flex-grow flex flex-col gap-y-4">
+            <div
+              className={cn(
+                "flex-grow flex flex-col gap-y-4",
+                classNameContainer
+              )}
+            >
               {Array.isArray(local.data) && local.data?.length ? (
                 local.data?.map((e, idx) => {
                   return (
