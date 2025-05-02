@@ -53,10 +53,14 @@ const SidebarBetterTree: React.FC<TreeMenuProps> = ({
   const [currentPage, setCurrentPage] = useState("");
   const [notification, setNotification] = useState(false as boolean);
   const [profile, setProfile] = useState(false as boolean);
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [notifications, setNotifications] = useState<any[]>([]);
   const local = useLocal({
     data: data,
     ready: false as boolean,
   });
+  /// ws//julong-notification.avolut.com/ws
+
   useEffect(() => {
     if (typeof location === "object") {
       const newPage = window.location.pathname;
@@ -75,7 +79,49 @@ const SidebarBetterTree: React.FC<TreeMenuProps> = ({
       run();
     }
   }, []);
-
+  useEffect(() => {
+    const run = async () => {
+      const count: any = await apix({
+        port: "notification",
+        value: "data.data",
+        path: `/api/v1/notifications/unread/count?user_id=${get_user(
+          "id"
+        )}&application=${process.env.NEXT_PUBLIC_NOTIFICATION_TYPE}`,
+        method: "get",
+      });
+      console.log(count);
+      setNotificationCount(count);
+      const wsCount = new WebSocket(
+        `wss://${
+          process.env.NEXT_PUBLIC_API_NOTIFICATION
+        }/ws?user_id=${get_user("id")}&app_type=${
+          process.env.NEXT_PUBLIC_NOTIFICATION_TYPE
+        }`
+      );
+      wsCount.onopen = () => {
+        console.log("WebSocket (count) connection established");
+      };
+      wsCount.onmessage = (event) => {
+        console.log(event);
+        const data = JSON.parse(event.data);
+        console.log("WebSocket (count) message received:", data);
+        setNotificationCount(data?.unread_count);
+        // setNotifications((prev) => [data.notification, ...prev]);
+      };
+      wsCount.onerror = (error) => {
+        console.error("WebSocket (count) error:", error);
+      };
+      wsCount.onclose = () => {
+        console.log("WebSocket (count) connection closed");
+      };
+      return () => {
+        if (wsCount.readyState === WebSocket.OPEN) {
+          wsCount.close();
+        }
+      };
+    };
+    run();
+  }, []);
   const isChildActive = (items: TreeMenuItem[]): boolean => {
     return items.some((item) => {
       if (item.href && currentPage.startsWith(item.href)) return true;
@@ -576,6 +622,7 @@ const SidebarBetterTree: React.FC<TreeMenuProps> = ({
                         );
                       }}
                       onLoad={async (param: any) => {
+                        return notifications;
                         const params = await events("onload-param", {
                           ...param,
                         });
@@ -643,6 +690,17 @@ const SidebarBetterTree: React.FC<TreeMenuProps> = ({
                         d="M6 19v-9a6 6 0 0 1 6-6v0a6 6 0 0 1 6 6v9M6 19h12M6 19H4m14 0h2m-9 3h2"
                       ></path>
                       <circle cx={12} cy={3} r={1}></circle>
+                      {mini && notificationCount > 0 ? (
+                        <circle
+                          cx="18"
+                          cy="6"
+                          r="4"
+                          fill="red"
+                          stroke="white"
+                        />
+                      ) : (
+                        <></>
+                      )}
                     </g>
                   </svg>
                 </div>
@@ -650,7 +708,7 @@ const SidebarBetterTree: React.FC<TreeMenuProps> = ({
                   <div className="flex flex-row gap-x-2 items-center">
                     Notifications{" "}
                     <div className="p-0.5 text-2xs rounded-full bg-red-500 text-white min-w-6 h-6 flex flex-row items-center justify-center">
-                      912
+                      {notificationCount}
                     </div>
                   </div>
                 )}

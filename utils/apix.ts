@@ -2,7 +2,13 @@ import get from "lodash.get";
 import api from "./axios";
 
 type apixType = {
-  port: "portal" | "recruitment" | "mpp" | "public" | "onboarding";
+  port:
+    | "portal"
+    | "recruitment"
+    | "mpp"
+    | "public"
+    | "onboarding"
+    | "notification";
   path: string;
   method?: "get" | "delete" | "post" | "put";
   data?: any;
@@ -38,6 +44,8 @@ export const apix = async ({
       ? process.env.NEXT_PUBLIC_API_MPP
       : port === "onboarding"
       ? process.env.NEXT_PUBLIC_API_ONBOARDING
+      : port === "notification"
+      ? `https://${process.env.NEXT_PUBLIC_API_NOTIFICATION}`
       : port === "public"
       ? process.env.NEXT_PUBLIC_BASE_URL
       : ""
